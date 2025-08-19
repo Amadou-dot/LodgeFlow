@@ -5,6 +5,7 @@ import { Link } from '@heroui/link';
 
 import { subtitle, title } from '@/components/primitives';
 import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function DiningPage() {
   const menuCategories = [
@@ -195,12 +196,14 @@ export default function DiningPage() {
               </Chip>
             </div>
           </div>
-          <div className='relative'>
-            <div className='w-full h-80 bg-gradient-to-br from-orange-200 to-red-200 dark:from-orange-800 dark:to-red-800 rounded-2xl flex items-center justify-center'>
-              <span className='text-orange-700 dark:text-orange-300 text-lg font-medium'>
-                Farm to Table Excellence
-              </span>
-            </div>
+          <div className='relative h-64 lg:h-80'>
+            <Image
+              src='https://images.unsplash.com/photo-1684954215462-cad9f3693b41?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+              alt='Dining Philosophy'
+              fill
+              style={{ objectFit: 'cover' }}
+              className='rounded-2xl'
+            />
           </div>
         </div>
       </section>

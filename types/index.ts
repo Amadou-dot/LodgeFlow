@@ -1,8 +1,9 @@
-import { SVGProps } from "react";
-import type { ICabin } from "@/models/Cabin";
-import type { ICustomer } from "@/models/Customer";
-import type { IBooking } from "@/models/Booking";
-import type { ISettings } from "@/models/Settings";
+import type { IBooking } from '@/models/Booking';
+import type { ICabin } from '@/models/Cabin';
+import type { ICustomer } from '@/models/Customer';
+import type { IExperience } from '@/models/Experience';
+import type { ISettings } from '@/models/Settings';
+import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -13,12 +14,13 @@ export type Cabin = ICabin;
 export type Customer = ICustomer;
 export type Booking = IBooking;
 export type Settings = ISettings;
+export type Experience = IExperience;
 
 // Extended types for populated models (used in API responses)
 export interface PopulatedBooking
   extends Omit<
     IBooking,
-    "cabin" | "customer" | "checkInDate" | "checkOutDate"
+    'cabin' | 'customer' | 'checkInDate' | 'checkOutDate'
   > {
   cabin: ICabin;
   customer: ICustomer;
@@ -79,7 +81,7 @@ export interface CreateCustomerData {
     relationship: string;
   };
   preferences?: {
-    smokingPreference?: "smoking" | "non-smoking" | "no-preference";
+    smokingPreference?: 'smoking' | 'non-smoking' | 'no-preference';
     dietaryRestrictions?: string[];
     accessibilityNeeds?: string[];
   };
@@ -102,4 +104,43 @@ export interface AvailabilityQuery {
 export interface AvailableCabin extends ICabin {
   isAvailable: boolean;
   conflictingBookings?: string[];
+}
+
+// Experience-related types
+export interface ExperienceQueryParams {
+  category?: string;
+  difficulty?: 'Easy' | 'Moderate' | 'Challenging';
+  minPrice?: number;
+  maxPrice?: number;
+  isPopular?: boolean;
+  tags?: string[];
+}
+
+export interface CreateExperienceData {
+  name: string;
+  price: number;
+  duration: string;
+  difficulty: 'Easy' | 'Moderate' | 'Challenging';
+  category: string;
+  description: string;
+  longDescription?: string;
+  image: string;
+  gallery?: string[];
+  includes: string[];
+  available: string[];
+  ctaText: string;
+  isPopular?: boolean;
+  maxParticipants?: number;
+  minAge?: number;
+  requirements?: string[];
+  location?: string;
+  highlights?: string[];
+  whatToBring?: string[];
+  cancellationPolicy?: string;
+  seasonality?: string;
+  tags?: string[];
+}
+
+export interface UpdateExperienceData extends Partial<CreateExperienceData> {
+  _id: string;
 }
