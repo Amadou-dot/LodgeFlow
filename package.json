@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",

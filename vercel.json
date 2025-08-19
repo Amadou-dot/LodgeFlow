@@ -1,0 +1,4 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile --network-timeout 300000",
+  "buildCommand": "pnpm run build"
+}
