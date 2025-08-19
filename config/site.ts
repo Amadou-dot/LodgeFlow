@@ -1,58 +1,50 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "The Wild Oasis",
+  description: "Welcome to paradise. Escape to luxury in the heart of nature at The Wild Oasis.",
   navItems: [
     {
       label: "Home",
       href: "/",
     },
     {
-      label: "Docs",
-      href: "/docs",
+      label: "Cabins",
+      href: "/cabins",
     },
     {
-      label: "Pricing",
-      href: "/pricing",
+      label: "Experiences",
+      href: "/experiences",
     },
     {
-      label: "Blog",
-      href: "/blog",
+      label: "Dining",
+      href: "/dining",
     },
     {
       label: "About",
       href: "/about",
     },
+    {
+      label: "Contact",
+      href: "/contact",
+    },
   ],
   navMenuItems: [
+    {
+      label: "My Bookings",
+      href: "/bookings",
+    },
     {
       label: "Profile",
       href: "/profile",
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
+      label: "Preferences",
+      href: "/preferences",
     },
     {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
+      label: "Help & Support",
+      href: "/help",
     },
     {
       label: "Logout",
@@ -60,10 +52,9 @@ export const siteConfig = {
     },
   ],
   links: {
-    github: "https://github.com/heroui-inc/heroui",
-    twitter: "https://twitter.com/hero_ui",
-    docs: "https://heroui.com",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
+    reservations: "tel:+1-800-WILD-OASIS",
+    email: "mailto:hello@thewildoasis.com",
+    instagram: "https://instagram.com/#",
+    facebook: "https://facebook.com/#",
   },
 };

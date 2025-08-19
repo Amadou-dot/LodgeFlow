@@ -1,0 +1,208 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB, Booking, Customer, Cabin, Settings } from "@/models";
+import type { ApiResponse, CreateBookingData, CreateCustomerData } from "@/types";
+
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
+
+    const body = await request.json();
+    const { 
+      cabin: cabinId, 
+      customer: customerData, 
+      checkInDate, 
+      checkOutDate, 
+      numGuests,
+      extras = {},
+      specialRequests = [],
+      observations 
+    } = body;
+
+    // Validate required fields
+    if (!cabinId || !customerData || !checkInDate || !checkOutDate || !numGuests) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Missing required fields",
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn >= checkOut) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Check-out date must be after check-in date",
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
+    // Check if cabin exists and is available
+    const cabin = await Cabin.findById(cabinId);
+    if (!cabin) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Cabin not found",
+      };
+      return NextResponse.json(response, { status: 404 });
+    }
+
+    if (numGuests > cabin.capacity) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: `Cabin capacity exceeded. Maximum guests: ${cabin.capacity}`,
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
+    // Check for conflicting bookings
+    const conflictingBookings = await Booking.find({
+      cabin: cabinId,
+      status: { $nin: ["cancelled"] },
+      $or: [
+        {
+          checkInDate: { $lt: checkOut },
+          checkOutDate: { $gt: checkIn },
+        },
+      ],
+    });
+
+    if (conflictingBookings.length > 0) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "Cabin is not available for the selected dates",
+      };
+      return NextResponse.json(response, { status: 409 });
+    }
+
+    // Get settings for pricing
+    const settings = await Settings.findOne().sort({ createdAt: -1 });
+    if (!settings) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: "System settings not found",
+      };
+      return NextResponse.json(response, { status: 500 });
+    }
+
+    // Calculate nights and pricing
+    const numNights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (numNights < settings.minBookingLength || numNights > settings.maxBookingLength) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: `Booking length must be between ${settings.minBookingLength} and ${settings.maxBookingLength} nights`,
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
+    // Calculate prices
+    const effectivePrice = cabin.price - cabin.discount;
+    const cabinPrice = effectivePrice * numNights;
+
+    let extrasPrice = 0;
+    const bookingExtras = {
+      hasBreakfast: extras.hasBreakfast || false,
+      breakfastPrice: 0,
+      hasPets: extras.hasPets || false,
+      petFee: 0,
+      hasParking: extras.hasParking || false,
+      parkingFee: 0,
+      hasEarlyCheckIn: extras.hasEarlyCheckIn || false,
+      earlyCheckInFee: 0,
+      hasLateCheckOut: extras.hasLateCheckOut || false,
+      lateCheckOutFee: 0,
+    };
+
+    if (bookingExtras.hasBreakfast) {
+      bookingExtras.breakfastPrice = settings.breakfastPrice * numGuests * numNights;
+      extrasPrice += bookingExtras.breakfastPrice;
+    }
+
+    if (bookingExtras.hasPets && settings.allowPets) {
+      bookingExtras.petFee = settings.petFee * numNights;
+      extrasPrice += bookingExtras.petFee;
+    }
+
+    if (bookingExtras.hasParking && !settings.parkingIncluded) {
+      bookingExtras.parkingFee = settings.parkingFee * numNights;
+      extrasPrice += bookingExtras.parkingFee;
+    }
+
+    if (bookingExtras.hasEarlyCheckIn) {
+      bookingExtras.earlyCheckInFee = settings.earlyCheckInFee;
+      extrasPrice += bookingExtras.earlyCheckInFee;
+    }
+
+    if (bookingExtras.hasLateCheckOut) {
+      bookingExtras.lateCheckOutFee = settings.lateCheckOutFee;
+      extrasPrice += bookingExtras.lateCheckOutFee;
+    }
+
+    const totalPrice = cabinPrice + extrasPrice;
+    const depositAmount = settings.requireDeposit 
+      ? Math.round(totalPrice * (settings.depositPercentage / 100))
+      : 0;
+
+    // Create or find customer
+    let customer = await Customer.findOne({ email: customerData.email });
+    
+    if (!customer) {
+      customer = await Customer.create(customerData);
+    } else {
+      // Update customer info if provided
+      Object.assign(customer, customerData);
+      await customer.save();
+    }
+
+    // Create booking
+    const booking = await Booking.create({
+      cabin: cabinId,
+      customer: customer._id,
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      numNights,
+      numGuests,
+      status: "unconfirmed",
+      cabinPrice: effectivePrice,
+      extrasPrice,
+      totalPrice,
+      isPaid: false,
+      paymentMethod: "online",
+      extras: bookingExtras,
+      observations,
+      specialRequests,
+      depositPaid: false,
+      depositAmount,
+    });
+
+    // Update customer statistics
+    await Customer.findByIdAndUpdate(customer._id, {
+      $inc: { totalBookings: 1, totalSpent: totalPrice },
+      lastBookingDate: new Date(),
+    });
+
+    // Populate the booking for response
+    const populatedBooking = await Booking.findById(booking._id)
+      .populate("cabin")
+      .populate("customer");
+
+    const response: ApiResponse<any> = {
+      success: true,
+      data: populatedBooking,
+      message: "Booking created successfully",
+    };
+
+    return NextResponse.json(response, { status: 201 });
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    
+    const response: ApiResponse<never> = {
+      success: false,
+      error: "Failed to create booking",
+    };
+
+    return NextResponse.json(response, { status: 500 });
+  }
+}
