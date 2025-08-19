@@ -42,7 +42,7 @@ export function TeamGrid({
   );
 }
 
-function TeamMemberCard({ name, role, bio, image, organization = 'Wild Oasis Team' }: TeamMemberProps) {
+function TeamMemberCard({ name, role, bio, image, organization = 'LodgeFlow Team' }: TeamMemberProps) {
   const initials = name
     .split(' ')
     .map(n => n[0])

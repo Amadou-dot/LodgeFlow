@@ -51,9 +51,9 @@ export default function RootLayout({
                 isExternal
                 className='flex items-center gap-1 text-current'
                 href={siteConfig.links.email}
-                title='The Wild Oasis Contact'>
+                title='LodgeFlow Contact'>
                 <span className='text-default-600'>© 2024</span>
-                <p className='text-primary'>The Wild Oasis</p>
+                <p className='text-primary'>LodgeFlow</p>
               </Link>
             </footer>
           </div>

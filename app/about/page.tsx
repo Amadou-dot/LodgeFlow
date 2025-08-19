@@ -50,7 +50,7 @@ export default function AboutPage() {
     {
       name: 'Sarah Chen',
       role: 'Co-Founder & CEO',
-      bio: 'A passionate advocate for sustainable tourism, Sarah leads The Wild Oasis with a vision to harmonize luxury and nature.',
+      bio: 'A passionate advocate for sustainable tourism, Sarah leads LodgeFlow with a vision to harmonize luxury and nature.',
       image: '/images/team/sarah.jpg',
     },
     {
@@ -74,7 +74,7 @@ export default function AboutPage() {
     {
       name: 'Sophia Patel',
       role: 'Marketing Director',
-      bio: 'Sophia brings a wealth of experience in luxury branding and marketing, ensuring The Wild Oasis reaches those who seek its unique offerings.',
+      bio: 'Sophia brings a wealth of experience in luxury branding and marketing, ensuring LodgeFlow reaches those who seek its unique offerings.',
       image: '/images/team/sophia.jpg',
     },
     {
@@ -90,8 +90,8 @@ export default function AboutPage() {
       {/* Hero Section */}
       <PageHeader 
         title="About"
-        titleAccent="The Wild Oasis"
-        subtitle="Nestled in the heart of pristine wilderness, The Wild Oasis has been a sanctuary for those seeking to reconnect with nature's tranquility since 2009."
+        titleAccent="LodgeFlow"
+        subtitle="Nestled in the heart of pristine wilderness, LodgeFlow has been a sanctuary for those seeking to reconnect with nature's tranquility since 2009."
       />
 
       {/* Story Section */}
@@ -109,8 +109,8 @@ export default function AboutPage() {
               luxury and nature's raw beauty.
             </p>
             <p>
-              Founded by environmental enthusiasts Sarah and Michael Chen, The
-              Wild Oasis was born from their vision of sustainable luxury
+              Founded by environmental enthusiasts Sarah and Michael Chen, 
+              LodgeFlow was born from their vision of sustainable luxury
               tourism. After years of traveling the world, they discovered this
               untouched valley and knew they had found something special.
             </p>
@@ -133,7 +133,7 @@ export default function AboutPage() {
         <div className='relative'>
           <div className='w-full h-96 bg-gradient-to-br from-green-200 to-blue-200 dark:from-green-800 dark:to-blue-800 rounded-2xl flex items-center justify-center'>
             <span className='text-green-700 dark:text-green-300 text-lg font-medium'>
-              The Wild Oasis Story
+              LodgeFlow Story
             </span>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function AboutPage() {
       <section>
         <SectionHeader 
           title="Our Values"
-          subtitle="The principles that guide everything we do at The Wild Oasis"
+          subtitle="The principles that guide everything we do at LodgeFlow"
           className="mb-12"
         />
         <ValuesGrid values={values} />
@@ -158,7 +158,7 @@ export default function AboutPage() {
       <section>
         <SectionHeader 
           title="Meet Our Team"
-          subtitle="The passionate people who make your Wild Oasis experience unforgettable"
+          subtitle="The passionate people who make your LodgeFlow experience unforgettable"
           className="mb-12"
         />
         <TeamGrid members={team} maxDisplay={6} />
@@ -166,7 +166,7 @@ export default function AboutPage() {
 
       {/* Call to Action */}
       <CallToActionSection 
-        title="Ready to Experience The Wild Oasis?"
+        title="Ready to Experience LodgeFlow?"
         subtitle="Join thousands of guests who have discovered their perfect escape in nature"
         buttons={[
           {

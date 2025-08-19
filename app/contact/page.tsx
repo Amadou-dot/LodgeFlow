@@ -13,19 +13,19 @@ export default function ContactPage() {
     {
       icon: <FiPhone className='w-5 h-5 text-green-600' />,
       title: 'Phone',
-      lines: ['+1 (800) WILD-OASIS', '+1 (800) 945-3627'],
+      lines: ['+1 (800) LODGEFLOW', '+1 (800) 563-4335'],
       subtitle: 'Daily: 8:00 AM - 10:00 PM'
     },
     {
       icon: <FiMail className='w-5 h-5 text-green-600' />,
       title: 'Email',
-      lines: ['hello@thewildoasis.com', 'reservations@thewildoasis.com'],
+      lines: ['hello@lodgeflow.com', 'reservations@lodgeflow.com'],
       subtitle: 'We respond within 2 hours'
     },
     {
       icon: <FiMapPin className='w-5 h-5 text-green-600' />,
       title: 'Location',
-      lines: ['The Wild Oasis Resort', '1000 Wilderness Drive', 'Pine Valley, MT 59718']
+      lines: ['LodgeFlow Resort', '1000 Wilderness Drive', 'Pine Valley, MT 59718']
     }
   ];
 
@@ -35,7 +35,7 @@ export default function ContactPage() {
       <PageHeader 
         title="Contact"
         titleAccent="Us"
-        subtitle="We're here to help you plan the perfect escape to The Wild Oasis. Get in touch with our team for any questions or assistance."
+        subtitle="We're here to help you plan the perfect escape to LodgeFlow. Get in touch with our team for any questions or assistance."
       />
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
@@ -147,11 +147,11 @@ export default function ContactPage() {
         </p>
         <Button
           as={Link}
-          href='tel:+1-800-911-OASIS'
+          href='tel:+1-800-911-FLOW'
           color='warning'
           size='lg'
           startContent={<FiAlertTriangle className='w-5 h-5' />}>
-          Emergency: +1 (800) 911-OASIS
+          Emergency: +1 (800) 911-FLOW
         </Button>
       </section>
     </div>

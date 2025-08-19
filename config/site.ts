@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "The Wild Oasis",
-  description: "Welcome to paradise. Escape to luxury in the heart of nature at The Wild Oasis.",
+  name: "LodgeFlow",
+  description: "Welcome to paradise. Escape to luxury in the heart of nature at LodgeFlow.",
   navItems: [
     {
       label: "Home",
@@ -52,8 +52,8 @@ export const siteConfig = {
     },
   ],
   links: {
-    reservations: "tel:+1-800-WILD-OASIS",
-    email: "mailto:hello@thewildoasis.com",
+    reservations: "tel:+1-800-LODGEFLOW",
+    email: "mailto:hello@lodgeflow.com",
     instagram: "https://instagram.com/#",
     facebook: "https://facebook.com/#",
   },

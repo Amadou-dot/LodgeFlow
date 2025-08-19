@@ -2,6 +2,7 @@ import { Link } from "@heroui/link";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
+import { Image } from "@heroui/image";
 import { FiPhone, FiMail } from "react-icons/fi";
 
 import { siteConfig } from "@/config/site";
@@ -31,16 +32,19 @@ export default async function Home() {
     {
       title: "Luxury Cabins",
       description: "Premium accommodations nestled in pristine wilderness",
+      image: "https://images.unsplash.com/photo-1740446568651-1d31966b228a?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       imagePlaceholder: "Luxury Cabins Image"
     },
     {
       title: "Fine Dining",
       description: "Gourmet cuisine crafted with local, organic ingredients",
+      image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       imagePlaceholder: "Fine Dining Image"
     },
     {
       title: "Nature Activities",
       description: "Hiking, fishing, wildlife watching, and more adventures",
+      image: "https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1746&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       imagePlaceholder: "Nature Activities Image"
     }
   ];
@@ -50,7 +54,7 @@ export default async function Home() {
       {/* Hero Section */}
       <HeroSection 
         title="Welcome to"
-        titleAccent="The Wild Oasis"
+        titleAccent="LodgeFlow"
         subtitle="Escape to paradise. Experience luxury in the heart of untouched nature, where comfort meets wilderness in perfect harmony."
         buttons={[
           {
@@ -70,7 +74,7 @@ export default async function Home() {
       <section className="container mx-auto px-6">
         <SectionHeader 
           title="Experience Nature's Luxury"
-          subtitle="Discover what makes The Wild Oasis the perfect retreat"
+          subtitle="Discover what makes LodgeFlow the perfect retreat"
           className="mb-12"
         />
         <FeatureGrid features={features} />
@@ -115,11 +119,16 @@ export default async function Home() {
                 </CardHeader>
                 <CardBody className="overflow-visible py-2">
                   <div className="relative mb-4">
-                    <div className="w-full h-48 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg flex items-center justify-center">
-                      <span className="text-green-600 dark:text-green-300 text-sm">
-                        {cabin.name} Image
-                      </span>
-                    </div>
+                    <Image
+                      src={cabin.image}
+                      alt={`${cabin.name} - Luxury cabin at LodgeFlow`}
+                      className="w-full h-48 object-cover rounded-lg"
+                      classNames={{
+                        wrapper: "w-full h-48",
+                        img: "w-full h-full object-cover"
+                      }}
+                      fallbackSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMjUgNzVMMTUwIDEwMEwxNzUgNzVMMjAwIDEwMFYxNTBIMTAwVjEwMEwxMjUgNzVaIiBmaWxsPSIjOUNBM0FGIi8+CjxjaXJjbGUgY3g9IjEzMCIgY3k9IjkwIiByPSI1IiBmaWxsPSIjOUNBM0FGIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjM3MzgxIiBmb250LXNpemU9IjEyIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+SW1hZ2UgTm90IEZvdW5kPC90ZXh0Pgo8L3N2Zz4K"
+                    />
                   </div>
                   <p className="text-default-500 text-small mb-4">{cabin.description}</p>
                   <Button
@@ -140,7 +149,7 @@ export default async function Home() {
       {/* Call to Action */}
       <CallToActionSection 
         title="Ready for Your Escape?"
-        subtitle="Book your perfect getaway at The Wild Oasis today and create memories that will last a lifetime."
+        subtitle="Book your perfect getaway at LodgeFlow today and create memories that will last a lifetime."
         buttons={[
           {
             label: "Browse All Cabins",
@@ -164,7 +173,7 @@ export default async function Home() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             as={Link}
-            href="tel:+1-800-WILD-OASIS"
+            href="tel:+1-800-LODGEFLOW"
             color="primary"
             startContent={<FiPhone className="w-4 h-4" />}
           >

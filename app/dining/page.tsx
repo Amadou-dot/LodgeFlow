@@ -128,7 +128,7 @@ export default function DiningPage() {
   const beverages = [
     {
       category: 'Local Craft Beer',
-      items: ['Wild Oasis IPA', 'Mountain Mist Lager', 'Seasonal Ales'],
+      items: ['LodgeFlow IPA', 'Mountain Mist Lager', 'Seasonal Ales'],
     },
     {
       category: 'Regional Wines',
@@ -168,7 +168,7 @@ export default function DiningPage() {
             <h2 className={title({ size: 'md' })}>Our Culinary Philosophy</h2>
             <div className='space-y-4 mt-6 text-default-600'>
               <p>
-                At The Wild Oasis, we believe great food connects us to the land
+                At LodgeFlow, we believe great food connects us to the land
                 and each other. Our executive chef works with local farmers,
                 foragers, and artisans to create menus that change with the
                 seasons.
@@ -360,7 +360,7 @@ export default function DiningPage() {
         <div className='flex flex-col sm:flex-row gap-4 justify-center'>
           <Button
             as={Link}
-            href='tel:+1-800-WILD-OASIS'
+            href='tel:+1-800-LODGEFLOW'
             color='primary'
             size='lg'
             startContent={<FaPhone className='w-4 h-4' />}>
@@ -368,7 +368,7 @@ export default function DiningPage() {
           </Button>
           <Button
             as={Link}
-            href='mailto:dining@thewildoasis.com'
+            href='mailto:dining@lodgeflow.com'
             variant='bordered'
             size='lg'
             startContent={<FaEnvelope className='w-4 h-4' />}>

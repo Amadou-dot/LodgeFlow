@@ -209,7 +209,7 @@ export default function ExperiencesPage() {
           },
           {
             label: "Call Now",
-            href: "tel:+1-800-WILD-OASIS",
+            href: "tel:+1-800-LODGEFLOW",
             variant: "bordered",
             startContent: <FiPhone className="w-4 h-4" />
           }
