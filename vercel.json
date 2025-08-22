@@ -1,4 +1,9 @@
 {
   "installCommand": "pnpm install --prefer-frozen-lockfile",
-  "buildCommand": "pnpm run build"
+  "buildCommand": "pnpm run build",
+  "functions": {
+    "app/**/*.js": {
+      "maxDuration": 30
+    }
+  }
 }

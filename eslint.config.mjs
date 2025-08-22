@@ -1,4 +1,3 @@
-import { defineConfig, globalIgnores } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import react from "eslint-plugin-react";
 import unusedImports from "eslint-plugin-unused-imports";
@@ -21,7 +20,9 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default defineConfig([globalIgnores([
+export default [
+{
+  ignores: [
     ".now/*",
     "**/*.css",
     "**/.changeset",
@@ -42,7 +43,8 @@ export default defineConfig([globalIgnores([
     "!**/plopfile.js",
     "!**/react-shim.js",
     "!**/tsup.config.ts",
-]), {
+  ]
+}, {
     extends: fixupConfigRules(compat.extends(
         "plugin:react/recommended",
         "plugin:prettier/recommended",
@@ -148,4 +150,4 @@ export default defineConfig([globalIgnores([
             next: ["const", "let", "var"],
         }],
     },
-}]);
+}];
