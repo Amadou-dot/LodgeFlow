@@ -1,4 +1,6 @@
 pnpm-lock.yaml
+yarn.lock
+package-lock.json
 node_modules
 .git
 .env.local
