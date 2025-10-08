@@ -1,149 +1,100 @@
+'use client';
+
 import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
 import { Link } from '@heroui/link';
+import { Spinner } from '@heroui/spinner';
 
 import { subtitle, title } from '@/components/primitives';
 import { FaEnvelope, FaPhone } from 'react-icons/fa';
 import Image from 'next/image';
+import { useDining } from '@/hooks/useDining';
+import type { Dining } from '@/types';
 
 export default function DiningPage() {
-  const menuCategories = [
-    {
-      name: 'Farm-to-Table Breakfast',
-      time: '6:30 AM - 10:00 AM',
-      description:
-        'Start your day with fresh, locally sourced ingredients prepared to perfection.',
-      dishes: [
-        {
-          name: 'Wild Berry Pancakes',
-          price: 18,
-          description: 'Fluffy pancakes with foraged berries and maple syrup',
-        },
-        {
-          name: 'Mountain Scramble',
-          price: 22,
-          description: 'Farm-fresh eggs with wild mushrooms and herbs',
-        },
-        {
-          name: 'Smoked Trout Benedict',
-          price: 26,
-          description: 'House-smoked trout on artisan bread with hollandaise',
-        },
-      ],
-    },
-    {
-      name: 'Artisan Lunch',
-      time: '12:00 PM - 3:00 PM',
-      description:
-        'Light, fresh meals perfect for fueling your outdoor adventures.',
-      dishes: [
-        {
-          name: 'Forest Forager Salad',
-          price: 24,
-          description: 'Seasonal greens with foraged mushrooms and nuts',
-        },
-        {
-          name: 'Grilled Rainbow Trout',
-          price: 28,
-          description: 'Locally caught trout with seasonal vegetables',
-        },
-        {
-          name: 'Wild Game Burger',
-          price: 26,
-          description: 'Sustainable venison with caramelized onions',
-        },
-      ],
-    },
-    {
-      name: 'Gourmet Dinner',
-      time: '6:00 PM - 9:00 PM',
-      description:
-        'Elevated dining experiences showcasing the best of regional cuisine.',
-      dishes: [
-        {
-          name: 'Elk Tenderloin',
-          price: 48,
-          description: 'Tender elk with juniper reduction and root vegetables',
-        },
-        {
-          name: 'Cedar Plank Salmon',
-          price: 42,
-          description: 'Wild-caught salmon with indigenous seasonings',
-        },
-        {
-          name: 'Seasonal Tasting Menu',
-          price: 85,
-          description:
-            "Chef's selection of 5 courses featuring local ingredients",
-        },
-      ],
-    },
-  ];
+  const { data: diningData, isLoading, error } = useDining();
 
-  const specialExperiences = [
-    {
-      name: "Chef's Table Experience",
-      price: 125,
-      duration: '3 hours',
-      description:
-        'Intimate dining with our executive chef, featuring a custom menu and wine pairings.',
-      includes: [
-        '7-course tasting menu',
-        'Wine pairings',
-        'Kitchen tour',
-        'Recipe cards',
-      ],
-      maxGuests: 8,
-    },
-    {
-      name: 'Wilderness Picnic',
-      price: 75,
-      duration: '4 hours',
-      description:
-        'Gourmet picnic basket delivered to your favorite scenic spot on the property.',
-      includes: [
-        'Gourmet basket',
-        'Blanket & setup',
-        'Location guide',
-        'Clean-up service',
-      ],
-      maxGuests: 6,
-    },
-    {
-      name: 'Campfire Cooking Class',
-      price: 95,
-      duration: '3 hours',
-      description:
-        'Learn traditional outdoor cooking techniques with our wilderness chef.',
-      includes: [
-        'Hands-on instruction',
-        'All ingredients',
-        'Recipe book',
-        'Full meal',
-      ],
-      maxGuests: 12,
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className='flex justify-center items-center min-h-screen'>
+        <Spinner size='lg' />
+      </div>
+    );
+  }
 
-  const beverages = [
-    {
-      category: 'Local Craft Beer',
-      items: ['LodgeFlow IPA', 'Mountain Mist Lager', 'Seasonal Ales'],
-    },
-    {
-      category: 'Regional Wines',
-      items: ['Valley Pinot Noir', 'Mountain Chardonnay', 'Wildflower Rosé'],
-    },
-    {
-      category: 'Artisan Spirits',
-      items: ['Locally Distilled Whiskey', 'Herbal Gin', 'Berry Liqueurs'],
-    },
-    {
-      category: 'Non-Alcoholic',
-      items: ['Fresh Pressed Juices', 'Herbal Teas', 'Mountain Spring Water'],
-    },
-  ];
+  if (error) {
+    return (
+      <div className='text-center py-8'>
+        <h2 className={title({ size: 'md' })}>Error Loading Dining Options</h2>
+        <p className='text-default-600 mt-4'>
+          We're having trouble loading the dining menu. Please try again later.
+        </p>
+      </div>
+    );
+  }
+
+  if (!diningData || diningData.length === 0) {
+    return (
+      <div className='space-y-12 py-8'>
+        {/* Header Section */}
+        <section className='text-center'>
+          <h1 className={title({ size: 'lg' })}>
+            Culinary{' '}
+            <span className={title({ color: 'green', size: 'lg' })}>
+              Excellence
+            </span>
+          </h1>
+          <p className={subtitle({ class: 'mt-4 max-w-3xl mx-auto' })}>
+            Experience farm-to-table dining at its finest. Our culinary team
+            transforms locally sourced, seasonal ingredients into unforgettable
+            meals that celebrate the flavors of our region.
+          </p>
+        </section>
+
+        <div className='text-center py-8'>
+          <h2 className={title({ size: 'md' })}>Coming Soon</h2>
+          <p className='text-default-600 mt-4'>
+            Our dining menu is being prepared. Please check back soon for our
+            complete culinary offerings.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  const menusByMealType = diningData?.filter(item => item.type === 'menu').reduce((acc, item) => {
+    if (!acc[item.mealType]) {
+      acc[item.mealType] = [];
+    }
+    acc[item.mealType].push(item);
+    return acc;
+  }, {} as Record<string, Dining[]>) || {};
+
+  // Get dining experiences
+  const diningExperiences = diningData?.filter(item => item.type === 'experience') || [];
+
+  // Group beverages by category
+  const beveragesByCategory = diningData?.filter(item => item.category !== 'regular').reduce((acc, item) => {
+    if (!acc[item.category]) {
+      acc[item.category] = [];
+    }
+    acc[item.category].push(item);
+    return acc;
+  }, {} as Record<string, Dining[]>) || {};
+
+  const mealTypeDisplayNames = {
+    breakfast: 'Farm-to-Table Breakfast',
+    lunch: 'Artisan Lunch', 
+    dinner: 'Gourmet Dinner',
+    'all-day': 'All-Day Dining'
+  };
+
+  const mealTypeDescriptions = {
+    breakfast: 'Start your day with fresh, locally sourced ingredients prepared to perfection.',
+    lunch: 'Light, fresh meals perfect for fueling your outdoor adventures.',
+    dinner: 'Elevated dining experiences showcasing the best of regional cuisine.',
+    'all-day': 'Available throughout the day for your convenience.'
+  };
 
   return (
     <div className='space-y-12 py-8'>
@@ -217,45 +168,93 @@ export default function DiningPage() {
           </p>
         </div>
 
-        <div className='space-y-8'>
-          {menuCategories.map((category, index) => (
-            <Card key={index} className='py-6'>
-              <CardHeader className='pb-0 pt-2 px-6'>
-                <div className='flex justify-between items-center w-full'>
-                  <div>
-                    <h3 className='text-xl font-bold'>{category.name}</h3>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {Object.entries(menusByMealType).map(([mealType, items]) => {
+            const displayName = mealTypeDisplayNames[mealType as keyof typeof mealTypeDisplayNames] || mealType;
+            const description = mealTypeDescriptions[mealType as keyof typeof mealTypeDescriptions];
+            const servingTime = items.length > 0 ? `${items[0].servingTime.start} - ${items[0].servingTime.end}` : '';
+            
+            // Get the CTA text based on meal type
+            const getCtaText = (mealType: string) => {
+              switch (mealType) {
+                case 'breakfast':
+                  return 'Reserve Breakfast';
+                case 'lunch':
+                  return 'Reserve Lunch';
+                case 'dinner':
+                  return 'Reserve Dinner';
+                case 'all-day':
+                  return 'Reserve Meal';
+                default:
+                  return 'Reserve Meal';
+              }
+            };
+
+            return (
+              <Card key={mealType} className='py-4 flex flex-col h-full'>
+                {/* Image Section */}
+                {items.length > 0 && items[0].image && (
+                  <div className="relative w-full h-48 mb-4">
+                    <Image
+                      src={items[0].image}
+                      alt={displayName}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-t-lg"
+                    />
+                  </div>
+                )}
+                
+                <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
+                  <h4 className='font-bold text-large'>{displayName}</h4>
+                  {servingTime && (
                     <Chip
                       color='primary'
                       variant='flat'
                       size='sm'
                       className='mt-2'>
-                      {category.time}
+                      {servingTime}
                     </Chip>
-                  </div>
-                </div>
-                <p className='text-default-600 mt-3'>{category.description}</p>
-              </CardHeader>
-              <CardBody className='px-6'>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                  {category.dishes.map((dish, dishIndex) => (
-                    <div
-                      key={dishIndex}
-                      className='border border-default-200 rounded-lg p-4'>
-                      <div className='flex justify-between items-start mb-2'>
-                        <h4 className='font-semibold'>{dish.name}</h4>
-                        <span className='text-green-600 font-bold'>
-                          ${dish.price}
-                        </span>
+                  )}
+                  <p className='text-default-600 mt-3 text-sm'>
+                    {description}
+                  </p>
+                </CardHeader>
+                
+                <CardBody className='overflow-visible py-2 flex flex-col flex-grow'>
+                  {/* Featured Dishes */}
+                  <div className='space-y-3 mb-4 flex-grow'>
+                    {items.slice(0, 3).map((dish) => (
+                      <div key={dish._id} className='border-b border-default-200 pb-3 last:border-b-0'>
+                        <div className='flex justify-between items-start mb-1'>
+                          <h5 className='font-semibold text-sm'>{dish.name}</h5>
+                          <span className='text-green-600 font-bold text-sm'>
+                            ${dish.price}
+                          </span>
+                        </div>
+                        <p className='text-xs text-default-500 mb-2'>
+                          {dish.description}
+                        </p>
+                        {dish.dietary && dish.dietary.length > 0 && (
+                          <div className='flex flex-wrap gap-1'>
+                            {dish.dietary.slice(0, 2).map((diet) => (
+                              <Chip key={diet} size='sm' variant='flat' color='success'>
+                                {diet}
+                              </Chip>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <p className='text-sm text-default-500'>
-                        {dish.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
-          ))}
+                    ))}
+                  </div>
+
+                  <Button color='primary' size='sm' className='w-full mt-auto'>
+                    {getCtaText(mealType)}
+                  </Button>
+                </CardBody>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
