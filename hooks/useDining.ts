@@ -11,6 +11,7 @@ const fetchDining = async (params: DiningQueryParams = {}): Promise<Dining[]> =>
   if (params.minPrice) searchParams.append('minPrice', params.minPrice.toString());
   if (params.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString());
   if (params.dietary?.length) searchParams.append('dietary', params.dietary.join(','));
+  if (params.search) searchParams.append('search', params.search);
 
   const url = `/api/dining${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
   

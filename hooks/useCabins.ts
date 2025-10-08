@@ -1,12 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { Cabin, ApiResponse } from '@/types';
-
-interface CabinsQueryParams {
-  capacity?: number;
-  minPrice?: number;
-  maxPrice?: number;
-  available?: boolean;
-}
+import type { Cabin, ApiResponse, CabinsQueryParams } from '@/types';
 
 const fetchCabins = async (params: CabinsQueryParams = {}): Promise<Cabin[]> => {
   const searchParams = new URLSearchParams();
@@ -15,6 +8,7 @@ const fetchCabins = async (params: CabinsQueryParams = {}): Promise<Cabin[]> => 
   if (params.minPrice) searchParams.append('minPrice', params.minPrice.toString());
   if (params.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString());
   if (params.available !== undefined) searchParams.append('available', params.available.toString());
+  if (params.search) searchParams.append('search', params.search);
 
   const url = `/api/cabins${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
   
