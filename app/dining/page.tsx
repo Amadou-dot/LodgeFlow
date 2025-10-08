@@ -268,14 +268,18 @@ export default function DiningPage() {
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          {specialExperiences.map((experience, index) => (
-            <Card key={index} className='py-4'>
+          {diningExperiences.map((experience) => (
+            <Card key={experience._id} className='py-4 flex flex-col h-full'>
               <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
                 <h4 className='font-bold text-large'>{experience.name}</h4>
                 <div className='flex items-center gap-2 text-small text-default-500 mt-1'>
-                  <span>⏱️ {experience.duration}</span>
-                  <span>•</span>
-                  <span>👥 Max {experience.maxGuests}</span>
+                  {experience.duration && (
+                    <>
+                      <span>⏱️ {experience.duration}</span>
+                      <span>•</span>
+                    </>
+                  )}
+                  <span>👥 Max {experience.maxPeople}</span>
                 </div>
                 <div className='mt-2'>
                   <span className='text-2xl font-bold text-green-600'>
@@ -284,34 +288,40 @@ export default function DiningPage() {
                   <span className='text-sm text-default-500'>/person</span>
                 </div>
               </CardHeader>
-              <CardBody className='overflow-visible py-2'>
+              <CardBody className='overflow-visible py-2 flex flex-col flex-grow'>
                 <div className='relative mb-4'>
-                  <div className='w-full h-32 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900 rounded-lg flex items-center justify-center'>
-                    <span className='text-amber-700 dark:text-amber-300 text-sm font-medium text-center px-4'>
-                      {experience.name}
-                    </span>
-                  </div>
+                  <Image
+                    src={experience.image}
+                    alt={experience.name}
+                    width={300}
+                    height={128}
+                    className='w-full h-32 object-cover rounded-lg'
+                  />
                 </div>
 
-                <p className='text-default-500 mb-3 text-sm'>
-                  {experience.description}
-                </p>
+                <div className='flex-grow'>
+                  <p className='text-default-500 mb-3 text-sm'>
+                    {experience.description}
+                  </p>
 
-                <div className='mb-4'>
-                  <h5 className='text-sm font-semibold mb-2'>Includes:</h5>
-                  <div className='space-y-1'>
-                    {experience.includes.map((item, itemIndex) => (
-                      <div
-                        key={itemIndex}
-                        className='flex items-center gap-2 text-sm'>
-                        <span className='text-green-500'>✓</span>
-                        <span className='text-default-600'>{item}</span>
+                  {experience.includes && experience.includes.length > 0 && (
+                    <div className='mb-4'>
+                      <h5 className='text-sm font-semibold mb-2'>Includes:</h5>
+                      <div className='space-y-1'>
+                        {experience.includes.slice(0, 4).map((item, itemIndex) => (
+                          <div
+                            key={itemIndex}
+                            className='flex items-center gap-2 text-sm'>
+                            <span className='text-green-500'>✓</span>
+                            <span className='text-default-600'>{item}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
-                <Button color='primary' size='sm' className='w-full'>
+                <Button color='primary' size='sm' className='w-full mt-auto'>
                   Reserve Experience
                 </Button>
               </CardBody>
