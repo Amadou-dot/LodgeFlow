@@ -3,6 +3,7 @@ import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
 import { Link } from '@heroui/link';
+import Image from 'next/image';
 
 interface PricingItem {
   name: string;
@@ -18,6 +19,8 @@ interface PricingItem {
   ctaText?: string;
   ctaHref?: string;
   isPopular?: boolean;
+  image?: string;
+  gallery?: string[];
 }
 
 interface PricingGridProps {
@@ -48,10 +51,30 @@ function PricingCard({ item, showCTA }: { item: PricingItem; showCTA: boolean })
 
   return (
     <Card className={`py-4 ${item.isPopular ? 'ring-2 ring-primary' : ''}`} shadow={item.isPopular ? 'lg' : 'sm'}>
+      {/* Image Section */}
+      {item.image && (
+        <div className="relative w-full h-48 mb-4">
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            style={{ objectFit: 'cover' }}
+            className="rounded-t-lg"
+          />
+          {item.isPopular && (
+            <div className="absolute top-2 right-2">
+              <Chip color="primary" variant="solid" size="sm">
+                Popular
+              </Chip>
+            </div>
+          )}
+        </div>
+      )}
+
       <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
         <div className="flex justify-between items-start w-full mb-2">
           <h4 className="font-bold text-large">{item.name}</h4>
-          {item.isPopular && (
+          {item.isPopular && !item.image && (
             <Chip color="primary" variant="flat" size="sm">
               Popular
             </Chip>
