@@ -3,6 +3,7 @@ import type { ICabin } from '@/models/Cabin';
 import type { ICustomer } from '@/models/Customer';
 import type { IExperience } from '@/models/Experience';
 import type { ISettings } from '@/models/Settings';
+import type { IDining } from '@/models/Dining';
 import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
@@ -15,6 +16,7 @@ export type Customer = ICustomer;
 export type Booking = IBooking;
 export type Settings = ISettings;
 export type Experience = IExperience;
+export type Dining = IDining;
 
 // Extended types for populated models (used in API responses)
 export interface PopulatedBooking
@@ -143,4 +145,15 @@ export interface CreateExperienceData {
 
 export interface UpdateExperienceData extends Partial<CreateExperienceData> {
   _id: string;
+}
+
+// Dining-related types
+export interface DiningQueryParams {
+  type?: 'menu' | 'experience';
+  mealType?: 'breakfast' | 'lunch' | 'dinner' | 'all-day';
+  category?: 'regular' | 'craft-beer' | 'wine' | 'spirits' | 'non-alcoholic';
+  isPopular?: boolean;
+  dietary?: string[];
+  minPrice?: number;
+  maxPrice?: number;
 }
