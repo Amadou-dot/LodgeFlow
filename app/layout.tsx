@@ -52,7 +52,7 @@ export default function RootLayout({
                 className='flex items-center gap-1 text-current'
                 href={siteConfig.links.email}
                 title='LodgeFlow Contact'>
-                <span className='text-default-600'>© 2024</span>
+                <span className='text-default-600'>© {new Date().getFullYear()}</span>
                 <p className='text-primary'>LodgeFlow</p>
               </Link>
             </footer>
