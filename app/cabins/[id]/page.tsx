@@ -55,6 +55,7 @@ export default function Page({ params }: { params: Params }) {
           name: cabin.name,
           regularPrice: cabin.price,
           maxCapacity: cabin.capacity,
+          image: cabin.image,
         }}
       />
     </div>
