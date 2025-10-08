@@ -41,6 +41,16 @@ export async function GET(request: Request) {
       const dietaryArray = dietary.split(',');
       query.dietary = { $in: dietaryArray };
     }
+    
+    // Text search functionality
+    const search = searchParams.get('search');
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { dietary: { $regex: search, $options: 'i' } }
+      ];
+    }
 
     const dining = await Dining.find(query).sort({
       mealType: 1,
