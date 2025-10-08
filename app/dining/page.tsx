@@ -340,24 +340,73 @@ export default function DiningPage() {
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-          {beverages.map((category, index) => (
-            <div
-              key={index}
-              className='bg-white dark:bg-default-100 rounded-lg p-4'>
-              <h4 className='font-bold text-center mb-3'>
-                {category.category}
-              </h4>
-              <ul className='space-y-2'>
-                {category.items.map((item, itemIndex) => (
-                  <li
-                    key={itemIndex}
-                    className='text-sm text-default-600 text-center'>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {Object.entries(beveragesByCategory).map(([category, items]) => {
+            const categoryDisplayNames = {
+              'craft-beer': 'Local Craft Beer',
+              'wine': 'Regional Wines',
+              'spirits': 'Artisan Spirits',
+              'non-alcoholic': 'Non-Alcoholic'
+            };
+            
+            return (
+              <Card key={category} className='py-4 bg-white dark:bg-default-100 flex flex-col h-full'>
+                {/* Image Section */}
+                {items.length > 0 && items[0].image && (
+                  <div className="relative w-full h-32 mb-4">
+                    <Image
+                      src={items[0].image}
+                      alt={categoryDisplayNames[category as keyof typeof categoryDisplayNames] || category}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-t-lg"
+                    />
+                  </div>
+                )}
+                
+                <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
+                  <h4 className='font-bold text-center w-full mb-3'>
+                    {categoryDisplayNames[category as keyof typeof categoryDisplayNames] || category}
+                  </h4>
+                </CardHeader>
+                
+                <CardBody className='overflow-visible py-2 flex flex-col flex-grow'>
+                  <div className='flex-grow'>
+                    <ul className='space-y-2'>
+                      {items.slice(0, 5).map((item) => (
+                        <li
+                          key={item._id}
+                          className='text-sm text-default-600 text-center border-b border-default-200 pb-2 last:border-b-0'>
+                          <div className='font-medium'>{item.name}</div>
+                          {item.price && (
+                            <span className='text-xs text-green-600'>
+                              ${item.price}
+                            </span>
+                          )}
+                          {item.description && (
+                            <p className='text-xs text-default-500 mt-1'>
+                              {item.description.substring(0, 50)}...
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    {items.length > 5 && (
+                      <div className='text-center mt-3'>
+                        <span className='text-xs text-default-400'>
+                          +{items.length - 5} more options
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <Button color='primary' variant='bordered' size='sm' className='w-full mt-auto'>
+                    View Full Selection
+                  </Button>
+                </CardBody>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
