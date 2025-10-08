@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const available = searchParams.get("available");
+    const search = searchParams.get("search");
 
     // Build query
     let query: any = {};
@@ -23,6 +24,15 @@ export async function GET(request: NextRequest) {
       query.price = {};
       if (minPrice) query.price.$gte = parseInt(minPrice);
       if (maxPrice) query.price.$lte = parseInt(maxPrice);
+    }
+    
+    // Text search functionality
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { amenities: { $regex: search, $options: 'i' } }
+      ];
     }
 
     const cabins = await Cabin.find(query).sort({ price: 1 });
