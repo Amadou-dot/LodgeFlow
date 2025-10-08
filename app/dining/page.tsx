@@ -5,15 +5,133 @@ import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
 import { Link } from '@heroui/link';
 import { Spinner } from '@heroui/spinner';
+import { Select, SelectItem } from '@heroui/select';
 
 import { subtitle, title } from '@/components/primitives';
+import StandardFilters from '@/components/StandardFilters';
 import { FaEnvelope, FaPhone } from 'react-icons/fa';
 import Image from 'next/image';
 import { useDining } from '@/hooks/useDining';
-import type { Dining } from '@/types';
+import type { Dining, DiningQueryParams } from '@/types';
+import { useEffect, useState } from 'react';
 
 export default function DiningPage() {
-  const { data: diningData, isLoading, error } = useDining();
+  const [filters, setFilters] = useState<DiningQueryParams>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Combine filters with search and sorting
+  const queryParams: DiningQueryParams = {
+    ...filters,
+    search: searchTerm || undefined,
+  };
+  
+  const { data: diningData, isLoading, error } = useDining(queryParams);
+
+  // Sort options for the filters
+  const sortOptions = [
+    { key: 'name', label: 'Name', value: 'name' },
+    { key: 'price', label: 'Price', value: 'price' },
+    { key: 'mealType', label: 'Meal Type', value: 'mealType' },
+    { key: 'type', label: 'Type', value: 'type' },
+  ];
+
+  // Handle search change
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+
+  // Handle sort change
+  const handleSortChange = (sortValue: string) => {
+    setSortBy(sortValue);
+  };
+
+  // Handle sort order change
+  const handleSortOrderChange = (order: 'asc' | 'desc') => {
+    setSortOrder(order);
+  };
+
+  // Sort the data based on current sort settings
+  const sortedData = diningData ? [...diningData].sort((a, b) => {
+    let aValue: any = a[sortBy as keyof Dining];
+    let bValue: any = b[sortBy as keyof Dining];
+    
+    // Handle different data types
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+    
+    if (sortOrder === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  }) : [];
+
+  // Additional filters component
+  const additionalFilters = (
+    <div className="flex flex-wrap gap-2">
+      <Select
+        placeholder="Filter by type"
+        className="w-40"
+        size="sm"
+        selectedKeys={filters.type ? [filters.type] : []}
+        onSelectionChange={(keys) => {
+          const selected = Array.from(keys)[0] as string;
+          setFilters(prev => ({ ...prev, type: selected as any }));
+        }}
+      >
+        <SelectItem key="menu">Menu Items</SelectItem>
+        <SelectItem key="experience">Experiences</SelectItem>
+      </Select>
+      
+      <Select
+        placeholder="Filter by meal"
+        className="w-40"
+        size="sm"
+        selectedKeys={filters.mealType ? [filters.mealType] : []}
+        onSelectionChange={(keys) => {
+          const selected = Array.from(keys)[0] as string;
+          setFilters(prev => ({ ...prev, mealType: selected as any }));
+        }}
+      >
+        <SelectItem key="breakfast">Breakfast</SelectItem>
+        <SelectItem key="lunch">Lunch</SelectItem>
+        <SelectItem key="dinner">Dinner</SelectItem>
+        <SelectItem key="all-day">All Day</SelectItem>
+      </Select>
+      
+      <Select
+        placeholder="Filter by category"
+        className="w-40"
+        size="sm"
+        selectedKeys={filters.category ? [filters.category] : []}
+        onSelectionChange={(keys) => {
+          const selected = Array.from(keys)[0] as string;
+          setFilters(prev => ({ ...prev, category: selected as any }));
+        }}
+      >
+        <SelectItem key="regular">Regular</SelectItem>
+        <SelectItem key="craft-beer">Craft Beer</SelectItem>
+        <SelectItem key="wine">Wine</SelectItem>
+        <SelectItem key="spirits">Spirits</SelectItem>
+        <SelectItem key="non-alcoholic">Non-Alcoholic</SelectItem>
+      </Select>
+      
+      <Button
+        size="sm"
+        variant="bordered"
+        onPress={() => {
+          setFilters({});
+          setSearchTerm('');
+        }}
+      >
+        Clear Filters
+      </Button>
+    </div>
+  );
 
   if (isLoading) {
     return (
@@ -52,6 +170,21 @@ export default function DiningPage() {
           </p>
         </section>
 
+        {/* Filters */}
+        <StandardFilters
+          searchPlaceholder="Search dining options, ingredients, or dietary preferences..."
+          searchValue={searchTerm}
+          onSearchChange={handleSearchChange}
+          sortOptions={sortOptions}
+          currentSort={sortBy}
+          onSortChange={handleSortChange}
+          sortOrder={sortOrder}
+          onSortOrderChange={handleSortOrderChange}
+          additionalFilters={additionalFilters}
+          totalCount={sortedData?.length}
+          itemName="dining option"
+        />
+
         <div className='text-center py-8'>
           <h2 className={title({ size: 'md' })}>Coming Soon</h2>
           <p className='text-default-600 mt-4'>
@@ -62,7 +195,9 @@ export default function DiningPage() {
       </div>
     );
   }
-  const menusByMealType = diningData?.filter(item => item.type === 'menu').reduce((acc, item) => {
+  
+  // Use sorted data instead of original diningData
+  const menusByMealType = sortedData?.filter(item => item.type === 'menu').reduce((acc, item) => {
     if (!acc[item.mealType]) {
       acc[item.mealType] = [];
     }
@@ -71,10 +206,10 @@ export default function DiningPage() {
   }, {} as Record<string, Dining[]>) || {};
 
   // Get dining experiences
-  const diningExperiences = diningData?.filter(item => item.type === 'experience') || [];
+  const diningExperiences = sortedData?.filter(item => item.type === 'experience') || [];
 
   // Group beverages by category
-  const beveragesByCategory = diningData?.filter(item => item.category !== 'regular').reduce((acc, item) => {
+  const beveragesByCategory = sortedData?.filter(item => item.category !== 'regular').reduce((acc, item) => {
     if (!acc[item.category]) {
       acc[item.category] = [];
     }
@@ -113,51 +248,86 @@ export default function DiningPage() {
         </p>
       </section>
 
-      {/* Philosophy Section */}
-      <section className='bg-green-50 dark:bg-green-950 rounded-2xl p-8'>
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 items-center'>
-          <div>
-            <h2 className={title({ size: 'md' })}>Our Culinary Philosophy</h2>
-            <div className='space-y-4 mt-6 text-default-600'>
-              <p>
-                At LodgeFlow, we believe great food connects us to the land
-                and each other. Our executive chef works with local farmers,
-                foragers, and artisans to create menus that change with the
-                seasons.
-              </p>
-              <p>
-                Every ingredient tells a story - from the wild mushrooms
-                gathered in our own forests to the organic vegetables grown in
-                nearby farms. We're committed to sustainable practices that
-                honor both our guests and our environment.
-              </p>
-            </div>
-            <div className='flex flex-wrap gap-2 mt-6'>
-              <Chip color='success' variant='flat'>
-                Locally Sourced
-              </Chip>
-              <Chip color='success' variant='flat'>
-                Organic
-              </Chip>
-              <Chip color='success' variant='flat'>
-                Sustainable
-              </Chip>
-              <Chip color='success' variant='flat'>
-                Seasonal Menu
-              </Chip>
-            </div>
-          </div>
-          <div className='relative h-64 lg:h-80'>
-            <Image
-              src='https://images.unsplash.com/photo-1684954215462-cad9f3693b41?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-              alt='Dining Philosophy'
-              fill
-              style={{ objectFit: 'cover' }}
-              className='rounded-2xl'
-            />
-          </div>
+      {/* Filters */}
+      <StandardFilters
+        searchPlaceholder="Search dining options, ingredients, or dietary preferences..."
+        searchValue={searchTerm}
+        onSearchChange={handleSearchChange}
+        sortOptions={sortOptions}
+        currentSort={sortBy}
+        onSortChange={handleSortChange}
+        sortOrder={sortOrder}
+        onSortOrderChange={handleSortOrderChange}
+        additionalFilters={additionalFilters}
+        totalCount={sortedData?.length}
+        itemName="dining option"
+      />
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className='flex flex-col justify-center items-center py-12 gap-4'>
+          <Spinner size='lg' label='Loading dining options...' />
         </div>
-      </section>
+      )}
+
+      {/* No Results */}
+      {!isLoading && sortedData && sortedData.length === 0 && (
+        <div className='text-center py-12'>
+          <h3 className='text-xl font-semibold mb-2'>No dining options found</h3>
+          <p className='text-default-500 mb-4'>
+            Try adjusting your search or filters to see more options.
+          </p>
+        </div>
+      )}
+
+      {/* Results when we have data */}
+      {!isLoading && sortedData && sortedData.length > 0 && (
+        <>
+          {/* Philosophy Section */}
+          <section className='bg-green-50 dark:bg-green-950 rounded-2xl p-8'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 items-center'>
+              <div>
+                <h2 className={title({ size: 'md' })}>Our Culinary Philosophy</h2>
+                <div className='space-y-4 mt-6 text-default-600'>
+                  <p>
+                    At LodgeFlow, we believe great food connects us to the land
+                    and each other. Our executive chef works with local farmers,
+                    foragers, and artisans to create menus that change with the
+                    seasons.
+                  </p>
+                  <p>
+                    Every ingredient tells a story - from the wild mushrooms
+                    gathered in our own forests to the organic vegetables grown in
+                    nearby farms. We're committed to sustainable practices that
+                    honor both our guests and our environment.
+                  </p>
+                </div>
+                <div className='flex flex-wrap gap-2 mt-6'>
+                  <Chip color='success' variant='flat'>
+                    Locally Sourced
+                  </Chip>
+                  <Chip color='success' variant='flat'>
+                    Organic
+                  </Chip>
+                  <Chip color='success' variant='flat'>
+                    Sustainable
+                  </Chip>
+                  <Chip color='success' variant='flat'>
+                    Seasonal Menu
+                  </Chip>
+                </div>
+              </div>
+              <div className='relative h-64 lg:h-80'>
+                <Image
+                  src='https://images.unsplash.com/photo-1684954215462-cad9f3693b41?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                  alt='Dining Philosophy'
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className='rounded-2xl'
+                />
+              </div>
+            </div>
+          </section>
 
       {/* Daily Menus */}
       <section>
@@ -437,6 +607,8 @@ export default function DiningPage() {
           </Button>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }
