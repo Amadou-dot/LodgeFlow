@@ -108,6 +108,15 @@ export interface AvailableCabin extends ICabin {
   conflictingBookings?: string[];
 }
 
+// Cabin query parameters
+export interface CabinsQueryParams {
+  capacity?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  available?: boolean;
+  search?: string;
+}
+
 // Experience-related types
 export interface ExperienceQueryParams {
   category?: string;
@@ -156,4 +165,5 @@ export interface DiningQueryParams {
   dietary?: string[];
   minPrice?: number;
   maxPrice?: number;
+  search?: string;
 }
