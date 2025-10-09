@@ -1,26 +1,32 @@
 'use client';
 
 import {
-  Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-} from '@heroui/navbar';
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs';
 import { Button } from '@heroui/button';
 import { Link } from '@heroui/link';
+import {
+  Navbar as HeroUINavbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  NavbarMenu,
+  NavbarMenuItem,
+  NavbarMenuToggle,
+} from '@heroui/navbar';
 import { link as linkStyles } from '@heroui/theme';
+import clsx from 'clsx';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import clsx from 'clsx';
-import { FaInstagram, FaFacebook } from 'react-icons/fa';
 
-import { siteConfig } from '@/config/site';
 import { ThemeSwitch } from '@/components/theme-switch';
-import Image from 'next/image';
+import { siteConfig } from '@/config/site';
 import { useTheme } from 'next-themes';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 export const Navbar = () => {
   const pathname = usePathname();
@@ -47,7 +53,9 @@ export const Navbar = () => {
             {mounted ? (
               <Image
                 src={
-                  resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'
+                  resolvedTheme === 'dark'
+                    ? '/logo-dark.png'
+                    : '/logo-light.png'
                 }
                 alt='LodgeFlow'
                 width={32}
@@ -83,18 +91,6 @@ export const Navbar = () => {
         className='hidden sm:flex basis-1/5 sm:basis-full'
         justify='end'>
         <NavbarItem className='hidden sm:flex gap-2'>
-          <Link
-            isExternal
-            aria-label='Instagram'
-            href={siteConfig.links.instagram}>
-            <FaInstagram className='w-5 h-5 text-default-500 hover:text-green-600 transition-colors' />
-          </Link>
-          <Link
-            isExternal
-            aria-label='Facebook'
-            href={siteConfig.links.facebook}>
-            <FaFacebook className='w-5 h-5 text-default-500 hover:text-green-600 transition-colors' />
-          </Link>
           <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className='hidden md:flex'>
@@ -108,9 +104,51 @@ export const Navbar = () => {
             Book Now
           </Button>
         </NavbarItem>
+
+        {/* Authentication Section */}
+        <NavbarItem className='hidden md:flex gap-2'>
+          <SignedOut>
+            <SignInButton mode='modal'>
+              <Button
+                color='default'
+                variant='bordered'
+                size='sm'
+                className='font-medium'>
+                Sign In
+              </Button>
+            </SignInButton>
+            <SignUpButton mode='modal'>
+              <Button
+                color='secondary'
+                variant='bordered'
+                size='sm'
+                className='font-medium'>
+                Sign Up
+              </Button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: 'w-8 h-8',
+                },
+              }}
+            />
+          </SignedIn>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className='sm:hidden basis-1 pl-4' justify='end'>
+        <SignedIn>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: 'w-8 h-8',
+              },
+            }}
+          />
+        </SignedIn>
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
@@ -144,6 +182,32 @@ export const Navbar = () => {
               className='w-full mt-4'>
               Book Now
             </Button>
+          </NavbarMenuItem>
+
+          {/* Mobile Authentication */}
+          <NavbarMenuItem>
+            <SignedOut>
+              <div className='flex flex-col gap-2 mt-4'>
+                <SignInButton mode='modal'>
+                  <Button
+                    color='default'
+                    variant='bordered'
+                    size='md'
+                    className='w-full'>
+                    Sign In
+                  </Button>
+                </SignInButton>
+                <SignUpButton mode='modal'>
+                  <Button
+                    color='secondary'
+                    variant='bordered'
+                    size='md'
+                    className='w-full'>
+                    Sign Up
+                  </Button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
           </NavbarMenuItem>
         </div>
       </NavbarMenu>
