@@ -5,6 +5,7 @@ import { Metadata, Viewport } from 'next';
 
 import { Providers } from './providers';
 
+import { DynamicClerkProvider } from '@/components/DynamicClerkProvider';
 import { Navbar } from '@/components/navbar';
 import { fontSans } from '@/config/fonts';
 import { siteConfig } from '@/config/site';
@@ -41,22 +42,24 @@ export default function RootLayout({
           fontSans.variable
         )}>
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
-          <div className='relative flex flex-col h-screen'>
-            <Navbar />
-            <main className='container mx-auto max-w-7xl pt-16 px-6 flex-grow'>
-              {children}
-            </main>
-            <footer className='w-full flex items-center justify-center py-3'>
-              <Link
-                isExternal
-                className='flex items-center gap-1 text-current'
-                href={siteConfig.links.email}
-                title='LodgeFlow Contact'>
-                <span className='text-default-600'>© {new Date().getFullYear()}</span>
-                <p className='text-primary'>LodgeFlow</p>
-              </Link>
-            </footer>
-          </div>
+          <DynamicClerkProvider>
+            <div className='relative flex flex-col h-screen'>
+              <Navbar />
+              <main className='container mx-auto max-w-7xl pt-16 px-6 flex-grow'>
+                {children}
+              </main>
+              <footer className='w-full flex items-center justify-center py-3'>
+                <Link
+                  isExternal
+                  className='flex items-center gap-1 text-current'
+                  href={siteConfig.links.email}
+                  title='LodgeFlow Contact'>
+                  <span className='text-default-600'>© {new Date().getFullYear()}</span>
+                  <p className='text-primary'>LodgeFlow</p>
+                </Link>
+              </footer>
+            </div>
+          </DynamicClerkProvider>
         </Providers>
       </body>
     </html>
