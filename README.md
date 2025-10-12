@@ -10,6 +10,9 @@
   <a href="https://lodgeflow.aseck.dev/" target="_blank">
     <img src="https://img.shields.io/badge/Live%20Preview-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Preview"/>
   </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white"/>
   <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white"/>
   <img src="https://img.shields.io/badge/HeroUI-FF6B6B?style=for-the-badge&logo=react&logoColor=white"/>
