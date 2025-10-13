@@ -19,9 +19,14 @@ interface BookingFormProps {
     maxCapacity: number;
     image?: string;
   };
+  userData?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
-export default function BookingForm({ cabin }: BookingFormProps) {
+export default function BookingForm({ cabin, userData }: BookingFormProps) {
   // State for date range and guests
   const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(
     null
@@ -90,11 +95,13 @@ export default function BookingForm({ cabin }: BookingFormProps) {
               <Input
                 label='First Name'
                 placeholder='Enter your first name'
+                defaultValue={userData?.firstName}
                 isRequired
               />
               <Input
                 label='Last Name'
                 placeholder='Enter your last name'
+                defaultValue={userData?.lastName}
                 isRequired
               />
             </div>
@@ -103,7 +110,9 @@ export default function BookingForm({ cabin }: BookingFormProps) {
               label='Email'
               type='email'
               placeholder='Enter your email'
+              defaultValue={userData?.email}
               isRequired
+              isReadOnly={!!userData?.email}
             />
 
             <Input
