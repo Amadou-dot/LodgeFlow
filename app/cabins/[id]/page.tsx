@@ -1,6 +1,7 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
 import { useCabin } from '@/hooks/useCabin';
+import { useUser } from '@clerk/nextjs';
 import { Spinner } from '@heroui/spinner';
 import { useEffect, useState } from 'react';
 
@@ -11,6 +12,7 @@ type Params = Promise<{
 export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
+  const { user, isLoaded: userLoaded } = useUser();
 
   useEffect(() => {
     const getCabinId = async () => {
@@ -21,7 +23,7 @@ export default function Page({ params }: { params: Params }) {
     getCabinId();
   }, [params]);
 
-  if (isLoading || !cabinId) {
+  if (isLoading || !cabinId || !userLoaded) {
     return (
       <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
         <Spinner size='lg' label='Loading cabin details...' />
@@ -56,6 +58,11 @@ export default function Page({ params }: { params: Params }) {
           regularPrice: cabin.price,
           maxCapacity: cabin.capacity,
           image: cabin.image,
+        }}
+        userData={{
+          firstName: user?.firstName || '',
+          lastName: user?.lastName || '',
+          email: user?.emailAddresses[0]?.emailAddress || '',
         }}
       />
     </div>

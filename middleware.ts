@@ -3,7 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 const isPublicRoute = createRouteMatcher([
   '/',
   '/about(.*)',
-  '/cabins(.*)',
+  '/cabins',
   '/experiences(.*)',
   '/dining(.*)',
   '/pricing(.*)',
@@ -17,8 +17,12 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // For customer portal, most routes should be public
-  // Only protect API routes that create bookings or user-specific data
+  // Protect cabin booking pages - require login to book
+  if (req.nextUrl.pathname.match(/^\/cabins\/[^/]+$/)) {
+    await auth.protect();
+  }
+  
+  // Protect API routes that create bookings or user-specific data
   if (req.nextUrl.pathname.startsWith('/api/bookings')) {
     await auth.protect();
   }
