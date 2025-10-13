@@ -23,6 +23,7 @@ interface BookingFormProps {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   };
 }
 
@@ -120,6 +121,8 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
               type='tel'
               placeholder='Enter your phone number'
               isRequired
+              defaultValue={userData?.phone}
+              isReadOnly={!!userData?.phone}
             />
 
             {/* Booking Details with Date Range Picker */}
