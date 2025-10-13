@@ -57,7 +57,26 @@ cd LodgeFlow
 
 # Install dependencies
 pnpm install
+
+# Copy environment variables
+cp .env.local.example .env.local
 ```
+
+### Clerk Authentication Setup
+
+1. Create a free account at [Clerk](https://clerk.com)
+2. Create a new application in the [Clerk Dashboard](https://dashboard.clerk.com)
+3. Go to **API Keys** and copy your keys
+4. Add to `.env.local`:
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+CLERK_SECRET_KEY=sk_test_your_key_here
+```
+5. In Clerk Dashboard, configure these paths:
+   - Sign-in URL: `/sign-in`
+   - Sign-up URL: `/sign-up`
+   - After sign-in URL: `/`
+   - After sign-up URL: `/`
 
 ### Database Setup
 
