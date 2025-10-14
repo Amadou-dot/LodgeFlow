@@ -6,26 +6,26 @@ export async function GET(request: Request) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    
+
     // Build query object based on search parameters
     const query: any = { isAvailable: true };
-    
+
     if (searchParams.get('type')) {
       query.type = searchParams.get('type');
     }
-    
+
     if (searchParams.get('mealType')) {
       query.mealType = searchParams.get('mealType');
     }
-    
+
     if (searchParams.get('category')) {
       query.category = searchParams.get('category');
     }
-    
+
     if (searchParams.get('isPopular')) {
       query.isPopular = searchParams.get('isPopular') === 'true';
     }
-    
+
     // Price range filtering
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
@@ -34,21 +34,21 @@ export async function GET(request: Request) {
       if (minPrice) query.price.$gte = parseFloat(minPrice);
       if (maxPrice) query.price.$lte = parseFloat(maxPrice);
     }
-    
+
     // Dietary restrictions filtering
     const dietary = searchParams.get('dietary');
     if (dietary) {
       const dietaryArray = dietary.split(',');
       query.dietary = { $in: dietaryArray };
     }
-    
+
     // Text search functionality
     const search = searchParams.get('search');
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
-        { dietary: { $regex: search, $options: 'i' } }
+        { dietary: { $regex: search, $options: 'i' } },
       ];
     }
 

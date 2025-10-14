@@ -19,9 +19,7 @@ export function SectionHeader({
     <div className={`${centered ? 'text-center' : ''} ${className}`}>
       <h2 className={title({ size })}>{sectionTitle}</h2>
       {sectionSubtitle && (
-        <p className={subtitle({ class: 'mt-4' })}>
-          {sectionSubtitle}
-        </p>
+        <p className={subtitle({ class: 'mt-4' })}>{sectionSubtitle}</p>
       )}
     </div>
   );

@@ -29,7 +29,11 @@ export function PageHeader({
         )}
       </h1>
       {pageSubtitle && (
-        <p className={subtitle({ class: `mt-4 ${centered ? 'max-w-2xl mx-auto' : ''}` })}>
+        <p
+          className={subtitle({
+            class: `mt-4 ${centered ? 'max-w-2xl mx-auto' : ''}`,
+          })}
+        >
           {pageSubtitle}
         </p>
       )}

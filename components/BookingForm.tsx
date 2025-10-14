@@ -6,7 +6,7 @@ import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Checkbox } from '@heroui/checkbox';
 import { DateRangePicker } from '@heroui/date-picker';
-import { Form } from "@heroui/form";
+import { Form } from '@heroui/form';
 import { Input, Textarea } from '@heroui/input';
 import { Select, SelectItem } from '@heroui/select';
 import { addToast } from '@heroui/toast';
@@ -15,7 +15,7 @@ import {
   parseDate,
   toCalendarDate,
   today,
-  type DateValue
+  type DateValue,
 } from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
 import Image from 'next/image';
@@ -56,7 +56,9 @@ interface AvailabilityData {
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function BookingForm({ cabin, userData }: BookingFormProps) {
-  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(null);
+  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(
+    null
+  );
   const [numberOfGuests, setNumberOfGuests] = useState<string>('');
   const { isSignedIn, isLoaded, user } = useUser();
   const { mutate: createBooking } = useCreateBooking();
@@ -65,10 +67,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   const { data: availabilityData, error: availabilityError } = useSWR<{
     success: boolean;
     data: AvailabilityData;
-  }>(
-    cabin?._id ? `/api/cabins/${cabin._id}/availability` : null,
-    fetcher
-  );
+  }>(cabin?._id ? `/api/cabins/${cabin._id}/availability` : null, fetcher);
 
   const todayDate = today(getLocalTimeZone());
 
@@ -110,17 +109,27 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
       hasLateCheckOut: data['late_checkout'] === 'on',
     };
     const specialRequests = (data['special_requests'] as string)
-      .split('\
-')
+      .split(
+        '\
+'
+      )
       .map(req => req.trim())
       .filter(req => req.length > 0);
 
     if (!dateRange?.start || !dateRange?.end) {
-      addToast({ title: 'Error', description: 'Please select your booking dates', color: 'danger' });
+      addToast({
+        title: 'Error',
+        description: 'Please select your booking dates',
+        color: 'danger',
+      });
       return;
     }
     if (!numberOfGuests) {
-      addToast({ title: 'Error', description: 'Please select number of guests', color: 'danger' });
+      addToast({
+        title: 'Error',
+        description: 'Please select number of guests',
+        color: 'danger',
+      });
       return;
     }
 
@@ -132,28 +141,39 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
       numGuests: parseInt(numberOfGuests, 10),
       extras,
       specialRequests,
-      observations: data['observations'] as string || '',
+      observations: (data['observations'] as string) || '',
     };
 
     createBooking(bookingData, {
-      onSuccess: (response) => {
+      onSuccess: response => {
         // Redirect to confirmation page with booking ID
         if (response.data && response.data._id) {
           router.push(`/cabins/confirmation/${response.data._id}`);
         } else {
-          addToast({ title: 'Success', description: 'Your booking request has been submitted!', color: 'success' });
+          addToast({
+            title: 'Success',
+            description: 'Your booking request has been submitted!',
+            color: 'success',
+          });
         }
       },
-      onError: (error) => {
-        addToast({ title: 'Error', description: error instanceof Error ? error.message : 'An error occurred', color: 'danger' });
-      }
+      onError: error => {
+        addToast({
+          title: 'Error',
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+          color: 'danger',
+        });
+      },
     });
-  }
+  };
 
   const maxCapacity = cabin?.maxCapacity || 8;
   const cabinName = cabin?.name || 'This Cabin';
   const regularPrice = cabin?.regularPrice || 0;
-  const cabinImage = cabin?.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d';
+  const cabinImage =
+    cabin?.image ||
+    'https://images.unsplash.com/photo-1571896349842-33c89424de2d';
 
   const guestOptions = Array.from({ length: maxCapacity }, (_, i) => ({
     key: (i + 1).toString(),
@@ -176,76 +196,187 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
       <div className='relative h-64 lg:h-full min-h-[400px] rounded-lg overflow-hidden'>
-        <Image src={cabinImage} alt={cabinName} fill style={{ objectFit: 'cover' }} className='rounded-lg' />
+        <Image
+          alt={cabinName}
+          className='rounded-lg'
+          fill
+          src={cabinImage}
+          style={{ objectFit: 'cover' }}
+        />
       </div>
 
       <Card className='p-6'>
         <CardHeader className='flex flex-col'>
           <h3 className={title({ size: 'sm' })}>Book {cabinName}</h3>
-          <p className={subtitle({ class: 'mt-2 text-center' })}>${regularPrice}/night • Up to {maxCapacity} guests</p>
+          <p className={subtitle({ class: 'mt-2 text-center' })}>
+            ${regularPrice}/night • Up to {maxCapacity} guests
+          </p>
         </CardHeader>
         <CardBody className='space-y-4'>
-          <Form className='space-y-4' onSubmit={handleSubmit} aria-label='Cabin booking form'>
+          <Form
+            aria-label='Cabin booking form'
+            className='space-y-4'
+            onSubmit={handleSubmit}
+          >
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
-              <Input label='First Name' placeholder='Enter your first name' defaultValue={userData?.firstName || ''} isRequired name='first_name' isReadOnly={true} />
-              <Input label='Last Name' placeholder='Enter your last name' defaultValue={userData?.lastName || ''} isRequired name='last_name' isReadOnly={true} />
+              <Input
+                defaultValue={userData?.firstName || ''}
+                isReadOnly={true}
+                isRequired
+                label='First Name'
+                name='first_name'
+                placeholder='Enter your first name'
+              />
+              <Input
+                defaultValue={userData?.lastName || ''}
+                isReadOnly={true}
+                isRequired
+                label='Last Name'
+                name='last_name'
+                placeholder='Enter your last name'
+              />
             </div>
-            <Input label='Email' type='email' placeholder='Enter your email' defaultValue={userData?.email || ''} isRequired isReadOnly={!!userData?.email} name='email' />
-            <Input label='Phone' type='tel' placeholder='Enter your phone number' isRequired defaultValue={userData?.phone || ''} isReadOnly={!!userData?.phone} name='phone_number' />
+            <Input
+              defaultValue={userData?.email || ''}
+              isReadOnly={!!userData?.email}
+              isRequired
+              label='Email'
+              name='email'
+              placeholder='Enter your email'
+              type='email'
+            />
+            <Input
+              defaultValue={userData?.phone || ''}
+              isReadOnly={!!userData?.phone}
+              isRequired
+              label='Phone'
+              name='phone_number'
+              placeholder='Enter your phone number'
+              type='tel'
+            />
 
             <DateRangePicker
-              label='Stay Duration'
-              isRequired
-              minValue={todayDate}
-              value={dateRange}
-              onChange={setDateRange}
-              description={availabilityData?.success ? 'Select your check-in and check-out dates. Unavailable dates are crossed out.' : 'Select your check-in and check-out dates'}
+              calendarWidth={400}
               isDateUnavailable={isDateUnavailable}
-              errorMessage={availabilityError ? 'Failed to load availability data' : undefined}
+              isRequired
+              label='Stay Duration'
+              minValue={todayDate}
               name='booking_duration'
               showMonthAndYearPickers
+              value={dateRange}
               visibleMonths={2}
-              calendarWidth={400}
+              description={
+                availabilityData?.success
+                  ? 'Select your check-in and check-out dates. Unavailable dates are crossed out.'
+                  : 'Select your check-in and check-out dates'
+              }
+              errorMessage={
+                availabilityError
+                  ? 'Failed to load availability data'
+                  : undefined
+              }
+              onChange={setDateRange}
             />
 
             {availabilityData?.success && (
               <div className='text-xs text-default-500'>
-                {availabilityData.data.unavailableDates.length > 0 ? <>Unavailable dates are crossed out and cannot be selected.</> : <>All dates in the next 6 months are available for booking.</>}
+                {availabilityData.data.unavailableDates.length > 0 ? (
+                  <>Unavailable dates are crossed out and cannot be selected.</>
+                ) : (
+                  <>All dates in the next 6 months are available for booking.</>
+                )}
               </div>
             )}
 
-            <Select name='num_guests' label='Number of Guests' placeholder='Select number of guests' isRequired selectedKeys={numberOfGuests ? [numberOfGuests] : []} onSelectionChange={keys => { const selected = Array.from(keys)[0] as string; setNumberOfGuests(selected || ''); }}>
-              {guestOptions.map(option => (<SelectItem key={option.key}>{option.label}</SelectItem>))}
+            <Select
+              isRequired
+              label='Number of Guests'
+              name='num_guests'
+              placeholder='Select number of guests'
+              selectedKeys={numberOfGuests ? [numberOfGuests] : []}
+              onSelectionChange={keys => {
+                const selected = Array.from(keys)[0] as string;
+                setNumberOfGuests(selected || '');
+              }}
+            >
+              {guestOptions.map(option => (
+                <SelectItem key={option.key}>{option.label}</SelectItem>
+              ))}
             </Select>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <Checkbox color='success' name='breakfast'>Would you like to add breakfast?</Checkbox>
-              <Checkbox color='success' name='pets'>Will you be bringing a pet?</Checkbox>
-              <Checkbox color='success' name='parking'>Will you need parking?</Checkbox>
-              <Checkbox color='success' name='early_checkin'>Will you check-in early?</Checkbox>
-              <Checkbox color='success' name='late_checkout'>Will you check-out late?</Checkbox>
+            <div className='grid md:grid-cols-2 gap-6'>
+              <Checkbox color='success' name='breakfast'>
+                Would you like to add breakfast?
+              </Checkbox>
+              <Checkbox color='success' name='pets'>
+                Will you be bringing a pet?
+              </Checkbox>
+              <Checkbox color='success' name='parking'>
+                Will you need parking?
+              </Checkbox>
+              <Checkbox color='success' name='early_checkin'>
+                Will you check-in early?
+              </Checkbox>
+              <Checkbox color='success' name='late_checkout'>
+                Will you check-out late?
+              </Checkbox>
             </div>
 
-            <Textarea label='Special Requests' placeholder='Any special requests or dietary requirements?' description='Separate multiple requests with new lines. (ENTER)' minRows={3} name='special_requests' />
+            <Textarea
+              description='Separate multiple requests with new lines. (ENTER)'
+              label='Special Requests'
+              minRows={3}
+              name='special_requests'
+              placeholder='Any special requests or dietary requirements?'
+            />
 
             <div className='border-t pt-4 w-full'>
               <div className='space-y-2 mb-4'>
                 {totalInfo ? (
                   <>
-                    <div className='flex justify-between items-center text-sm'><span>${regularPrice} × {totalInfo.nights} night{totalInfo.nights > 1 ? 's' : ''}</span><span>${totalInfo.subtotal}</span></div>
-                    <div className='flex justify-between items-center font-bold text-lg'><span>Total (before taxes)</span><span className='text-green-600'>${totalInfo.subtotal}</span></div>
-                    <p className='text-xs text-default-500'>Taxes and fees will be calculated at confirmation</p>
+                    <div className='flex justify-between items-center text-sm'>
+                      <span>
+                        ${regularPrice} × {totalInfo.nights} night
+                        {totalInfo.nights > 1 ? 's' : ''}
+                      </span>
+                      <span>${totalInfo.subtotal}</span>
+                    </div>
+                    <div className='flex justify-between items-center font-bold text-lg'>
+                      <span>Total (before taxes)</span>
+                      <span className='text-green-600'>
+                        ${totalInfo.subtotal}
+                      </span>
+                    </div>
+                    <p className='text-xs text-default-500'>
+                      Taxes and fees will be calculated at confirmation
+                    </p>
                   </>
                 ) : (
-                  <div className='flex justify-between items-center'><span>Total</span><span className='text-default-500'>Select dates to see pricing</span></div>
+                  <div className='flex justify-between items-center'>
+                    <span>Total</span>
+                    <span className='text-default-500'>
+                      Select dates to see pricing
+                    </span>
+                  </div>
                 )}
               </div>
 
-              <Button type='submit' color='primary' size='lg' className='w-full' isDisabled={!dateRange?.start || !dateRange?.end || !numberOfGuests}>
+              <Button
+                className='w-full'
+                color='primary'
+                size='lg'
+                type='submit'
+                isDisabled={
+                  !dateRange?.start || !dateRange?.end || !numberOfGuests
+                }
+              >
                 Submit Booking Request
               </Button>
 
-              <p className='text-xs text-default-500 mt-2 text-center'>This is a booking request. Final confirmation will be provided by our team.</p>
+              <p className='text-xs text-default-500 mt-2 text-center'>
+                This is a booking request. Final confirmation will be provided
+                by our team.
+              </p>
             </div>
           </Form>
         </CardBody>

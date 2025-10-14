@@ -13,7 +13,11 @@ interface ValuesGridProps {
   className?: string;
 }
 
-export function ValuesGrid({ values, columns = 2, className = '' }: ValuesGridProps) {
+export function ValuesGrid({
+  values,
+  columns = 2,
+  className = '',
+}: ValuesGridProps) {
   const gridCols = {
     2: 'grid-cols-1 md:grid-cols-2',
     3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
@@ -31,11 +35,11 @@ export function ValuesGrid({ values, columns = 2, className = '' }: ValuesGridPr
 
 function ValueCard({ title, description, icon }: ValueCardProps) {
   return (
-    <Card className="py-6">
-      <CardBody className="text-center space-y-4">
-        <div className="text-4xl">{icon}</div>
-        <h3 className="text-xl font-bold">{title}</h3>
-        <p className="text-default-600">{description}</p>
+    <Card className='py-6'>
+      <CardBody className='text-center space-y-4'>
+        <div className='text-4xl'>{icon}</div>
+        <h3 className='text-xl font-bold'>{title}</h3>
+        <p className='text-default-600'>{description}</p>
       </CardBody>
     </Card>
   );

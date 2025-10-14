@@ -16,13 +16,13 @@ export default function CabinsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  
+
   // Combine filters with search
   const queryParams = {
     ...filters,
     search: searchTerm || undefined,
   };
-  
+
   const { data: cabins, isLoading, error } = useCabins(queryParams);
 
   // Sort options for the filters
@@ -48,81 +48,83 @@ export default function CabinsPage() {
   };
 
   // Sort the data based on current sort settings
-  const sortedCabins = cabins ? [...cabins].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof Cabin];
-    let bValue: any = b[sortBy as keyof Cabin];
-    
-    // Handle different data types
-    if (typeof aValue === 'string') {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-    
-    if (sortOrder === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    } else {
-      return aValue < bValue ? 1 : -1;
-    }
-  }) : [];
+  const sortedCabins = cabins
+    ? [...cabins].sort((a, b) => {
+        let aValue: any = a[sortBy as keyof Cabin];
+        let bValue: any = b[sortBy as keyof Cabin];
+
+        // Handle different data types
+        if (typeof aValue === 'string') {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+        }
+
+        if (sortOrder === 'asc') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      })
+    : [];
 
   // Additional filters component
   const additionalFilters = (
-    <div className="flex flex-wrap gap-2">
+    <div className='flex flex-wrap gap-2'>
       <Select
-        placeholder="Capacity"
-        className="w-40"
-        size="sm"
+        className='w-40'
+        placeholder='Capacity'
         selectedKeys={filters.capacity ? [filters.capacity.toString()] : []}
-        onSelectionChange={(keys) => {
+        size='sm'
+        onSelectionChange={keys => {
           const selected = Array.from(keys)[0] as string;
           const capacity = selected ? parseInt(selected) : undefined;
           setFilters(prev => ({ ...prev, capacity }));
         }}
       >
-        <SelectItem key="1">1+ guests</SelectItem>
-        <SelectItem key="2">2+ guests</SelectItem>
-        <SelectItem key="4">4+ guests</SelectItem>
-        <SelectItem key="6">6+ guests</SelectItem>
-        <SelectItem key="8">8+ guests</SelectItem>
+        <SelectItem key='1'>1+ guests</SelectItem>
+        <SelectItem key='2'>2+ guests</SelectItem>
+        <SelectItem key='4'>4+ guests</SelectItem>
+        <SelectItem key='6'>6+ guests</SelectItem>
+        <SelectItem key='8'>8+ guests</SelectItem>
       </Select>
-      
+
       <Select
-        placeholder="Min Price"
-        className="w-40"
-        size="sm"
+        className='w-40'
+        placeholder='Min Price'
         selectedKeys={filters.minPrice ? [filters.minPrice.toString()] : []}
-        onSelectionChange={(keys) => {
+        size='sm'
+        onSelectionChange={keys => {
           const selected = Array.from(keys)[0] as string;
           const minPrice = selected ? parseInt(selected) : undefined;
           setFilters(prev => ({ ...prev, minPrice }));
         }}
       >
-        <SelectItem key="50">$50+</SelectItem>
-        <SelectItem key="100">$100+</SelectItem>
-        <SelectItem key="150">$150+</SelectItem>
-        <SelectItem key="200">$200+</SelectItem>
+        <SelectItem key='50'>$50+</SelectItem>
+        <SelectItem key='100'>$100+</SelectItem>
+        <SelectItem key='150'>$150+</SelectItem>
+        <SelectItem key='200'>$200+</SelectItem>
       </Select>
-      
+
       <Select
-        placeholder="Max Price"
-        className="w-40"
-        size="sm"
+        className='w-40'
+        placeholder='Max Price'
         selectedKeys={filters.maxPrice ? [filters.maxPrice.toString()] : []}
-        onSelectionChange={(keys) => {
+        size='sm'
+        onSelectionChange={keys => {
           const selected = Array.from(keys)[0] as string;
           const maxPrice = selected ? parseInt(selected) : undefined;
           setFilters(prev => ({ ...prev, maxPrice }));
         }}
       >
-        <SelectItem key="100">Up to $100</SelectItem>
-        <SelectItem key="150">Up to $150</SelectItem>
-        <SelectItem key="200">Up to $200</SelectItem>
-        <SelectItem key="300">Up to $300</SelectItem>
+        <SelectItem key='100'>Up to $100</SelectItem>
+        <SelectItem key='150'>Up to $150</SelectItem>
+        <SelectItem key='200'>Up to $200</SelectItem>
+        <SelectItem key='300'>Up to $300</SelectItem>
       </Select>
-      
+
       <Button
-        size="sm"
-        variant="bordered"
+        size='sm'
+        variant='bordered'
         onPress={() => {
           setFilters({});
           setSearchTerm('');
@@ -172,31 +174,31 @@ export default function CabinsPage() {
       {/* Header */}
       <div className='text-center mb-8'>
         <PageHeader
+          subtitle='Discover our collection of beautiful cabins, each offering unique experiences in the heart of nature. From cozy retreats to spacious family accommodations.'
           title='Our'
           titleAccent='Cabins'
-          subtitle='Discover our collection of beautiful cabins, each offering unique experiences in the heart of nature. From cozy retreats to spacious family accommodations.'
         />
       </div>
 
       {/* Filters */}
       <StandardFilters
-        searchPlaceholder="Search cabins by name, amenities, or description..."
-        searchValue={searchTerm}
-        onSearchChange={handleSearchChange}
-        sortOptions={sortOptions}
-        currentSort={sortBy}
-        onSortChange={handleSortChange}
-        sortOrder={sortOrder}
-        onSortOrderChange={handleSortOrderChange}
         additionalFilters={additionalFilters}
+        currentSort={sortBy}
+        itemName='cabin'
+        searchPlaceholder='Search cabins by name, amenities, or description...'
+        searchValue={searchTerm}
+        sortOptions={sortOptions}
+        sortOrder={sortOrder}
         totalCount={sortedCabins?.length}
-        itemName="cabin"
+        onSearchChange={handleSearchChange}
+        onSortChange={handleSortChange}
+        onSortOrderChange={handleSortOrderChange}
       />
 
       {/* Loading State */}
       {isLoading && (
         <div className='flex flex-col justify-center items-center py-12 gap-4'>
-          <Spinner size='lg' label='Loading cabins...' />
+          <Spinner label='Loading cabins...' size='lg' />
         </div>
       )}
 

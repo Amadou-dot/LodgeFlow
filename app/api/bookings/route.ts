@@ -1,9 +1,5 @@
 import { Booking, Cabin, connectDB, Settings } from '@/models';
-import type {
-  ApiResponse,
-  CreateBookingData,
-  PopulatedBooking
-} from '@/types';
+import type { ApiResponse, CreateBookingData, PopulatedBooking } from '@/types';
 import { clerkClient } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
@@ -203,8 +199,9 @@ export async function POST(request: NextRequest) {
     );
 
     // Populate the booking for response
-    const populatedBooking: PopulatedBooking = await Booking.findById(booking._id)
-      .populate('cabin');
+    const populatedBooking: PopulatedBooking = await Booking.findById(
+      booking._id
+    ).populate('cabin');
     const response: ApiResponse<any> = {
       success: true,
       data: populatedBooking,

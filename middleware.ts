@@ -21,7 +21,7 @@ export default clerkMiddleware(async (auth, req) => {
   if (req.nextUrl.pathname.match(/^\/cabins\/[^/]+$/)) {
     await auth.protect();
   }
-  
+
   // Protect API routes that create bookings or user-specific data
   if (req.nextUrl.pathname.startsWith('/api/bookings')) {
     await auth.protect();

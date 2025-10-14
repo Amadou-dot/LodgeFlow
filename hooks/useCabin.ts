@@ -13,11 +13,11 @@ interface Cabin {
 
 const fetchCabin = async (cabinId: string): Promise<Cabin> => {
   const response = await fetch(`/api/cabins/${cabinId}`);
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch cabin');
   }
-  
+
   const data = await response.json();
   return data.cabin;
 };

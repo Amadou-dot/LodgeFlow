@@ -7,19 +7,19 @@ import { useEffect, useState } from 'react';
 // Search Icon component since it doesn't exist in LodgeFlow icons
 const SearchIcon = ({ className = '', ...props }) => (
   <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
+    fill='none'
+    height='16'
+    stroke='currentColor'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    strokeWidth='2'
+    viewBox='0 0 24 24'
+    width='16'
     {...props}
   >
-    <circle cx="11" cy="11" r="8" />
-    <path d="m21 21-4.35-4.35" />
+    <circle cx='11' cy='11' r='8' />
+    <path d='m21 21-4.35-4.35' />
   </svg>
 );
 
@@ -85,20 +85,20 @@ export default function StandardFilters({
         {/* Search Input */}
         <div className='flex gap-2'>
           <Input
+            className='flex-1'
+            isClearable
             placeholder={searchPlaceholder}
             startContent={<SearchIcon />}
             value={localSearchValue}
             onChange={e => setLocalSearchValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className='flex-1'
-            isClearable
             onClear={handleSearchClear}
+            onKeyPress={handleKeyPress}
           />
           <Button
-            variant='solid'
             color='primary'
-            onPress={handleSearchSubmit}
             isDisabled={localSearchValue === searchValue}
+            variant='solid'
+            onPress={handleSearchSubmit}
           >
             Search
           </Button>
@@ -109,10 +109,10 @@ export default function StandardFilters({
           {sortOptions.map(option => (
             <Button
               key={option.key}
-              variant={currentSort === option.value ? 'solid' : 'bordered'}
-              size='sm'
-              onPress={() => onSortChange(option.value)}
               className='text-xs md:text-sm'
+              size='sm'
+              variant={currentSort === option.value ? 'solid' : 'bordered'}
+              onPress={() => onSortChange(option.value)}
             >
               {option.label}
             </Button>
@@ -121,8 +121,8 @@ export default function StandardFilters({
           {/* Sort Order Toggle */}
           <Button
             isIconOnly
-            variant='bordered'
             size='sm'
+            variant='bordered'
             onPress={() =>
               onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')
             }

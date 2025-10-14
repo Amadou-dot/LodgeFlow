@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IBooking extends Document {
   _id: string;
@@ -8,12 +8,17 @@ export interface IBooking extends Document {
   checkOutDate: Date;
   numNights: number;
   numGuests: number;
-  status: "unconfirmed" | "confirmed" | "checked-in" | "checked-out" | "cancelled";
+  status:
+    | 'unconfirmed'
+    | 'confirmed'
+    | 'checked-in'
+    | 'checked-out'
+    | 'cancelled';
   cabinPrice: number;
   extrasPrice: number;
   totalPrice: number;
   isPaid: boolean;
-  paymentMethod: "cash" | "card" | "bank-transfer" | "online";
+  paymentMethod: 'cash' | 'card' | 'bank-transfer' | 'online';
   extras: {
     hasBreakfast: boolean;
     breakfastPrice: number;
@@ -38,56 +43,62 @@ const BookingSchema: Schema = new Schema(
   {
     cabin: {
       type: Schema.Types.ObjectId,
-      ref: "Cabin",
-      required: [true, "Cabin is required"],
+      ref: 'Cabin',
+      required: [true, 'Cabin is required'],
     },
     customer: {
       type: Schema.Types.String,
-      required: [true, "Customer is required"],
+      required: [true, 'Customer is required'],
     },
     checkInDate: {
       type: Date,
-      required: [true, "Check-in date is required"],
+      required: [true, 'Check-in date is required'],
     },
     checkOutDate: {
       type: Date,
-      required: [true, "Check-out date is required"],
+      required: [true, 'Check-out date is required'],
       validate: {
         validator: function (this: IBooking, checkOutDate: Date) {
           return checkOutDate > this.checkInDate;
         },
-        message: "Check-out date must be after check-in date",
+        message: 'Check-out date must be after check-in date',
       },
     },
     numNights: {
       type: Number,
-      required: [true, "Number of nights is required"],
-      min: [1, "Minimum 1 night required"],
+      required: [true, 'Number of nights is required'],
+      min: [1, 'Minimum 1 night required'],
     },
     numGuests: {
       type: Number,
-      required: [true, "Number of guests is required"],
-      min: [1, "At least 1 guest required"],
+      required: [true, 'Number of guests is required'],
+      min: [1, 'At least 1 guest required'],
     },
     status: {
       type: String,
-      enum: ["unconfirmed", "confirmed", "checked-in", "checked-out", "cancelled"],
-      default: "unconfirmed",
+      enum: [
+        'unconfirmed',
+        'confirmed',
+        'checked-in',
+        'checked-out',
+        'cancelled',
+      ],
+      default: 'unconfirmed',
     },
     cabinPrice: {
       type: Number,
-      required: [true, "Cabin price is required"],
-      min: [0, "Cabin price must be positive"],
+      required: [true, 'Cabin price is required'],
+      min: [0, 'Cabin price must be positive'],
     },
     extrasPrice: {
       type: Number,
       default: 0,
-      min: [0, "Extras price must be positive"],
+      min: [0, 'Extras price must be positive'],
     },
     totalPrice: {
       type: Number,
-      required: [true, "Total price is required"],
-      min: [0, "Total price must be positive"],
+      required: [true, 'Total price is required'],
+      min: [0, 'Total price must be positive'],
     },
     isPaid: {
       type: Boolean,
@@ -95,8 +106,8 @@ const BookingSchema: Schema = new Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["cash", "card", "bank-transfer", "online"],
-      default: "online",
+      enum: ['cash', 'card', 'bank-transfer', 'online'],
+      default: 'online',
     },
     extras: {
       hasBreakfast: { type: Boolean, default: false },
@@ -112,7 +123,7 @@ const BookingSchema: Schema = new Schema(
     },
     observations: {
       type: String,
-      maxlength: [1000, "Observations cannot exceed 1000 characters"],
+      maxlength: [1000, 'Observations cannot exceed 1000 characters'],
     },
     specialRequests: {
       type: [String],
@@ -125,14 +136,14 @@ const BookingSchema: Schema = new Schema(
     depositAmount: {
       type: Number,
       default: 0,
-      min: [0, "Deposit amount must be positive"],
+      min: [0, 'Deposit amount must be positive'],
     },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
+  }
 );
 
 // Indexes for efficient queries
@@ -145,12 +156,13 @@ BookingSchema.index(
   { cabin: 1, checkInDate: 1, checkOutDate: 1 },
   {
     partialFilterExpression: {
-      status: { $nin: ["cancelled"] },
+      status: { $nin: ['cancelled'] },
     },
-  },
+  }
 );
 
 // Prevent model re-compilation in development
-const Booking = mongoose.models.Booking || mongoose.model<IBooking>("Booking", BookingSchema);
+const Booking =
+  mongoose.models.Booking || mongoose.model<IBooking>('Booking', BookingSchema);
 
 export default Booking;

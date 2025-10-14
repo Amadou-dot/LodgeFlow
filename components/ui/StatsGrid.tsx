@@ -13,7 +13,11 @@ interface StatsGridProps {
   className?: string;
 }
 
-export function StatsGrid({ stats, columns = 4, className = '' }: StatsGridProps) {
+export function StatsGrid({
+  stats,
+  columns = 4,
+  className = '',
+}: StatsGridProps) {
   const gridCols = {
     2: 'grid-cols-2',
     3: 'grid-cols-3',
@@ -39,12 +43,12 @@ function StatCard({ value, label, icon, color = 'green' }: StatCardProps) {
   };
 
   return (
-    <div className="space-y-2">
-      {icon && <div className="text-2xl">{icon}</div>}
+    <div className='space-y-2'>
+      {icon && <div className='text-2xl'>{icon}</div>}
       <div className={`text-3xl lg:text-4xl font-bold ${colorClasses[color]}`}>
         {value}
       </div>
-      <div className="text-sm text-default-600">{label}</div>
+      <div className='text-sm text-default-600'>{label}</div>
     </div>
   );
 }

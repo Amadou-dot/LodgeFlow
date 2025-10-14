@@ -46,21 +46,21 @@ export const Navbar = () => {
   };
 
   return (
-    <HeroUINavbar maxWidth='xl' position='sticky' isBordered>
+    <HeroUINavbar isBordered maxWidth='xl' position='sticky'>
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
         <NavbarBrand as='li' className='gap-3 max-w-fit'>
           <NextLink className='flex justify-start items-center gap-2' href='/'>
             {mounted ? (
               <Image
+                alt='LodgeFlow'
+                className='rounded-lg'
+                height={32}
+                width={32}
                 src={
                   resolvedTheme === 'dark'
                     ? '/logo-dark.png'
                     : '/logo-light.png'
                 }
-                alt='LodgeFlow'
-                width={32}
-                height={32}
-                className='rounded-lg'
               />
             ) : (
               <div className='w-8 h-8 bg-default-200 rounded-lg animate-pulse' />
@@ -71,6 +71,8 @@ export const Navbar = () => {
           {siteConfig.navItems.map(item => (
             <NavbarItem key={item.href}>
               <NextLink
+                color='foreground'
+                href={item.href}
                 className={clsx(
                   linkStyles({ color: 'foreground' }),
                   'transition-colors',
@@ -78,8 +80,7 @@ export const Navbar = () => {
                     ? 'text-green-600 font-semibold'
                     : 'hover:text-green-600'
                 )}
-                color='foreground'
-                href={item.href}>
+              >
                 {item.label}
               </NextLink>
             </NavbarItem>
@@ -89,7 +90,8 @@ export const Navbar = () => {
 
       <NavbarContent
         className='hidden sm:flex basis-1/5 sm:basis-full'
-        justify='end'>
+        justify='end'
+      >
         <NavbarItem className='hidden sm:flex gap-2'>
           <ThemeSwitch />
         </NavbarItem>
@@ -99,19 +101,21 @@ export const Navbar = () => {
           <SignedOut>
             <SignInButton mode='modal'>
               <Button
+                className='font-medium'
                 color='default'
-                variant='bordered'
                 size='sm'
-                className='font-medium'>
+                variant='bordered'
+              >
                 Sign In
               </Button>
             </SignInButton>
             <SignUpButton mode='modal'>
               <Button
+                className='font-medium'
                 color='secondary'
-                variant='bordered'
                 size='sm'
-                className='font-medium'>
+                variant='bordered'
+              >
                 Sign Up
               </Button>
             </SignUpButton>
@@ -156,7 +160,8 @@ export const Navbar = () => {
                   isActive(item.href)
                     ? 'text-green-600 font-semibold'
                     : 'hover:text-green-600'
-                )}>
+                )}
+              >
                 {item.label}
               </Link>
             </NavbarMenuItem>
@@ -168,19 +173,21 @@ export const Navbar = () => {
               <div className='flex flex-col gap-2 mt-4'>
                 <SignInButton mode='modal'>
                   <Button
+                    className='w-full'
                     color='default'
-                    variant='bordered'
                     size='md'
-                    className='w-full'>
+                    variant='bordered'
+                  >
                     Sign In
                   </Button>
                 </SignInButton>
                 <SignUpButton mode='modal'>
                   <Button
+                    className='w-full'
                     color='secondary'
-                    variant='bordered'
                     size='md'
-                    className='w-full'>
+                    variant='bordered'
+                  >
                     Sign Up
                   </Button>
                 </SignUpButton>

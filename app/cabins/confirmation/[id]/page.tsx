@@ -55,7 +55,11 @@ interface BookingData {
   depositPaid: boolean;
 }
 
-export default function BookingConfirmationPage({ params }: { params: Params }) {
+export default function BookingConfirmationPage({
+  params,
+}: {
+  params: Params;
+}) {
   const [bookingId, setBookingId] = useState<string>('');
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +109,7 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
   if (isLoading || !isLoaded) {
     return (
       <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-        <Spinner size='lg' label='Loading booking details...' />
+        <Spinner label='Loading booking details...' size='lg' />
       </div>
     );
   }
@@ -119,11 +123,17 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
             <XCircle className='w-16 h-16 text-danger' />
             <h2 className={title({ size: 'sm' })}>Unauthorized Access</h2>
             <p className='text-default-600'>
-              You don't have permission to view this booking confirmation. This booking belongs to another user.
+              You don't have permission to view this booking confirmation. This
+              booking belongs to another user.
             </p>
             <Divider className='my-2' />
-            <Link href='/cabins' className='w-full'>
-              <Button color='primary' variant='flat' startContent={<Home className='w-4 h-4' />} className='w-full'>
+            <Link className='w-full' href='/cabins'>
+              <Button
+                className='w-full'
+                color='primary'
+                startContent={<Home className='w-4 h-4' />}
+                variant='flat'
+              >
                 Return to Cabins
               </Button>
             </Link>
@@ -141,11 +151,17 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
             <XCircle className='w-16 h-16 text-danger' />
             <h2 className={title({ size: 'sm' })}>Booking Not Found</h2>
             <p className='text-default-600'>
-              {error || 'The booking you are looking for does not exist or has been removed.'}
+              {error ||
+                'The booking you are looking for does not exist or has been removed.'}
             </p>
             <Divider className='my-2' />
-            <Link href='/cabins' className='w-full'>
-              <Button color='primary' variant='flat' startContent={<Home className='w-4 h-4' />} className='w-full'>
+            <Link className='w-full' href='/cabins'>
+              <Button
+                className='w-full'
+                color='primary'
+                startContent={<Home className='w-4 h-4' />}
+                variant='flat'
+              >
                 Return to Cabins
               </Button>
             </Link>
@@ -174,10 +190,12 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
         <CheckCircle className='w-20 h-20 text-success' />
         <h1 className={title({ size: 'lg' })}>Booking Request Submitted!</h1>
         <p className={subtitle()}>
-          Your booking request has been received. We'll review it and send you a confirmation email shortly.
+          Your booking request has been received. We'll review it and send you a
+          confirmation email shortly.
         </p>
-        <Chip color='warning' variant='flat' size='lg'>
-          Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+        <Chip color='warning' size='lg' variant='flat'>
+          Status:{' '}
+          {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
         </Chip>
       </div>
 
@@ -185,11 +203,14 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
         {/* Cabin Image */}
         <div className='relative h-64 lg:h-full min-h-[300px] rounded-lg overflow-hidden'>
           <Image
-            src={booking.cabin.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d'}
             alt={booking.cabin.name}
+            className='rounded-lg'
             fill
             style={{ objectFit: 'cover' }}
-            className='rounded-lg'
+            src={
+              booking.cabin.image ||
+              'https://images.unsplash.com/photo-1571896349842-33c89424de2d'
+            }
           />
         </div>
 
@@ -245,7 +266,9 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
         booking.specialRequests.length > 0) && (
         <Card className='mb-6'>
           <CardHeader>
-            <h2 className={title({ size: 'sm' })}>Additional Services & Requests</h2>
+            <h2 className={title({ size: 'sm' })}>
+              Additional Services & Requests
+            </h2>
           </CardHeader>
           <CardBody className='space-y-4'>
             {/* Extras */}
@@ -255,7 +278,9 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
               booking.extras.hasEarlyCheckIn ||
               booking.extras.hasLateCheckOut) && (
               <div>
-                <p className='text-sm text-default-500 mb-2'>Selected Services:</p>
+                <p className='text-sm text-default-500 mb-2'>
+                  Selected Services:
+                </p>
                 <div className='flex flex-wrap gap-2'>
                   {booking.extras.hasBreakfast && (
                     <Chip color='success' variant='flat'>
@@ -291,7 +316,9 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
               <>
                 <Divider />
                 <div>
-                  <p className='text-sm text-default-500 mb-2'>Special Requests:</p>
+                  <p className='text-sm text-default-500 mb-2'>
+                    Special Requests:
+                  </p>
                   <ul className='list-disc list-inside space-y-1'>
                     {booking.specialRequests.map((request, index) => (
                       <li key={index} className='text-sm'>
@@ -314,9 +341,12 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
         <CardBody className='space-y-3'>
           <div className='flex justify-between items-center'>
             <span className='text-default-600'>
-              ${booking.cabinPrice} × {booking.numNights} night{booking.numNights > 1 ? 's' : ''}
+              ${booking.cabinPrice} × {booking.numNights} night
+              {booking.numNights > 1 ? 's' : ''}
             </span>
-            <span className='font-semibold'>${booking.cabinPrice * booking.numNights}</span>
+            <span className='font-semibold'>
+              ${booking.cabinPrice * booking.numNights}
+            </span>
           </div>
 
           {booking.extrasPrice > 0 && (
@@ -330,7 +360,9 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
 
           <div className='flex justify-between items-center text-lg'>
             <span className='font-bold'>Total (before taxes)</span>
-            <span className='font-bold text-success'>${booking.totalPrice}</span>
+            <span className='font-bold text-success'>
+              ${booking.totalPrice}
+            </span>
           </div>
 
           {booking.depositAmount > 0 && (
@@ -338,13 +370,16 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
               <Divider />
               <div className='flex justify-between items-center'>
                 <span className='text-default-600'>Deposit Required</span>
-                <span className='font-semibold text-warning'>${booking.depositAmount}</span>
+                <span className='font-semibold text-warning'>
+                  ${booking.depositAmount}
+                </span>
               </div>
             </>
           )}
 
           <p className='text-xs text-default-500 mt-2'>
-            Taxes and fees will be calculated and included in your final confirmation email.
+            Taxes and fees will be calculated and included in your final
+            confirmation email.
           </p>
         </CardBody>
       </Card>
@@ -352,7 +387,12 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
       {/* Action Buttons */}
       <div className='flex flex-col sm:flex-row gap-4 justify-center'>
         <Link href='/cabins'>
-          <Button color='primary' variant='flat' startContent={<Home className='w-4 h-4' />} size='lg'>
+          <Button
+            color='primary'
+            size='lg'
+            startContent={<Home className='w-4 h-4' />}
+            variant='flat'
+          >
             Browse More Cabins
           </Button>
         </Link>
@@ -362,7 +402,9 @@ export default function BookingConfirmationPage({ params }: { params: Params }) 
       <Card className='mt-6 bg-primary-50 dark:bg-primary-900/20'>
         <CardBody>
           <p className='text-sm text-center'>
-            You will receive a confirmation email at <strong>{user?.emailAddresses[0]?.emailAddress}</strong> once your booking is reviewed and approved by our team.
+            You will receive a confirmation email at{' '}
+            <strong>{user?.emailAddresses[0]?.emailAddress}</strong> once your
+            booking is reviewed and approved by our team.
           </p>
         </CardBody>
       </Card>

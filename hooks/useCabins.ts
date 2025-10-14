@@ -1,29 +1,35 @@
 import { useQuery } from '@tanstack/react-query';
 import type { Cabin, ApiResponse, CabinsQueryParams } from '@/types';
 
-const fetchCabins = async (params: CabinsQueryParams = {}): Promise<Cabin[]> => {
+const fetchCabins = async (
+  params: CabinsQueryParams = {}
+): Promise<Cabin[]> => {
   const searchParams = new URLSearchParams();
-  
-  if (params.capacity) searchParams.append('capacity', params.capacity.toString());
-  if (params.minPrice) searchParams.append('minPrice', params.minPrice.toString());
-  if (params.maxPrice) searchParams.append('maxPrice', params.maxPrice.toString());
-  if (params.available !== undefined) searchParams.append('available', params.available.toString());
+
+  if (params.capacity)
+    searchParams.append('capacity', params.capacity.toString());
+  if (params.minPrice)
+    searchParams.append('minPrice', params.minPrice.toString());
+  if (params.maxPrice)
+    searchParams.append('maxPrice', params.maxPrice.toString());
+  if (params.available !== undefined)
+    searchParams.append('available', params.available.toString());
   if (params.search) searchParams.append('search', params.search);
 
   const url = `/api/cabins${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
-  
+
   const response = await fetch(url);
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch cabins');
   }
-  
+
   const result: ApiResponse<Cabin[]> = await response.json();
-  
+
   if (!result.success) {
     throw new Error(result.error || 'Failed to fetch cabins');
   }
-  
+
   return result.data || [];
 };
 
