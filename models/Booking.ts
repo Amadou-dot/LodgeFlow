@@ -42,8 +42,7 @@ const BookingSchema: Schema = new Schema(
       required: [true, "Cabin is required"],
     },
     customer: {
-      type: Schema.Types.ObjectId,
-      ref: "Customer",
+      type: Schema.Types.String,
       required: [true, "Customer is required"],
     },
     checkInDate: {
