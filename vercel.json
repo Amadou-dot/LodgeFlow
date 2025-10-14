@@ -1,8 +1,0 @@
-{
-  "buildCommand": "npm run build",
-  "functions": {
-    "app/**/*.js": {
-      "maxDuration": 30
-    }
-  }
-}
