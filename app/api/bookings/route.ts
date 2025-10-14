@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (checkIn >= checkOut) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Check-out date must be after check-in date",
+        error: 'Check-out date must be after check-in date',
       };
       return NextResponse.json(response, { status: 400 });
     }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (!cabin) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Cabin not found",
+        error: 'Cabin not found',
       };
       return NextResponse.json(response, { status: 404 });
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     // Check for conflicting bookings
     const conflictingBookings = await Booking.find({
       cabin: cabinId,
-      status: { $nin: ["cancelled"] },
+      status: { $nin: ['cancelled'] },
       $or: [
         {
           checkInDate: { $lt: checkOut },
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     if (conflictingBookings.length > 0) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Cabin is not available for the selected dates",
+        error: 'Cabin is not available for the selected dates',
       };
       return NextResponse.json(response, { status: 409 });
     }
@@ -101,15 +101,20 @@ export async function POST(request: NextRequest) {
     if (!settings) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "System settings not found",
+        error: 'System settings not found',
       };
       return NextResponse.json(response, { status: 500 });
     }
 
     // Calculate nights and pricing
-    const numNights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (numNights < settings.minBookingLength || numNights > settings.maxBookingLength) {
+    const numNights = Math.ceil(
+      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (
+      numNights < settings.minBookingLength ||
+      numNights > settings.maxBookingLength
+    ) {
       const response: ApiResponse<never> = {
         success: false,
         error: `Booking length must be between ${settings.minBookingLength} and ${settings.maxBookingLength} nights`,
@@ -136,7 +141,8 @@ export async function POST(request: NextRequest) {
     };
 
     if (bookingExtras.hasBreakfast) {
-      bookingExtras.breakfastPrice = settings.breakfastPrice * numGuests * numNights;
+      bookingExtras.breakfastPrice =
+        settings.breakfastPrice * numGuests * numNights;
       extrasPrice += bookingExtras.breakfastPrice;
     }
 
