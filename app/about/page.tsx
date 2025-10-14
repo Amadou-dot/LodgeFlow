@@ -2,13 +2,13 @@ import { Button } from '@heroui/button';
 import { Link } from '@heroui/link';
 
 import { siteConfig } from '@/config/site';
-import { 
-  PageHeader, 
-  SectionHeader, 
-  StatsGrid, 
-  ValuesGrid, 
-  TeamGrid, 
-  CallToActionSection 
+import {
+  PageHeader,
+  SectionHeader,
+  StatsGrid,
+  ValuesGrid,
+  TeamGrid,
+  CallToActionSection,
 } from '@/components/ui';
 
 export default function AboutPage() {
@@ -88,20 +88,16 @@ export default function AboutPage() {
   return (
     <div className='space-y-16 py-8'>
       {/* Hero Section */}
-      <PageHeader 
-        title="About"
-        titleAccent="LodgeFlow"
+      <PageHeader
         subtitle="Nestled in the heart of pristine wilderness, LodgeFlow has been a sanctuary for those seeking to reconnect with nature's tranquility since 2009."
+        title='About'
+        titleAccent='LodgeFlow'
       />
 
       {/* Story Section */}
       <section className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
         <div>
-          <SectionHeader 
-            title="Our Story"
-            centered={false}
-            className="mb-6"
-          />
+          <SectionHeader centered={false} className='mb-6' title='Our Story' />
           <div className='space-y-4 text-default-600'>
             <p>
               What began as a dream to create a perfect escape from the modern
@@ -109,7 +105,7 @@ export default function AboutPage() {
               luxury and nature's raw beauty.
             </p>
             <p>
-              Founded by environmental enthusiasts Sarah and Michael Chen, 
+              Founded by environmental enthusiasts Sarah and Michael Chen,
               LodgeFlow was born from their vision of sustainable luxury
               tourism. After years of traveling the world, they discovered this
               untouched valley and knew they had found something special.
@@ -123,10 +119,11 @@ export default function AboutPage() {
           </div>
           <Button
             as={Link}
-            href='/cabins'
+            className='mt-6'
             color='primary'
+            href='/cabins'
             size='lg'
-            className='mt-6'>
+          >
             Explore Our Cabins
           </Button>
         </div>
@@ -146,39 +143,39 @@ export default function AboutPage() {
 
       {/* Values Section */}
       <section>
-        <SectionHeader 
-          title="Our Values"
-          subtitle="The principles that guide everything we do at LodgeFlow"
-          className="mb-12"
+        <SectionHeader
+          className='mb-12'
+          subtitle='The principles that guide everything we do at LodgeFlow'
+          title='Our Values'
         />
         <ValuesGrid values={values} />
       </section>
 
       {/* Team Section */}
       <section>
-        <SectionHeader 
-          title="Meet Our Team"
-          subtitle="The passionate people who make your LodgeFlow experience unforgettable"
-          className="mb-12"
+        <SectionHeader
+          className='mb-12'
+          subtitle='The passionate people who make your LodgeFlow experience unforgettable'
+          title='Meet Our Team'
         />
-        <TeamGrid members={team} maxDisplay={6} />
+        <TeamGrid maxDisplay={6} members={team} />
       </section>
 
       {/* Call to Action */}
-      <CallToActionSection 
-        title="Ready to Experience LodgeFlow?"
-        subtitle="Join thousands of guests who have discovered their perfect escape in nature"
+      <CallToActionSection
+        subtitle='Join thousands of guests who have discovered their perfect escape in nature'
+        title='Ready to Experience LodgeFlow?'
         buttons={[
           {
             label: 'Book Your Stay',
             href: '/cabins',
-            color: 'primary'
+            color: 'primary',
           },
           {
             label: 'Contact Us',
             href: siteConfig.links.email,
-            variant: 'bordered'
-          }
+            variant: 'bordered',
+          },
         ]}
       />
     </div>

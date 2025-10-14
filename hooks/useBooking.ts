@@ -5,7 +5,9 @@ export const useCreateBooking = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (bookingData: CreateBookingData): Promise<{ success: boolean; data: Booking; message?: string }> => {
+    mutationFn: async (
+      bookingData: CreateBookingData
+    ): Promise<{ success: boolean; data: Booking; message?: string }> => {
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

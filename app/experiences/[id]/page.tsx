@@ -40,7 +40,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
   if (isLoading || !experienceId) {
     return (
       <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-        <Spinner size='lg' label='Loading experience details...' />
+        <Spinner label='Loading experience details...' size='lg' />
       </div>
     );
   }
@@ -82,10 +82,10 @@ export default function ExperiencePage({ params }: { params: Params }) {
       <div className='relative'>
         <div className='relative h-96 rounded-2xl overflow-hidden'>
           <Image
-            src={experience.image}
             alt={experience.name}
-            fill
             className='object-cover'
+            fill
+            src={experience.image}
           />
           <div className='absolute inset-0 bg-black/40' />
 
@@ -93,16 +93,17 @@ export default function ExperiencePage({ params }: { params: Params }) {
           <div className='absolute bottom-0 left-0 right-0 p-8 text-white'>
             <div className='flex items-center gap-3 mb-4'>
               <Chip
-                variant='solid'
+                className='text-white'
                 color={getDifficultyColor(experience.difficulty)}
-                className='text-white'>
+                variant='solid'
+              >
                 {experience.difficulty}
               </Chip>
-              <Chip variant='solid' color='primary'>
+              <Chip color='primary' variant='solid'>
                 {experience.category}
               </Chip>
               {experience.isPopular && (
-                <Chip variant='solid' color='warning' startContent={<FiStar />}>
+                <Chip color='warning' startContent={<FiStar />} variant='solid'>
                   Popular
                 </Chip>
               )}
@@ -246,12 +247,13 @@ export default function ExperiencePage({ params }: { params: Params }) {
                   {experience.gallery.map((image, index) => (
                     <div
                       key={index}
-                      className='relative h-32 rounded-lg overflow-hidden'>
+                      className='relative h-32 rounded-lg overflow-hidden'
+                    >
                       <Image
-                        src={image}
                         alt={`${experience.name} gallery ${index + 1}`}
-                        fill
                         className='object-cover'
+                        fill
+                        src={image}
                       />
                     </div>
                   ))}
@@ -314,21 +316,23 @@ export default function ExperiencePage({ params }: { params: Params }) {
               <div className='space-y-3'>
                 <Button
                   as={Link}
-                  href='/contact'
-                  color='primary'
-                  size='lg'
                   className='w-full'
-                  startContent={<FiMail className='w-4 h-4' />}>
+                  color='primary'
+                  href='/contact'
+                  size='lg'
+                  startContent={<FiMail className='w-4 h-4' />}
+                >
                   {experience.ctaText}
                 </Button>
 
                 <Button
                   as={Link}
-                  href='tel:+1-800-LODGEFLOW'
-                  variant='bordered'
-                  size='lg'
                   className='w-full'
-                  startContent={<FiPhone className='w-4 h-4' />}>
+                  href='tel:+1-800-LODGEFLOW'
+                  size='lg'
+                  startContent={<FiPhone className='w-4 h-4' />}
+                  variant='bordered'
+                >
                   Call to Book
                 </Button>
               </div>

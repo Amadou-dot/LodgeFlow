@@ -75,27 +75,29 @@ export default function DiningPage() {
   const additionalFilters = (
     <div className='flex flex-wrap gap-2'>
       <Select
-        placeholder='Filter by type'
         className='w-40'
-        size='sm'
+        placeholder='Filter by type'
         selectedKeys={filters.type ? [filters.type] : []}
+        size='sm'
         onSelectionChange={keys => {
           const selected = Array.from(keys)[0] as string;
           setFilters(prev => ({ ...prev, type: selected as any }));
-        }}>
+        }}
+      >
         <SelectItem key='menu'>Menu Items</SelectItem>
         <SelectItem key='experience'>Experiences</SelectItem>
       </Select>
 
       <Select
-        placeholder='Filter by meal'
         className='w-40'
-        size='sm'
+        placeholder='Filter by meal'
         selectedKeys={filters.mealType ? [filters.mealType] : []}
+        size='sm'
         onSelectionChange={keys => {
           const selected = Array.from(keys)[0] as string;
           setFilters(prev => ({ ...prev, mealType: selected as any }));
-        }}>
+        }}
+      >
         <SelectItem key='breakfast'>Breakfast</SelectItem>
         <SelectItem key='lunch'>Lunch</SelectItem>
         <SelectItem key='dinner'>Dinner</SelectItem>
@@ -103,14 +105,15 @@ export default function DiningPage() {
       </Select>
 
       <Select
-        placeholder='Filter by category'
         className='w-40'
-        size='sm'
+        placeholder='Filter by category'
         selectedKeys={filters.category ? [filters.category] : []}
+        size='sm'
         onSelectionChange={keys => {
           const selected = Array.from(keys)[0] as string;
           setFilters(prev => ({ ...prev, category: selected as any }));
-        }}>
+        }}
+      >
         <SelectItem key='regular'>Regular</SelectItem>
         <SelectItem key='craft-beer'>Craft Beer</SelectItem>
         <SelectItem key='wine'>Wine</SelectItem>
@@ -124,7 +127,8 @@ export default function DiningPage() {
         onPress={() => {
           setFilters({});
           setSearchTerm('');
-        }}>
+        }}
+      >
         Clear Filters
       </Button>
     </div>
@@ -248,7 +252,7 @@ export default function DiningPage() {
       {/* Loading State */}
       {isLoading && (
         <div className='flex flex-col justify-center items-center py-12 gap-4'>
-          <Spinner size='lg' label='Loading dining options...' />
+          <Spinner label='Loading dining options...' size='lg' />
         </div>
       )}
 
@@ -305,11 +309,11 @@ export default function DiningPage() {
               </div>
               <div className='relative h-64 lg:h-80'>
                 <Image
-                  src='https://images.unsplash.com/photo-1684954215462-cad9f3693b41?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
                   alt='Dining Philosophy'
-                  fill
-                  style={{ objectFit: 'cover' }}
                   className='rounded-2xl'
+                  fill
+                  src='https://images.unsplash.com/photo-1684954215462-cad9f3693b41?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
             </div>
@@ -361,11 +365,11 @@ export default function DiningPage() {
                     {items.length > 0 && items[0].image && (
                       <div className='relative w-full h-48 mb-4'>
                         <Image
-                          src={items[0].image}
                           alt={displayName}
-                          fill
-                          style={{ objectFit: 'cover' }}
                           className='rounded-t-lg'
+                          fill
+                          src={items[0].image}
+                          style={{ objectFit: 'cover' }}
                         />
                       </div>
                     )}
@@ -374,10 +378,11 @@ export default function DiningPage() {
                       <h4 className='font-bold text-large'>{displayName}</h4>
                       {servingTime && (
                         <Chip
+                          className='mt-2'
                           color='primary'
-                          variant='flat'
                           size='sm'
-                          className='mt-2'>
+                          variant='flat'
+                        >
                           {servingTime}
                         </Chip>
                       )}
@@ -392,7 +397,8 @@ export default function DiningPage() {
                         {items.slice(0, 3).map(dish => (
                           <div
                             key={dish._id}
-                            className='border-b border-default-200 pb-3 last:border-b-0'>
+                            className='border-b border-default-200 pb-3 last:border-b-0'
+                          >
                             <div className='flex justify-between items-start mb-1'>
                               <h5 className='font-semibold text-sm'>
                                 {dish.name}
@@ -409,9 +415,10 @@ export default function DiningPage() {
                                 {dish.dietary.slice(0, 2).map(diet => (
                                   <Chip
                                     key={diet}
+                                    color='success'
                                     size='sm'
                                     variant='flat'
-                                    color='success'>
+                                  >
                                     {diet}
                                   </Chip>
                                 ))}
@@ -422,9 +429,10 @@ export default function DiningPage() {
                       </div>
 
                       <Button
+                        className='w-full mt-auto'
                         color='primary'
                         size='sm'
-                        className='w-full mt-auto'>
+                      >
                         {getCtaText(mealType)}
                       </Button>
                     </CardBody>
@@ -449,7 +457,8 @@ export default function DiningPage() {
               {diningExperiences.map(experience => (
                 <Card
                   key={experience._id}
-                  className='py-4 flex flex-col h-full'>
+                  className='py-4 flex flex-col h-full'
+                >
                   <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
                     <h4 className='font-bold text-large'>{experience.name}</h4>
                     <div className='flex items-center gap-2 text-small text-default-500 mt-1'>
@@ -471,11 +480,11 @@ export default function DiningPage() {
                   <CardBody className='overflow-visible py-2 flex flex-col flex-grow'>
                     <div className='relative mb-4'>
                       <Image
-                        src={experience.image}
                         alt={experience.name}
-                        width={300}
-                        height={128}
                         className='w-full h-32 object-cover rounded-lg'
+                        height={128}
+                        src={experience.image}
+                        width={300}
                       />
                     </div>
 
@@ -496,7 +505,8 @@ export default function DiningPage() {
                                 .map((item, itemIndex) => (
                                   <div
                                     key={itemIndex}
-                                    className='flex items-center gap-2 text-sm'>
+                                    className='flex items-center gap-2 text-sm'
+                                  >
                                     <span className='text-green-500'>✓</span>
                                     <span className='text-default-600'>
                                       {item}
@@ -509,9 +519,10 @@ export default function DiningPage() {
                     </div>
 
                     <Button
+                      className='w-full mt-auto'
                       color='primary'
                       size='sm'
-                      className='w-full mt-auto'>
+                    >
                       Reserve Experience
                     </Button>
                   </CardBody>
@@ -542,20 +553,21 @@ export default function DiningPage() {
                 return (
                   <Card
                     key={category}
-                    className='py-4 bg-white dark:bg-default-100 flex flex-col h-full'>
+                    className='py-4 bg-white dark:bg-default-100 flex flex-col h-full'
+                  >
                     {/* Image Section */}
                     {items.length > 0 && items[0].image && (
                       <div className='relative w-full h-32 mb-4'>
                         <Image
+                          className='rounded-t-lg'
+                          fill
                           src={items[0].image}
+                          style={{ objectFit: 'cover' }}
                           alt={
                             categoryDisplayNames[
                               category as keyof typeof categoryDisplayNames
                             ] || category
                           }
-                          fill
-                          style={{ objectFit: 'cover' }}
-                          className='rounded-t-lg'
                         />
                       </div>
                     )}
@@ -574,7 +586,8 @@ export default function DiningPage() {
                           {items.slice(0, 5).map(item => (
                             <li
                               key={item._id}
-                              className='text-sm text-default-600 text-center border-b border-default-200 pb-2 last:border-b-0'>
+                              className='text-sm text-default-600 text-center border-b border-default-200 pb-2 last:border-b-0'
+                            >
                               <div className='font-medium'>{item.name}</div>
                               {item.price && (
                                 <span className='text-xs text-green-600'>
@@ -600,10 +613,11 @@ export default function DiningPage() {
                       </div>
 
                       <Button
+                        className='w-full mt-auto'
                         color='primary'
-                        variant='bordered'
                         size='sm'
-                        className='w-full mt-auto'>
+                        variant='bordered'
+                      >
                         View Full Selection
                       </Button>
                     </CardBody>
@@ -624,18 +638,20 @@ export default function DiningPage() {
             <div className='flex flex-col sm:flex-row gap-4 justify-center'>
               <Button
                 as={Link}
-                href='tel:+1-800-LODGEFLOW'
                 color='primary'
+                href='tel:+1-800-LODGEFLOW'
                 size='lg'
-                startContent={<FaPhone className='w-4 h-4' />}>
+                startContent={<FaPhone className='w-4 h-4' />}
+              >
                 Make Reservation
               </Button>
               <Button
                 as={Link}
                 href='mailto:dining@lodgeflow.com'
-                variant='bordered'
                 size='lg'
-                startContent={<FaEnvelope className='w-4 h-4' />}>
+                startContent={<FaEnvelope className='w-4 h-4' />}
+                variant='bordered'
+              >
                 Special Requests
               </Button>
             </div>

@@ -42,15 +42,15 @@ export default function ExperiencesPage() {
     <div className='space-y-12 py-8'>
       {/* Header Section */}
       <PageHeader
+        subtitle='Immerse yourself in nature with our carefully curated adventures and activities. From peaceful meditation sessions to thrilling mountain expeditions, discover the perfect way to connect with the wilderness.'
         title='Wild'
         titleAccent='Experiences'
-        subtitle='Immerse yourself in nature with our carefully curated adventures and activities. From peaceful meditation sessions to thrilling mountain expeditions, discover the perfect way to connect with the wilderness.'
       />
 
       {/* Loading State */}
       {isLoading && (
         <div className='flex flex-col justify-center items-center py-12 gap-4'>
-          <Spinner size='lg' label='Loading experiences...' />
+          <Spinner label='Loading experiences...' size='lg' />
         </div>
       )}
 
@@ -70,16 +70,17 @@ export default function ExperiencesPage() {
           {/* Categories Overview */}
           <section className='bg-green-50 dark:bg-green-950 rounded-2xl p-8'>
             <SectionHeader
-              title='Experience Categories'
-              subtitle='Choose from our diverse range of outdoor activities'
               className='mb-8'
+              subtitle='Choose from our diverse range of outdoor activities'
+              title='Experience Categories'
             />
 
             <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4'>
               {categories.map((category, index) => (
                 <div
                   key={index}
-                  className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg'>
+                  className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg'
+                >
                   <div className='text-2xl font-bold text-green-600 mb-1'>
                     {category.count}
                   </div>
@@ -94,23 +95,23 @@ export default function ExperiencesPage() {
           {/* Experiences Grid */}
           <section>
             <SectionHeader
-              title='Available Experiences'
-              subtitle='Book your next adventure and create unforgettable memories'
               className='mb-12'
+              subtitle='Book your next adventure and create unforgettable memories'
+              title='Available Experiences'
             />
 
             <PricingGrid
+              columns={3}
               items={experiences.map(exp => ({
                 ...exp,
                 ctaHref: `/experiences/${exp._id}`,
               }))}
-              columns={3}
             />
           </section>
 
           {/* Booking Information */}
           <section className='bg-blue-50 dark:bg-blue-950 rounded-2xl p-8'>
-            <SectionHeader title='Booking Information' className='mb-8' />
+            <SectionHeader className='mb-8' title='Booking Information' />
 
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               <div className='space-y-2'>
@@ -170,8 +171,8 @@ export default function ExperiencesPage() {
 
           {/* Call to Action */}
           <CallToActionSection
-            title='Ready for Your Next Adventure?'
             subtitle='Contact our adventure specialists to plan the perfect wilderness experience tailored to your interests and skill level.'
+            title='Ready for Your Next Adventure?'
             buttons={[
               {
                 label: 'Contact Us',

@@ -26,7 +26,7 @@ export default function Page({ params }: { params: Params }) {
   if (isLoading || !cabinId || !userLoaded) {
     return (
       <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-        <Spinner size='lg' label='Loading cabin details...' />
+        <Spinner label='Loading cabin details...' size='lg' />
       </div>
     );
   }
@@ -61,6 +61,7 @@ export default function Page({ params }: { params: Params }) {
   return (
     <div>
       <BookingForm
+        userData={userData}
         cabin={{
           _id: cabin._id,
           name: cabin.name,
@@ -68,7 +69,6 @@ export default function Page({ params }: { params: Params }) {
           maxCapacity: cabin.capacity,
           image: cabin.image,
         }}
-        userData={userData}
       />
     </div>
   );

@@ -14,37 +14,38 @@ export default function ContactPage() {
       icon: <FiPhone className='w-5 h-5 text-green-600' />,
       title: 'Phone',
       lines: ['+1 (800) LODGEFLOW', '+1 (800) 563-4335'],
-      subtitle: 'Daily: 8:00 AM - 10:00 PM'
+      subtitle: 'Daily: 8:00 AM - 10:00 PM',
     },
     {
       icon: <FiMail className='w-5 h-5 text-green-600' />,
       title: 'Email',
       lines: ['hello@lodgeflow.com', 'reservations@lodgeflow.com'],
-      subtitle: 'We respond within 2 hours'
+      subtitle: 'We respond within 2 hours',
     },
     {
       icon: <FiMapPin className='w-5 h-5 text-green-600' />,
       title: 'Location',
-      lines: ['LodgeFlow Resort', '1000 Wilderness Drive', 'Pine Valley, MT 59718']
-    }
+      lines: [
+        'LodgeFlow Resort',
+        '1000 Wilderness Drive',
+        'Pine Valley, MT 59718',
+      ],
+    },
   ];
 
   return (
     <div className='space-y-8 py-8'>
       {/* Header */}
-      <PageHeader 
-        title="Contact"
-        titleAccent="Us"
+      <PageHeader
         subtitle="We're here to help you plan the perfect escape to LodgeFlow. Get in touch with our team for any questions or assistance."
+        title='Contact'
+        titleAccent='Us'
       />
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
         {/* Contact Information */}
         <div className='space-y-8'>
-          <ContactInfoCard 
-            title="Get in Touch"
-            items={contactItems}
-          >
+          <ContactInfoCard items={contactItems} title='Get in Touch'>
             <div className='pt-4 border-t'>
               <h4 className='font-semibold mb-3'>Follow Us</h4>
               <div className='flex gap-4'>
@@ -53,8 +54,9 @@ export default function ContactPage() {
                   href={siteConfig.links.instagram}
                   isExternal
                   size='sm'
+                  startContent={<FaInstagram className='w-4 h-4' />}
                   variant='flat'
-                  startContent={<FaInstagram className='w-4 h-4' />}>
+                >
                   Instagram
                 </Button>
                 <Button
@@ -62,8 +64,9 @@ export default function ContactPage() {
                   href={siteConfig.links.facebook}
                   isExternal
                   size='sm'
+                  startContent={<FaFacebook className='w-4 h-4' />}
                   variant='flat'
-                  startContent={<FaFacebook className='w-4 h-4' />}>
+                >
                   Facebook
                 </Button>
               </div>
@@ -75,8 +78,8 @@ export default function ContactPage() {
         <div>
           <Card>
             <CardBody>
-              <h3 className="text-xl font-bold">Send us a Message</h3>
-              <p className="text-default-600 mt-2 mb-6">
+              <h3 className='text-xl font-bold'>Send us a Message</h3>
+              <p className='text-default-600 mt-2 mb-6'>
                 Fill out the form below and we'll get back to you as soon as
                 possible.
               </p>
@@ -84,48 +87,49 @@ export default function ContactPage() {
               <form className='space-y-4'>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <Input
+                    isRequired
                     label='First Name'
                     placeholder='Enter your first name'
-                    isRequired
                   />
                   <Input
+                    isRequired
                     label='Last Name'
                     placeholder='Enter your last name'
-                    isRequired
                   />
                 </div>
 
                 <Input
-                  label='Email'
-                  type='email'
-                  placeholder='Enter your email'
                   isRequired
+                  label='Email'
+                  placeholder='Enter your email'
+                  type='email'
                 />
 
                 <Input
                   label='Phone'
-                  type='tel'
                   placeholder='Enter your phone number'
+                  type='tel'
                 />
 
                 <Input
+                  isRequired
                   label='Subject'
                   placeholder='What is this regarding?'
-                  isRequired
                 />
 
                 <Textarea
-                  label='Message'
-                  placeholder='Tell us how we can help you...'
-                  minRows={4}
                   isRequired
+                  label='Message'
+                  minRows={4}
+                  placeholder='Tell us how we can help you...'
                 />
 
                 <Button
-                  type='submit'
+                  className='w-full'
                   color='primary'
                   size='lg'
-                  className='w-full'>
+                  type='submit'
+                >
                   Send Message
                 </Button>
 
@@ -141,16 +145,17 @@ export default function ContactPage() {
 
       {/* Emergency Contact */}
       <section className='bg-orange-50 dark:bg-orange-950 rounded-2xl p-8 text-center'>
-        <h3 className="text-xl font-bold">Emergency Contact</h3>
-        <p className="text-default-600 mt-2 mb-6">
+        <h3 className='text-xl font-bold'>Emergency Contact</h3>
+        <p className='text-default-600 mt-2 mb-6'>
           For guests currently staying with us who need immediate assistance
         </p>
         <Button
           as={Link}
-          href='tel:+1-800-911-FLOW'
           color='warning'
+          href='tel:+1-800-911-FLOW'
           size='lg'
-          startContent={<FiAlertTriangle className='w-5 h-5' />}>
+          startContent={<FiAlertTriangle className='w-5 h-5' />}
+        >
           Emergency: +1 (800) 911-FLOW
         </Button>
       </section>

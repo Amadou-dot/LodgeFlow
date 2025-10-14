@@ -1,9 +1,12 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/lodgeflow";
+const MONGODB_URI =
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/lodgeflow';
 
 if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+  throw new Error(
+    'Please define the MONGODB_URI environment variable inside .env.local'
+  );
 }
 
 interface MongooseConnection {
@@ -28,8 +31,8 @@ async function connectDB(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("✅ MongoDB connected successfully");
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then(mongoose => {
+      // MongoDB connected successfully
       return mongoose;
     });
   }

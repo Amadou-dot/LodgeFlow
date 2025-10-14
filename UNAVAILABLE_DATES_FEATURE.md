@@ -7,6 +7,7 @@ I've successfully added the unavailable dates functionality to the customer-faci
 ### Changes Made
 
 #### 1. **Created Availability API Route**
+
 **File**: `/app/api/cabins/[id]/availability/route.ts`
 
 - Fetches all non-cancelled bookings for a specific cabin
@@ -15,16 +16,20 @@ I've successfully added the unavailable dates functionality to the customer-faci
 - Returns data in format: `{ cabinId, unavailableDates[], queryRange }`
 
 #### 2. **Installed SWR**
+
 ```bash
 pnpm add swr
 ```
+
 - Used for fetching availability data
 - Provides automatic caching and revalidation
 
 #### 3. **Updated BookingForm Component**
+
 **File**: `/components/BookingForm.tsx`
 
 **Added Features**:
+
 - ✅ **Real-time availability checking**: Fetches unavailable dates via SWR
 - ✅ **Visual feedback**: Unavailable dates are marked in red in the calendar
 - ✅ **Date validation**: Prevents selection of unavailable date ranges
@@ -41,8 +46,7 @@ const isDateUnavailable = (date: any) => {
     const startDate = parseDate(range.start);
     const endDate = parseDate(range.end);
     return (
-      calendarDate.compare(startDate) >= 0 &&
-      calendarDate.compare(endDate) < 0
+      calendarDate.compare(startDate) >= 0 && calendarDate.compare(endDate) < 0
     );
   });
 };
@@ -57,6 +61,7 @@ const validateDateRange = (value: RangeValue<CalendarDate> | null) => {
 ```
 
 **DateRangePicker Configuration**:
+
 ```typescript
 <DateRangePicker
   label='Stay Duration'
@@ -79,6 +84,7 @@ const validateDateRange = (value: RangeValue<CalendarDate> | null) => {
 ## 🎨 User Experience
 
 ### Visual Indicators
+
 1. **Red marked dates**: Unavailable dates appear in red in the calendar
 2. **Cannot be selected**: Users cannot click on unavailable dates
 3. **Validation message**: If they somehow select overlapping dates, an error message appears
@@ -87,6 +93,7 @@ const validateDateRange = (value: RangeValue<CalendarDate> | null) => {
    - "All dates in the next 6 months are available for booking." (if no bookings)
 
 ### Validation Flow
+
 1. User selects date range
 2. System checks if any date in range is unavailable
 3. System checks if range overlaps with existing bookings
@@ -98,6 +105,7 @@ const validateDateRange = (value: RangeValue<CalendarDate> | null) => {
 ## 🔧 Technical Details
 
 ### Data Flow
+
 ```
 1. Component mounts
 2. useSWR fetches `/api/cabins/[id]/availability`
@@ -108,18 +116,22 @@ const validateDateRange = (value: RangeValue<CalendarDate> | null) => {
 ```
 
 ### Date Range Comparison Logic
+
 The system checks if a selected range overlaps with any unavailable range using:
+
 ```typescript
 // Overlap occurs if:
-value.start.compare(endDate) < 0 && value.end.compare(startDate) > 0
+value.start.compare(endDate) < 0 && value.end.compare(startDate) > 0;
 ```
 
 This correctly handles all overlap scenarios:
+
 - Selected range contains unavailable range
-- Unavailable range contains selected range  
+- Unavailable range contains selected range
 - Partial overlaps on either end
 
 ### Performance
+
 - **SWR caching**: Availability data is cached and reused
 - **Lazy loading**: Only fetches when cabin ID is available
 - **Error handling**: Gracefully handles API failures with error messages
@@ -127,6 +139,7 @@ This correctly handles all overlap scenarios:
 ## 🧪 Testing
 
 ### Test Cases
+
 1. **No bookings**: Should show all dates available
 2. **Some bookings**: Should mark specific date ranges in red
 3. **Try to select unavailable dates**: Should not allow selection
@@ -134,6 +147,7 @@ This correctly handles all overlap scenarios:
 5. **Select available dates**: Should work normally and allow booking
 
 ### Edge Cases Handled
+
 - ✅ Past dates (blocked by `minValue={todayDate}`)
 - ✅ Cancelled bookings (excluded from unavailable dates)
 - ✅ API errors (shows error message, doesn't crash)
@@ -168,17 +182,20 @@ This correctly handles all overlap scenarios:
 ## 🚀 How to Test
 
 1. **Start the development server**:
+
    ```bash
    cd /home/yzel/github/LodgeFlow
    pnpm dev
    ```
 
 2. **Navigate to a cabin booking page**:
+
    - Go to `/cabins`
    - Click on any cabin
    - Sign in if prompted
 
 3. **Test unavailable dates**:
+
    - Open the date picker
    - Try clicking on dates that have existing bookings (they should be red)
    - Try selecting a range that overlaps with bookings

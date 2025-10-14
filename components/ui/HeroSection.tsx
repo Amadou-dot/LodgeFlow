@@ -11,8 +11,21 @@ interface HeroSectionProps {
   buttons?: Array<{
     label: string;
     href: string;
-    variant?: 'solid' | 'bordered' | 'light' | 'flat' | 'faded' | 'shadow' | 'ghost';
-    color?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+    variant?:
+      | 'solid'
+      | 'bordered'
+      | 'light'
+      | 'flat'
+      | 'faded'
+      | 'shadow'
+      | 'ghost';
+    color?:
+      | 'default'
+      | 'primary'
+      | 'secondary'
+      | 'success'
+      | 'warning'
+      | 'danger';
     startContent?: ReactNode;
   }>;
   backgroundImage?: string;
@@ -28,43 +41,47 @@ export function HeroSection({
   className = '',
 }: HeroSectionProps) {
   return (
-    <section 
+    <section
       className={`flex flex-col items-center justify-center gap-6 py-16 md:py-24 ${className}`}
-      style={backgroundImage ? { 
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      } : undefined}
+      style={
+        backgroundImage
+          ? {
+              backgroundImage: `url(${backgroundImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }
+          : undefined
+      }
     >
-      <div className="text-center max-w-4xl">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+      <div className='text-center max-w-4xl'>
+        <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold mb-4'>
           {title}
           {titleAccent && (
             <>
               {' '}
-              <span className="text-green-600 dark:text-green-400">
+              <span className='text-green-600 dark:text-green-400'>
                 {titleAccent}
               </span>
             </>
           )}
         </h1>
-        <p className="text-lg text-default-600 mt-4 max-w-2xl mx-auto">
+        <p className='text-lg text-default-600 mt-4 max-w-2xl mx-auto'>
           {subtitle}
         </p>
       </div>
 
       {buttons.length > 0 && (
-        <div className="flex gap-4 mt-8">
+        <div className='flex gap-4 mt-8'>
           {buttons.map((button, index) => (
             <Button
               key={index}
               as={Link}
-              href={button.href}
-              variant={button.variant || 'solid'}
+              className='px-8'
               color={button.color || 'primary'}
-              size="lg"
-              className="px-8"
+              href={button.href}
+              size='lg'
               startContent={button.startContent}
+              variant={button.variant || 'solid'}
             >
               {button.label}
             </Button>

@@ -34,13 +34,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang='en'>
+    <html lang='en' suppressHydrationWarning>
       <head />
       <body
         className={clsx(
           'min-h-screen text-foreground bg-background font-sans antialiased',
           fontSans.variable
-        )}>
+        )}
+      >
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
           <DynamicClerkProvider>
             <div className='relative flex flex-col h-screen'>
@@ -50,11 +51,14 @@ export default function RootLayout({
               </main>
               <footer className='w-full flex items-center justify-center py-3'>
                 <Link
-                  isExternal
                   className='flex items-center gap-1 text-current'
                   href={siteConfig.links.email}
-                  title='LodgeFlow Contact'>
-                  <span className='text-default-600'>© {new Date().getFullYear()}</span>
+                  isExternal
+                  title='LodgeFlow Contact'
+                >
+                  <span className='text-default-600'>
+                    © {new Date().getFullYear()}
+                  </span>
                   <p className='text-primary'>LodgeFlow</p>
                 </Link>
               </footer>

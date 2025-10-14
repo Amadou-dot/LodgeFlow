@@ -45,6 +45,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ and pnpm
 - MongoDB (Atlas or local installation)
 
@@ -68,10 +69,12 @@ cp .env.local.example .env.local
 2. Create a new application in the [Clerk Dashboard](https://dashboard.clerk.com)
 3. Go to **API Keys** and copy your keys
 4. Add to `.env.local`:
+
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
 CLERK_SECRET_KEY=sk_test_your_key_here
 ```
+
 5. In Clerk Dashboard, configure these paths:
    - Sign-in URL: `/sign-in`
    - Sign-up URL: `/sign-up`
@@ -81,14 +84,17 @@ CLERK_SECRET_KEY=sk_test_your_key_here
 ### Database Setup
 
 **MongoDB Atlas (Recommended)**
+
 1. Create a free account at [MongoDB Atlas](https://mongodb.com/atlas)
 2. Create a cluster and get your connection string
 3. Add to `.env.local`:
+
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.xxxxx.mongodb.net/lodgeflow
 ```
 
 **Local MongoDB**
+
 1. Install [MongoDB Community Server](https://www.mongodb.com/try/download/community)
 2. Start the MongoDB service
 3. Use the default local configuration (mongodb://localhost:27017/lodgeflow)
