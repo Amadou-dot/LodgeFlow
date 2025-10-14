@@ -93,17 +93,6 @@ export const Navbar = () => {
         <NavbarItem className='hidden sm:flex gap-2'>
           <ThemeSwitch />
         </NavbarItem>
-        <NavbarItem className='hidden md:flex'>
-          <Button
-            as={Link}
-            href='/cabins'
-            color='primary'
-            variant='solid'
-            size='sm'
-            className='font-medium'>
-            Book Now
-          </Button>
-        </NavbarItem>
 
         {/* Authentication Section */}
         <NavbarItem className='hidden md:flex gap-2'>
@@ -172,17 +161,6 @@ export const Navbar = () => {
               </Link>
             </NavbarMenuItem>
           ))}
-          <NavbarMenuItem>
-            <Button
-              as={Link}
-              href='/cabins'
-              color='primary'
-              variant='solid'
-              size='md'
-              className='w-full mt-4'>
-              Book Now
-            </Button>
-          </NavbarMenuItem>
 
           {/* Mobile Authentication */}
           <NavbarMenuItem>
