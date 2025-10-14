@@ -32,6 +32,7 @@ export const Navbar = () => {
   const pathname = usePathname();
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Only render logo after component has mounted to avoid hydration issues
   useEffect(() => {
@@ -46,7 +47,13 @@ export const Navbar = () => {
   };
 
   return (
-    <HeroUINavbar isBordered maxWidth='xl' position='sticky'>
+    <HeroUINavbar
+      isBordered
+      isMenuOpen={isMenuOpen}
+      maxWidth='xl'
+      position='sticky'
+      onMenuOpenChange={setIsMenuOpen}
+    >
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
         <NavbarBrand as='li' className='gap-3 max-w-fit'>
           <NextLink className='flex justify-start items-center gap-2' href='/'>
@@ -161,6 +168,7 @@ export const Navbar = () => {
                     ? 'text-green-600 font-semibold'
                     : 'hover:text-green-600'
                 )}
+                onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
               </Link>
