@@ -1,28 +1,48 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB, Booking, Customer, Cabin, Settings } from "@/models";
-import type { ApiResponse, CreateBookingData, CreateCustomerData } from "@/types";
-
+import { Booking, Cabin, connectDB, Settings } from '@/models';
+import type {
+  ApiResponse,
+  CreateBookingData,
+  PopulatedBooking
+} from '@/types';
+import { clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
     const body = await request.json();
-    const { 
-      cabin: cabinId, 
-      customer: customerData, 
-      checkInDate, 
-      checkOutDate, 
+    const {
+      cabinId: cabinId,
+      customerId: customerId,
+      checkInDate,
+      checkOutDate,
       numGuests,
       extras = {},
       specialRequests = [],
-      observations 
-    } = body;
+    } = body as CreateBookingData;
 
-    // Validate required fields
-    if (!cabinId || !customerData || !checkInDate || !checkOutDate || !numGuests) {
+    const client = await clerkClient();
+    const user = await client.users.getUser(customerId);
+
+    if (!user) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Missing required fields",
+        error: 'Customer not found',
+      };
+      return NextResponse.json(response, { status: 404 });
+    }
+
+    // Validate required fields
+    if (
+      !cabinId ||
+      !customerId ||
+      !checkInDate ||
+      !checkOutDate ||
+      !numGuests
+    ) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'Missing required fields',
       };
       return NextResponse.json(response, { status: 400 });
     }
@@ -33,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (checkIn >= checkOut) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Check-out date must be after check-in date",
+        error: 'Check-out date must be after check-in date',
       };
       return NextResponse.json(response, { status: 400 });
     }
@@ -43,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (!cabin) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Cabin not found",
+        error: 'Cabin not found',
       };
       return NextResponse.json(response, { status: 404 });
     }
@@ -59,7 +79,7 @@ export async function POST(request: NextRequest) {
     // Check for conflicting bookings
     const conflictingBookings = await Booking.find({
       cabin: cabinId,
-      status: { $nin: ["cancelled"] },
+      status: { $nin: ['cancelled'] },
       $or: [
         {
           checkInDate: { $lt: checkOut },
@@ -71,7 +91,7 @@ export async function POST(request: NextRequest) {
     if (conflictingBookings.length > 0) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "Cabin is not available for the selected dates",
+        error: 'Cabin is not available for the selected dates',
       };
       return NextResponse.json(response, { status: 409 });
     }
@@ -81,15 +101,20 @@ export async function POST(request: NextRequest) {
     if (!settings) {
       const response: ApiResponse<never> = {
         success: false,
-        error: "System settings not found",
+        error: 'System settings not found',
       };
       return NextResponse.json(response, { status: 500 });
     }
 
     // Calculate nights and pricing
-    const numNights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (numNights < settings.minBookingLength || numNights > settings.maxBookingLength) {
+    const numNights = Math.ceil(
+      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (
+      numNights < settings.minBookingLength ||
+      numNights > settings.maxBookingLength
+    ) {
       const response: ApiResponse<never> = {
         success: false,
         error: `Booking length must be between ${settings.minBookingLength} and ${settings.maxBookingLength} nights`,
@@ -116,7 +141,8 @@ export async function POST(request: NextRequest) {
     };
 
     if (bookingExtras.hasBreakfast) {
-      bookingExtras.breakfastPrice = settings.breakfastPrice * numGuests * numNights;
+      bookingExtras.breakfastPrice =
+        settings.breakfastPrice * numGuests * numNights;
       extrasPrice += bookingExtras.breakfastPrice;
     }
 
@@ -141,66 +167,57 @@ export async function POST(request: NextRequest) {
     }
 
     const totalPrice = cabinPrice + extrasPrice;
-    const depositAmount = settings.requireDeposit 
+    const depositAmount = settings.requireDeposit
       ? Math.round(totalPrice * (settings.depositPercentage / 100))
       : 0;
 
-    // Create or find customer
-    let customer = await Customer.findOne({ email: customerData.email });
-    
-    if (!customer) {
-      customer = await Customer.create(customerData);
-    } else {
-      // Update customer info if provided
-      Object.assign(customer, customerData);
-      await customer.save();
-    }
+    // Ensure customer exists
 
     // Create booking
     const booking = await Booking.create({
       cabin: cabinId,
-      customer: customer._id,
+      customer: customerId,
       checkInDate: checkIn,
       checkOutDate: checkOut,
       numNights,
       numGuests,
-      status: "unconfirmed",
+      status: 'unconfirmed',
       cabinPrice: effectivePrice,
       extrasPrice,
       totalPrice,
       isPaid: false,
-      paymentMethod: "online",
+      paymentMethod: 'online',
       extras: bookingExtras,
-      observations,
       specialRequests,
       depositPaid: false,
       depositAmount,
     });
 
     // Update customer statistics
-    await Customer.findByIdAndUpdate(customer._id, {
-      $inc: { totalBookings: 1, totalSpent: totalPrice },
-      lastBookingDate: new Date(),
-    });
+    await Booking.findOneAndUpdate(
+      { customer: customerId },
+      {
+        $inc: { totalBookings: 1, totalSpent: totalPrice },
+        lastBookingDate: new Date(),
+      }
+    );
 
     // Populate the booking for response
-    const populatedBooking = await Booking.findById(booking._id)
-      .populate("cabin")
-      .populate("customer");
-
+    const populatedBooking: PopulatedBooking = await Booking.findById(booking._id)
+      .populate('cabin');
     const response: ApiResponse<any> = {
       success: true,
       data: populatedBooking,
-      message: "Booking created successfully",
+      message: 'Booking created successfully',
     };
 
     return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error("Error creating booking:", error);
-    
+    console.error('Error creating booking:', error);
+
     const response: ApiResponse<never> = {
       success: false,
-      error: "Failed to create booking",
+      error: 'Failed to create booking',
     };
 
     return NextResponse.json(response, { status: 500 });

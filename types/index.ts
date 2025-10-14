@@ -1,9 +1,9 @@
 import type { IBooking } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
 import type { ICustomer } from '@/models/Customer';
+import type { IDining } from '@/models/Dining';
 import type { IExperience } from '@/models/Experience';
 import type { ISettings } from '@/models/Settings';
-import type { IDining } from '@/models/Dining';
 import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
@@ -25,11 +25,10 @@ export interface PopulatedBooking
     'cabin' | 'customer' | 'checkInDate' | 'checkOutDate'
   > {
   cabin: ICabin;
-  customer: ICustomer;
+  customer: string; // Clerk user ID
   checkInDate: string | Date;
   checkOutDate: string | Date;
   cabinName?: string;
-  guest?: ICustomer;
 }
 
 // API request types
@@ -48,8 +47,8 @@ export interface UpdateCabinData extends Partial<CreateCabinData> {
 }
 
 export interface CreateBookingData {
-  cabin: string;
-  customer: string;
+  cabinId: string;
+  customerId: string;
   checkInDate: Date;
   checkOutDate: Date;
   numGuests: number;

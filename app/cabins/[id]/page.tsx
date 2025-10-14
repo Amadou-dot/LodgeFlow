@@ -49,6 +49,15 @@ export default function Page({ params }: { params: Params }) {
     );
   }
 
+  const userData = user
+    ? {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        phone: user.phoneNumbers[0]?.phoneNumber || '',
+      }
+    : undefined;
+
   return (
     <div>
       <BookingForm
@@ -59,12 +68,7 @@ export default function Page({ params }: { params: Params }) {
           maxCapacity: cabin.capacity,
           image: cabin.image,
         }}
-        userData={{
-          firstName: user?.firstName || '',
-          lastName: user?.lastName || '',
-          email: user?.emailAddresses[0]?.emailAddress || '',
-          phone: user?.phoneNumbers[0]?.phoneNumber || '',
-        }}
+        userData={userData}
       />
     </div>
   );

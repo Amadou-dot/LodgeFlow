@@ -1,15 +1,27 @@
+import { subtitle, title } from '@/components/primitives';
+import { useCreateBooking } from '@/hooks/useBooking';
+import { CreateBookingData } from '@/types';
+import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
+import { Checkbox } from '@heroui/checkbox';
 import { DateRangePicker } from '@heroui/date-picker';
+import { Form } from "@heroui/form";
 import { Input, Textarea } from '@heroui/input';
 import { Select, SelectItem } from '@heroui/select';
-import type { DateValue } from '@internationalized/date';
-import { getLocalTimeZone, today } from '@internationalized/date';
+import { addToast } from '@heroui/toast';
+import {
+  getLocalTimeZone,
+  parseDate,
+  toCalendarDate,
+  today,
+  type DateValue
+} from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
 import Image from 'next/image';
-import { useState } from 'react';
-
-import { subtitle, title } from '@/components/primitives';
+import { useRouter } from 'next/navigation';
+import { FormEvent, useState } from 'react';
+import useSWR from 'swr';
 
 interface BookingFormProps {
   cabin: {
@@ -23,43 +35,138 @@ interface BookingFormProps {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
+    phone?: string;
   };
 }
 
-export default function BookingForm({ cabin, userData }: BookingFormProps) {
-  // State for date range and guests
-  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(
-    null
-  );
-  const [numberOfGuests, setNumberOfGuests] = useState<string>('');
+interface UnavailableDateRange {
+  start: string;
+  end: string;
+}
 
-  // Fallback values if cabin is undefined or missing properties
+interface AvailabilityData {
+  cabinId: string;
+  unavailableDates: UnavailableDateRange[];
+  queryRange: {
+    start: string;
+    end: string;
+  };
+}
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+export default function BookingForm({ cabin, userData }: BookingFormProps) {
+  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(null);
+  const [numberOfGuests, setNumberOfGuests] = useState<string>('');
+  const { isSignedIn, isLoaded, user } = useUser();
+  const { mutate: createBooking } = useCreateBooking();
+  const router = useRouter();
+
+  const { data: availabilityData, error: availabilityError } = useSWR<{
+    success: boolean;
+    data: AvailabilityData;
+  }>(
+    cabin?._id ? `/api/cabins/${cabin._id}/availability` : null,
+    fetcher
+  );
+
+  const todayDate = today(getLocalTimeZone());
+
+  const isDateUnavailable = (date: any) => {
+    if (!availabilityData?.success || !availabilityData.data.unavailableDates) {
+      return false;
+    }
+
+    const calendarDate = 'calendar' in date ? toCalendarDate(date) : date;
+
+    return availabilityData.data.unavailableDates.some(range => {
+      const startDate = parseDate(range.start);
+      const endDate = parseDate(range.end);
+      return (
+        calendarDate.compare(startDate) >= 0 &&
+        calendarDate.compare(endDate) < 0
+      );
+    });
+  };
+
+  if (!isSignedIn || !user) {
+    return (
+      <div className='p-6 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700'>
+        Please sign in to book this cabin.
+      </div>
+    );
+  }
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isLoaded || !isSignedIn) return;
+
+    const data = Object.fromEntries(new FormData(e.currentTarget));
+    const extras = {
+      hasBreakfast: data['breakfast'] === 'on',
+      hasPets: data['pets'] === 'on',
+      hasParking: data['parking'] === 'on',
+      hasEarlyCheckIn: data['early_checkin'] === 'on',
+      hasLateCheckOut: data['late_checkout'] === 'on',
+    };
+    const specialRequests = (data['special_requests'] as string)
+      .split('\
+')
+      .map(req => req.trim())
+      .filter(req => req.length > 0);
+
+    if (!dateRange?.start || !dateRange?.end) {
+      addToast({ title: 'Error', description: 'Please select your booking dates', color: 'danger' });
+      return;
+    }
+    if (!numberOfGuests) {
+      addToast({ title: 'Error', description: 'Please select number of guests', color: 'danger' });
+      return;
+    }
+
+    const bookingData: CreateBookingData = {
+      cabinId: cabin._id,
+      customerId: user.id,
+      checkInDate: new Date(dateRange.start.toString()),
+      checkOutDate: new Date(dateRange.end.toString()),
+      numGuests: parseInt(numberOfGuests, 10),
+      extras,
+      specialRequests,
+      observations: data['observations'] as string || '',
+    };
+
+    createBooking(bookingData, {
+      onSuccess: (response) => {
+        // Redirect to confirmation page with booking ID
+        if (response.data && response.data._id) {
+          router.push(`/cabins/confirmation/${response.data._id}`);
+        } else {
+          addToast({ title: 'Success', description: 'Your booking request has been submitted!', color: 'success' });
+        }
+      },
+      onError: (error) => {
+        addToast({ title: 'Error', description: error instanceof Error ? error.message : 'An error occurred', color: 'danger' });
+      }
+    });
+  }
+
   const maxCapacity = cabin?.maxCapacity || 8;
   const cabinName = cabin?.name || 'This Cabin';
   const regularPrice = cabin?.regularPrice || 0;
-  const cabinImage =
-    cabin?.image ||
-    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80';
+  const cabinImage = cabin?.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d';
 
   const guestOptions = Array.from({ length: maxCapacity }, (_, i) => ({
     key: (i + 1).toString(),
     label: `${i + 1} Guest${i + 1 > 1 ? 's' : ''}`,
   }));
 
-  // Calculate number of nights and total price
   const calculateTotal = () => {
-    if (!dateRange?.start || !dateRange?.end) {
-      return null;
-    }
-
+    if (!dateRange?.start || !dateRange?.end) return null;
     const startDate = new Date(dateRange.start.toString());
     const endDate = new Date(dateRange.end.toString());
     const timeDiff = endDate.getTime() - startDate.getTime();
     const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
     if (nights <= 0) return null;
-
     const subtotal = nights * regularPrice;
     return { nights, subtotal };
   };
@@ -68,141 +175,79 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-      {/* Cabin Image */}
       <div className='relative h-64 lg:h-full min-h-[400px] rounded-lg overflow-hidden'>
-        <Image
-          src={cabinImage}
-          alt={cabinName}
-          fill
-          style={{ objectFit: 'cover' }}
-          className='rounded-lg'
-        />
+        <Image src={cabinImage} alt={cabinName} fill style={{ objectFit: 'cover' }} className='rounded-lg' />
       </div>
 
-      {/* Booking Form */}
       <Card className='p-6'>
-        <CardHeader>
-          <div>
-            <h3 className={title({ size: 'sm' })}>Book {cabinName}</h3>
-            <p className={subtitle({ class: 'mt-2' })}>
-              ${regularPrice}/night • Up to {maxCapacity} guests
-            </p>
-          </div>
+        <CardHeader className='flex flex-col'>
+          <h3 className={title({ size: 'sm' })}>Book {cabinName}</h3>
+          <p className={subtitle({ class: 'mt-2 text-center' })}>${regularPrice}/night • Up to {maxCapacity} guests</p>
         </CardHeader>
         <CardBody className='space-y-4'>
-          <form className='space-y-4'>
-            {/* Guest Information */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <Input
-                label='First Name'
-                placeholder='Enter your first name'
-                defaultValue={userData?.firstName}
-                isRequired
-              />
-              <Input
-                label='Last Name'
-                placeholder='Enter your last name'
-                defaultValue={userData?.lastName}
-                isRequired
-              />
+          <Form className='space-y-4' onSubmit={handleSubmit} aria-label='Cabin booking form'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
+              <Input label='First Name' placeholder='Enter your first name' defaultValue={userData?.firstName || ''} isRequired name='first_name' isReadOnly={true} />
+              <Input label='Last Name' placeholder='Enter your last name' defaultValue={userData?.lastName || ''} isRequired name='last_name' isReadOnly={true} />
             </div>
+            <Input label='Email' type='email' placeholder='Enter your email' defaultValue={userData?.email || ''} isRequired isReadOnly={!!userData?.email} name='email' />
+            <Input label='Phone' type='tel' placeholder='Enter your phone number' isRequired defaultValue={userData?.phone || ''} isReadOnly={!!userData?.phone} name='phone_number' />
 
-            <Input
-              label='Email'
-              type='email'
-              placeholder='Enter your email'
-              defaultValue={userData?.email}
-              isRequired
-              isReadOnly={!!userData?.email}
-            />
-
-            <Input
-              label='Phone'
-              type='tel'
-              placeholder='Enter your phone number'
-              isRequired
-              defaultValue={userData?.phone}
-              isReadOnly={!!userData?.phone}
-            />
-
-            {/* Booking Details with Date Range Picker */}
             <DateRangePicker
               label='Stay Duration'
               isRequired
-              minValue={today(getLocalTimeZone())}
+              minValue={todayDate}
               value={dateRange}
               onChange={setDateRange}
-              description='Select your check-in and check-out dates'
+              description={availabilityData?.success ? 'Select your check-in and check-out dates. Unavailable dates are crossed out.' : 'Select your check-in and check-out dates'}
+              isDateUnavailable={isDateUnavailable}
+              errorMessage={availabilityError ? 'Failed to load availability data' : undefined}
+              name='booking_duration'
+              showMonthAndYearPickers
+              visibleMonths={2}
+              calendarWidth={400}
             />
 
-            <Select
-              label='Number of Guests'
-              placeholder='Select number of guests'
-              isRequired
-              selectedKeys={numberOfGuests ? [numberOfGuests] : []}
-              onSelectionChange={keys => {
-                const selected = Array.from(keys)[0] as string;
-                setNumberOfGuests(selected || '');
-              }}>
-              {guestOptions.map(option => (
-                <SelectItem key={option.key}>{option.label}</SelectItem>
-              ))}
+            {availabilityData?.success && (
+              <div className='text-xs text-default-500'>
+                {availabilityData.data.unavailableDates.length > 0 ? <>Unavailable dates are crossed out and cannot be selected.</> : <>All dates in the next 6 months are available for booking.</>}
+              </div>
+            )}
+
+            <Select name='num_guests' label='Number of Guests' placeholder='Select number of guests' isRequired selectedKeys={numberOfGuests ? [numberOfGuests] : []} onSelectionChange={keys => { const selected = Array.from(keys)[0] as string; setNumberOfGuests(selected || ''); }}>
+              {guestOptions.map(option => (<SelectItem key={option.key}>{option.label}</SelectItem>))}
             </Select>
 
-            <Textarea
-              label='Special Requests'
-              placeholder='Any special requests or dietary requirements?'
-              minRows={3}
-            />
+            <div className="grid md:grid-cols-2 gap-6">
+              <Checkbox color='success' name='breakfast'>Would you like to add breakfast?</Checkbox>
+              <Checkbox color='success' name='pets'>Will you be bringing a pet?</Checkbox>
+              <Checkbox color='success' name='parking'>Will you need parking?</Checkbox>
+              <Checkbox color='success' name='early_checkin'>Will you check-in early?</Checkbox>
+              <Checkbox color='success' name='late_checkout'>Will you check-out late?</Checkbox>
+            </div>
 
-            <div className='border-t pt-4'>
+            <Textarea label='Special Requests' placeholder='Any special requests or dietary requirements?' description='Separate multiple requests with new lines. (ENTER)' minRows={3} name='special_requests' />
+
+            <div className='border-t pt-4 w-full'>
               <div className='space-y-2 mb-4'>
                 {totalInfo ? (
                   <>
-                    <div className='flex justify-between items-center text-sm'>
-                      <span>
-                        ${regularPrice} × {totalInfo.nights} night
-                        {totalInfo.nights > 1 ? 's' : ''}
-                      </span>
-                      <span>${totalInfo.subtotal}</span>
-                    </div>
-                    <div className='flex justify-between items-center font-bold text-lg'>
-                      <span>Total (before taxes)</span>
-                      <span className='text-green-600'>
-                        ${totalInfo.subtotal}
-                      </span>
-                    </div>
-                    <p className='text-xs text-default-500'>
-                      Taxes and fees will be calculated at confirmation
-                    </p>
+                    <div className='flex justify-between items-center text-sm'><span>${regularPrice} × {totalInfo.nights} night{totalInfo.nights > 1 ? 's' : ''}</span><span>${totalInfo.subtotal}</span></div>
+                    <div className='flex justify-between items-center font-bold text-lg'><span>Total (before taxes)</span><span className='text-green-600'>${totalInfo.subtotal}</span></div>
+                    <p className='text-xs text-default-500'>Taxes and fees will be calculated at confirmation</p>
                   </>
                 ) : (
-                  <div className='flex justify-between items-center'>
-                    <span>Total</span>
-                    <span className='text-default-500'>
-                      Select dates to see pricing
-                    </span>
-                  </div>
+                  <div className='flex justify-between items-center'><span>Total</span><span className='text-default-500'>Select dates to see pricing</span></div>
                 )}
               </div>
 
-              <Button
-                type='submit'
-                color='primary'
-                size='lg'
-                className='w-full'
-                isDisabled={
-                  !dateRange?.start || !dateRange?.end || !numberOfGuests
-                }>
+              <Button type='submit' color='primary' size='lg' className='w-full' isDisabled={!dateRange?.start || !dateRange?.end || !numberOfGuests}>
                 Submit Booking Request
               </Button>
 
-              <p className='text-xs text-default-500 mt-2 text-center'>
-                This is a booking request. Final confirmation will be provided
-                by our team.
-              </p>
+              <p className='text-xs text-default-500 mt-2 text-center'>This is a booking request. Final confirmation will be provided by our team.</p>
             </div>
-          </form>
+          </Form>
         </CardBody>
       </Card>
     </div>
