@@ -19,6 +19,7 @@ import {
 } from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import useSWR from 'swr';
 
@@ -59,6 +60,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   const [numberOfGuests, setNumberOfGuests] = useState<string>('');
   const { isSignedIn, isLoaded, user } = useUser();
   const { mutate: createBooking } = useCreateBooking();
+  const router = useRouter();
 
   const { data: availabilityData, error: availabilityError } = useSWR<{
     success: boolean;
@@ -134,10 +136,13 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
     };
 
     createBooking(bookingData, {
-      onSuccess: () => {
-        addToast({ title: 'Success', description: 'Your booking request has been submitted!', color: 'success' });
-        setDateRange(null);
-        setNumberOfGuests('');
+      onSuccess: (response) => {
+        // Redirect to confirmation page with booking ID
+        if (response.data && response.data._id) {
+          router.push(`/cabins/confirmation/${response.data._id}`);
+        } else {
+          addToast({ title: 'Success', description: 'Your booking request has been submitted!', color: 'success' });
+        }
       },
       onError: (error) => {
         addToast({ title: 'Error', description: error instanceof Error ? error.message : 'An error occurred', color: 'danger' });
