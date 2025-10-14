@@ -1,9 +1,9 @@
 import type { IBooking } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
 import type { ICustomer } from '@/models/Customer';
+import type { IDining } from '@/models/Dining';
 import type { IExperience } from '@/models/Experience';
 import type { ISettings } from '@/models/Settings';
-import type { IDining } from '@/models/Dining';
 import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
