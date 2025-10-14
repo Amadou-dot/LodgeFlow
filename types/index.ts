@@ -1,6 +1,5 @@
 import type { IBooking } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
-import type { ICustomer } from '@/models/Customer';
 import type { IDining } from '@/models/Dining';
 import type { IExperience } from '@/models/Experience';
 import type { ISettings } from '@/models/Settings';
@@ -12,7 +11,6 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 
 // Re-export model types for easier importing
 export type Cabin = ICabin;
-export type Customer = ICustomer;
 export type Booking = IBooking;
 export type Settings = ISettings;
 export type Experience = IExperience;
@@ -61,31 +59,6 @@ export interface CreateBookingData {
   };
   specialRequests?: string[];
   observations?: string;
-}
-
-export interface CreateCustomerData {
-  name: string;
-  email: string;
-  phone: string;
-  nationality: string;
-  nationalId: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    zipCode: string;
-  };
-  emergencyContact: {
-    name: string;
-    phone: string;
-    relationship: string;
-  };
-  preferences?: {
-    smokingPreference?: 'smoking' | 'non-smoking' | 'no-preference';
-    dietaryRestrictions?: string[];
-    accessibilityNeeds?: string[];
-  };
 }
 
 export interface ApiResponse<T> {
