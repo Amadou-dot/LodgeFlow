@@ -128,10 +128,8 @@ Successfully configured comprehensive development tooling for the LodgeFlow cust
 
 ```json
 {
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
-    "**/*.{json,css,scss,md}": ["prettier --write"]
-  }
+  "**/*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
+  "**/*.{json,css,scss,md}": ["prettier --write"]
 }
 ```
 
