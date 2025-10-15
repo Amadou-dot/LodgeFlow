@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useCabins } from '@/hooks/useCabins';
-import { createTestQueryClient } from './test-utils';
+import { createTestQueryClient } from '@/__tests__/shared/test-utils';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (

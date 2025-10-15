@@ -6,7 +6,7 @@ import {
   useUpdateBooking,
   useCancelBooking,
 } from '@/hooks/useBooking';
-import { createTestQueryClient } from './test-utils';
+import { createTestQueryClient } from '@/__tests__/shared/test-utils';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 // Create wrapper for hooks

@@ -1,4 +1,4 @@
-import { render, screen } from './test-utils';
+import { render, screen } from '@/__tests__/shared/test-utils';
 import CabinCard from '@/components/CabinCard';
 
 const mockCabin = {

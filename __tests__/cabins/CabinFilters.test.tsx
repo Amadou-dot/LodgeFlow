@@ -1,4 +1,4 @@
-import { render, screen } from './test-utils';
+import { render, screen } from '@/__tests__/shared/test-utils';
 import CabinFilters from '@/components/CabinFilters';
 
 describe('CabinFilters', () => {
