@@ -3,25 +3,7 @@
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
 import { useEffect, useState } from 'react';
-
-// Search Icon component since it doesn't exist in LodgeFlow icons
-const SearchIcon = ({ className = '', ...props }) => (
-  <svg
-    className={className}
-    fill='none'
-    height='16'
-    stroke='currentColor'
-    strokeLinecap='round'
-    strokeLinejoin='round'
-    strokeWidth='2'
-    viewBox='0 0 24 24'
-    width='16'
-    {...props}
-  >
-    <circle cx='11' cy='11' r='8' />
-    <path d='m21 21-4.35-4.35' />
-  </svg>
-);
+import { Search } from 'lucide-react';
 
 export interface FilterOption {
   key: string;
@@ -88,7 +70,7 @@ export default function StandardFilters({
             className='flex-1'
             isClearable
             placeholder={searchPlaceholder}
-            startContent={<SearchIcon />}
+            startContent={<Search className='w-4 h-4' />}
             value={localSearchValue}
             onChange={e => setLocalSearchValue(e.target.value)}
             onClear={handleSearchClear}

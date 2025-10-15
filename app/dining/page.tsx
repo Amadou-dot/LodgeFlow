@@ -12,7 +12,7 @@ import { useDining } from '@/hooks/useDining';
 import type { Dining, DiningQueryParams } from '@/types';
 import Image from 'next/image';
 import { useState } from 'react';
-import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import { Mail, Phone } from 'lucide-react';
 
 export default function DiningPage() {
   const [filters, setFilters] = useState<DiningQueryParams>({});
@@ -641,7 +641,7 @@ export default function DiningPage() {
                 color='primary'
                 href='tel:+1-800-LODGEFLOW'
                 size='lg'
-                startContent={<FaPhone className='w-4 h-4' />}
+                startContent={<Phone className='w-4 h-4' />}
               >
                 Make Reservation
               </Button>
@@ -649,7 +649,7 @@ export default function DiningPage() {
                 as={Link}
                 href='mailto:dining@lodgeflow.com'
                 size='lg'
-                startContent={<FaEnvelope className='w-4 h-4' />}
+                startContent={<Mail className='w-4 h-4' />}
                 variant='bordered'
               >
                 Special Requests

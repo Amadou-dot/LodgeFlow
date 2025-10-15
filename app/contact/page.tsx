@@ -2,8 +2,14 @@ import { Card, CardBody } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Input, Textarea } from '@heroui/input';
 import { Link } from '@heroui/link';
-import { FiPhone, FiMail, FiMapPin, FiAlertTriangle } from 'react-icons/fi';
-import { FaInstagram, FaFacebook } from 'react-icons/fa';
+import {
+  Phone,
+  Mail,
+  MapPin,
+  AlertTriangle,
+  Instagram,
+  Facebook,
+} from 'lucide-react';
 
 import { siteConfig } from '@/config/site';
 import { PageHeader, ContactInfoCard } from '@/components/ui';
@@ -11,19 +17,19 @@ import { PageHeader, ContactInfoCard } from '@/components/ui';
 export default function ContactPage() {
   const contactItems = [
     {
-      icon: <FiPhone className='w-5 h-5 text-green-600' />,
+      icon: <Phone className='w-5 h-5 text-green-600' />,
       title: 'Phone',
       lines: ['+1 (800) LODGEFLOW', '+1 (800) 563-4335'],
       subtitle: 'Daily: 8:00 AM - 10:00 PM',
     },
     {
-      icon: <FiMail className='w-5 h-5 text-green-600' />,
+      icon: <Mail className='w-5 h-5 text-green-600' />,
       title: 'Email',
       lines: ['hello@lodgeflow.com', 'reservations@lodgeflow.com'],
       subtitle: 'We respond within 2 hours',
     },
     {
-      icon: <FiMapPin className='w-5 h-5 text-green-600' />,
+      icon: <MapPin className='w-5 h-5 text-green-600' />,
       title: 'Location',
       lines: [
         'LodgeFlow Resort',
@@ -54,7 +60,7 @@ export default function ContactPage() {
                   href={siteConfig.links.instagram}
                   isExternal
                   size='sm'
-                  startContent={<FaInstagram className='w-4 h-4' />}
+                  startContent={<Instagram className='w-4 h-4' />}
                   variant='flat'
                 >
                   Instagram
@@ -64,7 +70,7 @@ export default function ContactPage() {
                   href={siteConfig.links.facebook}
                   isExternal
                   size='sm'
-                  startContent={<FaFacebook className='w-4 h-4' />}
+                  startContent={<Facebook className='w-4 h-4' />}
                   variant='flat'
                 >
                   Facebook
@@ -154,7 +160,7 @@ export default function ContactPage() {
           color='warning'
           href='tel:+1-800-911-FLOW'
           size='lg'
-          startContent={<FiAlertTriangle className='w-5 h-5' />}
+          startContent={<AlertTriangle className='w-5 h-5' />}
         >
           Emergency: +1 (800) 911-FLOW
         </Button>

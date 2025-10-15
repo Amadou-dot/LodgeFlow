@@ -20,17 +20,18 @@ import {
 } from '@heroui/navbar';
 import { link as linkStyles } from '@heroui/theme';
 import clsx from 'clsx';
+import { ClipboardList, Moon, Sun } from 'lucide-react';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import { ThemeSwitch } from '@/components/theme-switch';
-import { siteConfig } from '@/config/site';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+
+import { ThemeSwitch } from '@/components/theme-switch';
+import { siteConfig } from '@/config/site';
 export const Navbar = () => {
   const pathname = usePathname();
-  const { theme, resolvedTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -44,6 +45,10 @@ export const Navbar = () => {
       return pathname === '/';
     }
     return pathname.startsWith(href);
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -99,10 +104,6 @@ export const Navbar = () => {
         className='hidden sm:flex basis-1/5 sm:basis-full'
         justify='end'
       >
-        <NavbarItem className='hidden sm:flex gap-2'>
-          <ThemeSwitch />
-        </NavbarItem>
-
         {/* Authentication Section */}
         <NavbarItem className='hidden md:flex gap-2'>
           <SignedOut>
@@ -134,7 +135,26 @@ export const Navbar = () => {
                   avatarBox: 'w-8 h-8',
                 },
               }}
-            />
+            >
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  href='/bookings'
+                  label='Booking History'
+                  labelIcon={<ClipboardList className='w-4 h-4' />}
+                />
+                <UserButton.Action
+                  label={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                  labelIcon={
+                    theme === 'dark' ? (
+                      <Sun className='w-4 h-4' />
+                    ) : (
+                      <Moon className='w-4 h-4' />
+                    )
+                  }
+                  onClick={toggleTheme}
+                />
+              </UserButton.MenuItems>
+            </UserButton>
           </SignedIn>
         </NavbarItem>
       </NavbarContent>
@@ -147,7 +167,26 @@ export const Navbar = () => {
                 avatarBox: 'w-8 h-8',
               },
             }}
-          />
+          >
+            <UserButton.MenuItems>
+              <UserButton.Link
+                href='/bookings'
+                label='Booking History'
+                labelIcon={<ClipboardList className='w-4 h-4' />}
+              />
+              <UserButton.Action
+                label={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                labelIcon={
+                  theme === 'dark' ? (
+                    <Sun className='w-4 h-4' />
+                  ) : (
+                    <Moon className='w-4 h-4' />
+                  )
+                }
+                onClick={toggleTheme}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
         </SignedIn>
         <ThemeSwitch />
         <NavbarMenuToggle />

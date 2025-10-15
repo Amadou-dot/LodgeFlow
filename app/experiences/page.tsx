@@ -1,8 +1,7 @@
 'use client';
 import { useExperiences } from '@/hooks/useExperiences';
 import { Spinner } from '@heroui/spinner';
-import { FaEnvelope } from 'react-icons/fa';
-import { FiPhone } from 'react-icons/fi';
+import { Mail, Phone } from 'lucide-react';
 
 import {
   CallToActionSection,
@@ -178,13 +177,13 @@ export default function ExperiencesPage() {
                 label: 'Contact Us',
                 href: '/contact',
                 color: 'primary',
-                startContent: <FaEnvelope className='w-4 h-4' />,
+                startContent: <Mail className='w-4 h-4' />,
               },
               {
                 label: 'Call Now',
                 href: 'tel:+1-800-LODGEFLOW',
                 variant: 'bordered',
-                startContent: <FiPhone className='w-4 h-4' />,
+                startContent: <Phone className='w-4 h-4' />,
               },
             ]}
           />

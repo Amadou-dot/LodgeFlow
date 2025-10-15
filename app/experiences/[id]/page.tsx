@@ -9,16 +9,16 @@ import { Spinner } from '@heroui/spinner';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
-  FiAlertCircle,
-  FiCalendar,
-  FiCheck,
-  FiClock,
-  FiMail,
-  FiMapPin,
-  FiPhone,
-  FiStar,
-  FiUsers,
-} from 'react-icons/fi';
+  AlertCircle,
+  Calendar,
+  Check,
+  Clock,
+  Mail,
+  MapPin,
+  Phone,
+  Star,
+  Users,
+} from 'lucide-react';
 
 type Params = Promise<{
   id: string;
@@ -103,7 +103,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
                 {experience.category}
               </Chip>
               {experience.isPopular && (
-                <Chip color='warning' startContent={<FiStar />} variant='solid'>
+                <Chip color='warning' startContent={<Star />} variant='solid'>
                   Popular
                 </Chip>
               )}
@@ -113,27 +113,27 @@ export default function ExperiencePage({ params }: { params: Params }) {
 
             <div className='flex items-center gap-6 text-sm'>
               <div className='flex items-center gap-2'>
-                <FiClock className='w-4 h-4' />
+                <Clock className='w-4 h-4' />
                 <span>{experience.duration}</span>
               </div>
 
               {experience.maxParticipants && (
                 <div className='flex items-center gap-2'>
-                  <FiUsers className='w-4 h-4' />
+                  <Users className='w-4 h-4' />
                   <span>Max {experience.maxParticipants} participants</span>
                 </div>
               )}
 
               {experience.location && (
                 <div className='flex items-center gap-2'>
-                  <FiMapPin className='w-4 h-4' />
+                  <MapPin className='w-4 h-4' />
                   <span>{experience.location}</span>
                 </div>
               )}
 
               {experience.rating && (
                 <div className='flex items-center gap-2'>
-                  <FiStar className='w-4 h-4 fill-current' />
+                  <Star className='w-4 h-4 fill-current' />
                   <span>
                     {experience.rating}/5 ({experience.reviewCount} reviews)
                   </span>
@@ -170,7 +170,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
                 <ul className='space-y-2'>
                   {experience.highlights.map((highlight, index) => (
                     <li key={index} className='flex items-start gap-3'>
-                      <FiCheck className='w-5 h-5 text-green-500 mt-0.5' />
+                      <Check className='w-5 h-5 text-green-500 mt-0.5' />
                       <span className='text-default-600'>{highlight}</span>
                     </li>
                   ))}
@@ -188,7 +188,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
               <ul className='space-y-2'>
                 {experience.includes.map((item, index) => (
                   <li key={index} className='flex items-start gap-3'>
-                    <FiCheck className='w-5 h-5 text-green-500 mt-0.5' />
+                    <Check className='w-5 h-5 text-green-500 mt-0.5' />
                     <span className='text-default-600'>{item}</span>
                   </li>
                 ))}
@@ -227,7 +227,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
                 <ul className='space-y-2'>
                   {experience.requirements.map((requirement, index) => (
                     <li key={index} className='flex items-start gap-3'>
-                      <FiAlertCircle className='w-5 h-5 text-orange-500 mt-0.5' />
+                      <AlertCircle className='w-5 h-5 text-orange-500 mt-0.5' />
                       <span className='text-default-600'>{requirement}</span>
                     </li>
                   ))}
@@ -279,7 +279,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
 
               <div className='space-y-4'>
                 <div className='flex items-center gap-3'>
-                  <FiClock className='w-5 h-5 text-default-400' />
+                  <Clock className='w-5 h-5 text-default-400' />
                   <div>
                     <div className='font-medium'>Duration</div>
                     <div className='text-sm text-default-600'>
@@ -290,7 +290,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
 
                 {experience.minAge && (
                   <div className='flex items-center gap-3'>
-                    <FiUsers className='w-5 h-5 text-default-400' />
+                    <Users className='w-5 h-5 text-default-400' />
                     <div>
                       <div className='font-medium'>Age Requirement</div>
                       <div className='text-sm text-default-600'>
@@ -301,7 +301,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
                 )}
 
                 <div className='flex items-center gap-3'>
-                  <FiCalendar className='w-5 h-5 text-default-400' />
+                  <Calendar className='w-5 h-5 text-default-400' />
                   <div>
                     <div className='font-medium'>Availability</div>
                     <div className='text-sm text-default-600'>
@@ -320,7 +320,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
                   color='primary'
                   href='/contact'
                   size='lg'
-                  startContent={<FiMail className='w-4 h-4' />}
+                  startContent={<Mail className='w-4 h-4' />}
                 >
                   {experience.ctaText}
                 </Button>
@@ -330,7 +330,7 @@ export default function ExperiencePage({ params }: { params: Params }) {
                   className='w-full'
                   href='tel:+1-800-LODGEFLOW'
                   size='lg'
-                  startContent={<FiPhone className='w-4 h-4' />}
+                  startContent={<Phone className='w-4 h-4' />}
                   variant='bordered'
                 >
                   Call to Book
