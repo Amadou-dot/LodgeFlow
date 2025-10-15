@@ -1,22 +1,26 @@
 import { Button } from '@heroui/button';
 import { Link } from '@heroui/link';
 
-import { siteConfig } from '@/config/site';
 import {
+  CallToActionSection,
   PageHeader,
   SectionHeader,
   StatsGrid,
-  ValuesGrid,
   TeamGrid,
-  CallToActionSection,
+  ValuesGrid,
 } from '@/components/ui';
+import { siteConfig } from '@/config/site';
 
 export default function AboutPage() {
+  const cabinCount = 12; // TODO: replace with dynamic fetch
+  const yearsEstablished = new Date().getFullYear() - 2010;
+  const customerCount = 10000; // TODO: replace with dynamic fetch
+
   const stats = [
-    { label: 'Years of Excellence', value: '15+' },
-    { label: 'Happy Guests', value: '10,000+' },
+    { label: 'Years of Excellence', value: `${yearsEstablished}+` },
+    { label: 'Happy Guests', value: `${customerCount}+` },
     { label: 'Pristine Acres', value: '500+' },
-    { label: 'Luxury Cabins', value: '12' },
+    { label: 'Luxury Cabins', value: `${cabinCount}+` },
   ];
 
   const values = [
@@ -112,9 +116,9 @@ export default function AboutPage() {
             </p>
             <p>
               Today, our resort spans over 500 acres of protected wilderness,
-              featuring 12 thoughtfully designed cabins that blend seamlessly
-              into the natural landscape. Each structure was built using
-              sustainable materials and powered by renewable energy.
+              featuring {cabinCount} thoughtfully designed cabins that blend
+              seamlessly into the natural landscape. Each structure was built
+              using sustainable materials and powered by renewable energy.
             </p>
           </div>
           <Button

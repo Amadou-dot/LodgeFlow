@@ -3,7 +3,7 @@ import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
 import { Image } from '@heroui/image';
-import { FiPhone, FiMail } from 'react-icons/fi';
+import { Phone, Mail } from 'lucide-react';
 
 import { siteConfig } from '@/config/site';
 import { connectDB, Cabin } from '@/models';
@@ -185,14 +185,14 @@ export default async function Home() {
             as={Link}
             color='primary'
             href='tel:+1-800-LODGEFLOW'
-            startContent={<FiPhone className='w-4 h-4' />}
+            startContent={<Phone className='w-4 h-4' />}
           >
             Call Us
           </Button>
           <Button
             as={Link}
             href={siteConfig.links.email}
-            startContent={<FiMail className='w-4 h-4' />}
+            startContent={<Mail className='w-4 h-4' />}
             variant='bordered'
           >
             Email Us
