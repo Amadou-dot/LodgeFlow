@@ -386,14 +386,14 @@ export default function BookingConfirmationPage({
 
       {/* Action Buttons */}
       <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-        <Link href='/cabins'>
+        <Link href='/bookings'>
           <Button
             color='primary'
             size='lg'
             startContent={<Home className='w-4 h-4' />}
             variant='flat'
           >
-            Browse More Cabins
+            View My Bookings
           </Button>
         </Link>
       </div>
