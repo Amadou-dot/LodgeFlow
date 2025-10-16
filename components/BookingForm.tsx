@@ -172,6 +172,9 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   const maxCapacity = cabin?.maxCapacity || 8;
   const cabinName = cabin?.name || 'This Cabin';
   const regularPrice = cabin?.regularPrice || 0;
+  const discount = cabin?.discount || 0;
+  const effectivePrice = regularPrice - discount;
+  const hasDiscount = discount > 0;
   const cabinImage =
     cabin?.image ||
     'https://images.unsplash.com/photo-1571896349842-33c89424de2d';
@@ -188,8 +191,10 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
     const timeDiff = endDate.getTime() - startDate.getTime();
     const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
     if (nights <= 0) return null;
-    const subtotal = nights * regularPrice;
-    return { nights, subtotal };
+    const subtotal = nights * effectivePrice;
+    const originalTotal = nights * regularPrice;
+    const totalSavings = hasDiscount ? originalTotal - subtotal : 0;
+    return { nights, subtotal, originalTotal, totalSavings };
   };
 
   const totalInfo = calculateTotal();
