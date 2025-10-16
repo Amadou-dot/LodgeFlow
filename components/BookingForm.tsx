@@ -214,9 +214,30 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
       <Card className='p-6'>
         <CardHeader className='flex flex-col'>
           <h3 className={title({ size: 'sm' })}>Book {cabinName}</h3>
-          <p className={subtitle({ class: 'mt-2 text-center' })}>
-            ${regularPrice}/night • Up to {maxCapacity} guests
-          </p>
+          <div className='mt-2 text-center'>
+            {hasDiscount ? (
+              <div className='space-y-1'>
+                <div className='flex items-center justify-center gap-2'>
+                  <span className='text-lg line-through text-default-400'>
+                    ${regularPrice}
+                  </span>
+                  <span className={subtitle({ class: 'text-green-600' })}>
+                    ${effectivePrice}/night
+                  </span>
+                </div>
+                <div className='text-sm text-green-600 font-semibold'>
+                  Save ${discount}/night!
+                </div>
+                <p className='text-xs text-default-500'>
+                  Up to {maxCapacity} guests
+                </p>
+              </div>
+            ) : (
+              <p className={subtitle()}>
+                ${regularPrice}/night • Up to {maxCapacity} guests
+              </p>
+            )}
+          </div>
         </CardHeader>
         <CardBody className='space-y-4'>
           <Form
@@ -340,14 +361,29 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
               <div className='space-y-2 mb-4'>
                 {totalInfo ? (
                   <>
+                    {hasDiscount && (
+                      <div className='flex justify-between items-center text-sm text-default-400 line-through'>
+                        <span>
+                          ${regularPrice} × {totalInfo.nights} night
+                          {totalInfo.nights > 1 ? 's' : ''}
+                        </span>
+                        <span>${totalInfo.originalTotal}</span>
+                      </div>
+                    )}
                     <div className='flex justify-between items-center text-sm'>
                       <span>
-                        ${regularPrice} × {totalInfo.nights} night
+                        ${effectivePrice} × {totalInfo.nights} night
                         {totalInfo.nights > 1 ? 's' : ''}
                       </span>
                       <span>${totalInfo.subtotal}</span>
                     </div>
-                    <div className='flex justify-between items-center font-bold text-lg'>
+                    {hasDiscount && totalInfo.totalSavings > 0 && (
+                      <div className='flex justify-between items-center text-sm text-green-600 font-semibold bg-green-50 dark:bg-green-950 px-3 py-2 rounded-lg'>
+                        <span>Your Savings</span>
+                        <span>-${totalInfo.totalSavings}</span>
+                      </div>
+                    )}
+                    <div className='flex justify-between items-center font-bold text-lg border-t pt-2'>
                       <span>Total (before taxes)</span>
                       <span className='text-green-600'>
                         ${totalInfo.subtotal}
