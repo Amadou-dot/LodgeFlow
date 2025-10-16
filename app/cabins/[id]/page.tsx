@@ -70,6 +70,7 @@ export default function Page({ params }: { params: Params }) {
               userData={userData}
               cabin={{
                 _id: cabin._id,
+                discount: cabin.discount,
                 image: cabin.image,
                 maxCapacity: cabin.capacity,
                 name: cabin.name,
