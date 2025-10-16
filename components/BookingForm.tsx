@@ -28,6 +28,7 @@ interface BookingFormProps {
     _id: string;
     name: string;
     regularPrice: number;
+    discount?: number;
     maxCapacity: number;
     image?: string;
   };
