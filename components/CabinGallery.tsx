@@ -1,8 +1,8 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import Image from 'next/image';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface CabinGalleryProps {
   images: string[];
@@ -10,6 +10,8 @@ interface CabinGalleryProps {
 
 export default function CabinGallery({ images }: CabinGalleryProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -22,12 +24,64 @@ export default function CabinGallery({ images }: CabinGalleryProps) {
     }
   };
 
+  const scrollToNext = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollAmount = 420;
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      
+      // If at the end, loop back to start
+      if (container.scrollLeft >= maxScroll - 10) {
+        container.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      } else {
+        container.scrollTo({
+          left: container.scrollLeft + scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
   const handleWheel = (e: React.WheelEvent) => {
     if (scrollContainerRef.current) {
       e.preventDefault();
       scrollContainerRef.current.scrollLeft += e.deltaY;
+      // Pause auto-scroll on manual interaction
+      setIsAutoScrolling(false);
     }
   };
+
+  const handleManualScroll = () => {
+    // Pause auto-scroll when user manually scrolls
+    setIsAutoScrolling(false);
+  };
+
+  const toggleAutoScroll = () => {
+    setIsAutoScrolling(!isAutoScrolling);
+  };
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (isAutoScrolling) {
+      autoScrollIntervalRef.current = setInterval(() => {
+        scrollToNext();
+      }, 3000); // Auto-scroll every 3 seconds
+    } else {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+    };
+  }, [isAutoScrolling]);
   // Use 3 images for mock gallery
   const galleryImages = [
     '/sarah_linden.png',
@@ -44,7 +98,10 @@ export default function CabinGallery({ images }: CabinGalleryProps) {
       <button
         aria-label="Scroll left"
         className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
-        onClick={() => scroll('left')}
+        onClick={() => {
+          scroll('left');
+          setIsAutoScrolling(false);
+        }}
       >
         <ChevronLeft className="w-6 h-6 text-gray-800" />
       </button>
@@ -53,25 +110,31 @@ export default function CabinGallery({ images }: CabinGalleryProps) {
       <button
         aria-label="Scroll right"
         className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
-        onClick={() => scroll('right')}
+        onClick={() => {
+          scroll('right');
+          setIsAutoScrolling(false);
+        }}
       >
         <ChevronRight className="w-6 h-6 text-gray-800" />
       </button>
 
-      {/* Scroll Indicator - visible on mobile */}
-      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white/80 to-transparent pointer-events-none z-[5] md:hidden" />
-      
-      {/* Scroll hint text - visible on mobile */}
-      <div className="absolute bottom-6 right-4 z-[5] md:hidden">
-        <div className="bg-black/70 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1 animate-pulse">
-          <span>Swipe</span>
-          <ChevronRight className="w-3 h-3" />
-        </div>
-      </div>
+      {/* Auto-scroll toggle button */}
+      <button
+        aria-label={isAutoScrolling ? 'Pause auto-scroll' : 'Resume auto-scroll'}
+        className="absolute top-2 right-2 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 cursor-pointer"
+        onClick={toggleAutoScroll}
+      >
+        {isAutoScrolling ? (
+          <Pause className="w-4 h-4 text-gray-800" />
+        ) : (
+          <Play className="w-4 h-4 text-gray-800" />
+        )}
+      </button>
 
       <div
         ref={scrollContainerRef}
         className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mr-4 pr-4 md:mr-0 md:pr-0"
+        onTouchStart={handleManualScroll}
         onWheel={handleWheel}
       >
         {galleryImages.map((src, idx) => (
