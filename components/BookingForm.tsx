@@ -18,7 +18,6 @@ import {
   type DateValue,
 } from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import useSWR from 'swr';
@@ -200,43 +199,32 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   const totalInfo = calculateTotal();
 
   return (
-    <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-      <div className='relative h-64 lg:h-full min-h-[400px] rounded-lg overflow-hidden'>
-        <Image
-          alt={cabinName}
-          className='rounded-lg'
-          fill
-          src={cabinImage}
-          style={{ objectFit: 'cover' }}
-        />
-      </div>
-
-      <Card className='p-6'>
-        <CardHeader className='flex flex-col'>
-          <h3 className={title({ size: 'sm' })}>Book {cabinName}</h3>
-          <div className='mt-2 text-center'>
-            {hasDiscount ? (
-              <div className='space-y-1'>
-                <div className='flex items-center justify-center gap-2'>
-                  <span className='text-lg line-through text-default-400'>
-                    ${regularPrice}
-                  </span>
-                  <span className={subtitle({ class: 'text-green-600' })}>
-                    ${effectivePrice}/night
-                  </span>
-                </div>
-                <div className='text-sm text-green-600 font-semibold'>
-                  Save ${discount}/night!
-                </div>
-                <p className='text-xs text-default-500'>
-                  Up to {maxCapacity} guests
-                </p>
+    <Card className='p-6'>
+      <CardHeader className='flex flex-col'>
+        <h3 className={title({ size: 'sm' })}>Book {cabinName}</h3>
+        <div className='mt-2 text-center'>
+          {hasDiscount ? (
+            <div className='space-y-1'>
+              <div className='flex items-center justify-center gap-2'>
+                <span className='text-lg line-through text-default-400'>
+                  ${regularPrice}
+                </span>
+                <span className={subtitle({ class: 'text-green-600' })}>
+                  ${effectivePrice}/night
+                </span>
               </div>
-            ) : (
-              <p className={subtitle()}>
-                ${regularPrice}/night • Up to {maxCapacity} guests
+              <div className='text-sm text-green-600 font-semibold'>
+                Save ${discount}/night!
+              </div>
+              <p className='text-xs text-default-500'>
+                Up to {maxCapacity} guests
               </p>
-            )}
+            </div>
+          ) : (
+            <p className={subtitle()}>
+              ${regularPrice}/night • Up to {maxCapacity} guests
+            </p>
+          )}
           </div>
         </CardHeader>
         <CardBody className='space-y-4'>
@@ -423,6 +411,5 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
           </Form>
         </CardBody>
       </Card>
-    </div>
   );
 }
