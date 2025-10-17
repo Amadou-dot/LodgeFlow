@@ -188,7 +188,9 @@ export const Navbar = () => {
             </UserButton.MenuItems>
           </UserButton>
         </SignedIn>
-        <ThemeSwitch />
+        <SignedOut>
+          <ThemeSwitch />
+        </SignedOut>
         <NavbarMenuToggle />
       </NavbarContent>
 
