@@ -1,9 +1,14 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
+import Breadcrumb from '@/components/Breadcrumb';
 import CabinDetails from '@/components/CabinDetails';
+import CabinGallery from '@/components/CabinGallery';
 import { useCabin } from '@/hooks/useCabin';
 import { useUser } from '@clerk/nextjs';
+import { Button } from '@heroui/button';
 import { Spinner } from '@heroui/spinner';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type Params = Promise<{
@@ -14,6 +19,7 @@ export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
   const { user, isLoaded: userLoaded } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const getCabinId = async () => {
@@ -59,29 +65,54 @@ export default function Page({ params }: { params: Params }) {
     }
     : undefined;
 
+  const breadcrumbItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Cabins', href: '/cabins' },
+    { label: cabin.name },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Breadcrumb Navigation */}
+      <div className="mb-6">
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
 
+      {/* Back Button */}
+      <div className="mb-8">
+        <Button
+          className="gap-2"
+          startContent={<ArrowLeft size={18} />}
+          variant="light"
+          onPress={() => router.push('/cabins')}
+        >
+          Back to Cabins
+        </Button>
+      </div>
 
-        <div className="lg:col-span-2">
-          <div className="sticky top-24">
-            <BookingForm
-              userData={userData}
-              cabin={{
-                _id: cabin._id,
-                discount: cabin.discount,
-                image: cabin.image,
-                maxCapacity: cabin.capacity,
-                name: cabin.name,
-                regularPrice: cabin.price,
-              }}
-            />
-          </div>
+      {/* Main Content - Two Row Layout */}
+      <div className="space-y-8">
+        {/* Gallery - Full Width */}
+        <CabinGallery images={[cabin.image]} />
+
+        {/* Cabin Details - Full Width */}
+        <div>
+          <CabinDetails cabin={cabin} />
         </div>
 
-        <div className="lg:col-span-2">
-          <CabinDetails cabin={cabin} />
+        {/* Booking Form - Full Width on Mobile, Centered on Desktop */}
+        <div className="lg:max-w-3xl lg:mx-auto">
+          <BookingForm
+            userData={userData}
+            cabin={{
+              _id: cabin._id,
+              discount: cabin.discount,
+              image: cabin.image,
+              maxCapacity: cabin.capacity,
+              name: cabin.name,
+              regularPrice: cabin.price,
+            }}
+          />
         </div>
       </div>
     </div>
