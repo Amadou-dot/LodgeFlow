@@ -21,10 +21,10 @@ import {
 import { link as linkStyles } from '@heroui/theme';
 import clsx from 'clsx';
 import { ClipboardList, Moon, Sun } from 'lucide-react';
-import NextLink from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
+import NextLink from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { ThemeSwitch } from '@/components/theme-switch';
