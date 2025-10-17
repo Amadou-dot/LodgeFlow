@@ -1,9 +1,14 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
+import Breadcrumb from '@/components/Breadcrumb';
 import CabinDetails from '@/components/CabinDetails';
+import CabinGallery from '@/components/CabinGallery';
 import { useCabin } from '@/hooks/useCabin';
 import { useUser } from '@clerk/nextjs';
+import { Button } from '@heroui/button';
 import { Spinner } from '@heroui/spinner';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type Params = Promise<{
@@ -14,6 +19,7 @@ export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
   const { user, isLoaded: userLoaded } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const getCabinId = async () => {
