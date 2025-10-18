@@ -61,13 +61,14 @@ export const Navbar = () => {
     >
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
         <NavbarBrand as='li' className='gap-3 max-w-fit'>
-          <NextLink className='flex justify-start items-center gap-2' href='/'>
+          <NextLink className='flex justify-start items-center gap-3' href='/'>
             {mounted ? (
               <Image
                 alt='LodgeFlow'
                 className='rounded-lg'
-                height={32}
-                width={32}
+                height={48}
+                priority
+                width={48}
                 src={
                   resolvedTheme === 'dark'
                     ? '/logo-dark.png'
@@ -75,11 +76,14 @@ export const Navbar = () => {
                 }
               />
             ) : (
-              <div className='w-8 h-8 bg-default-200 rounded-lg animate-pulse' />
+              <div className='w-12 h-12 bg-default-200 rounded-lg animate-pulse' />
             )}
+            <span className='hidden sm:inline-block font-bold text-xl text-inherit'>
+              LodgeFlow
+            </span>
           </NextLink>
         </NavbarBrand>
-        <ul className='hidden lg:flex gap-6 justify-start ml-8'>
+        <ul className='hidden sm:flex gap-6 justify-start ml-8'>
           {siteConfig.navItems.map(item => (
             <NavbarItem key={item.href}>
               <NextLink
@@ -105,7 +109,7 @@ export const Navbar = () => {
         justify='end'
       >
         {/* Authentication Section */}
-        <NavbarItem className='hidden md:flex gap-2'>
+        <NavbarItem className='flex gap-2'>
           <SignedOut>
             <SignInButton mode='modal'>
               <Button
