@@ -25,20 +25,14 @@ import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { ThemeSwitch } from '@/components/theme-switch';
 import { siteConfig } from '@/config/site';
 export const Navbar = () => {
   const pathname = usePathname();
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Only render logo after component has mounted to avoid hydration issues
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -62,23 +56,14 @@ export const Navbar = () => {
       <NavbarContent className='basis-1/5 sm:basis-full' justify='start'>
         <NavbarBrand as='li' className='gap-3 max-w-fit'>
           <NextLink className='flex justify-start items-center gap-3' href='/'>
-            {mounted ? (
-              <Image
-                alt='LodgeFlow'
-                className='rounded-lg'
-                height={48}
-                priority
-                width={48}
-                src={
-                  resolvedTheme === 'dark'
-                    ? '/logo-dark.png'
-                    : '/logo-light.png'
-                }
-              />
-            ) : (
-              <div className='w-12 h-12 bg-default-200 rounded-lg animate-pulse' />
-            )}
-            <span className='hidden sm:inline-block font-bold text-xl text-inherit'>
+            <Image
+              alt='LodgeFlow'
+              height={48}
+              priority
+              src='/logo.svg'
+              width={48}
+            />
+            <span className='hidden sm:inline-block font-bold text-xl text-inherit mr-3.5'>
               LodgeFlow
             </span>
           </NextLink>
