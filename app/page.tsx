@@ -98,7 +98,7 @@ export default async function Home() {
 
             return (
               <Card
-                key={cabin._id}
+                key={cabin._id.toString()}
                 className='py-4 hover:shadow-lg transition-shadow'
               >
                 <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
