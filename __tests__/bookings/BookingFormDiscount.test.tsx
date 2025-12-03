@@ -82,7 +82,9 @@ describe('BookingForm - Discount Pricing', () => {
         <BookingForm cabin={mockCabinWithoutDiscount} userData={mockUserData} />
       );
 
-      expect(screen.getByText('$200/night • Up to 4 guests')).toBeInTheDocument();
+      expect(
+        screen.getByText('$200/night • Up to 4 guests')
+      ).toBeInTheDocument();
       expect(screen.queryByText(/Save/)).not.toBeInTheDocument();
     });
 
@@ -144,7 +146,9 @@ describe('BookingForm - Discount Pricing', () => {
       );
 
       expect(screen.queryByText(/Save/)).not.toBeInTheDocument();
-      expect(screen.getByText('$200/night • Up to 4 guests')).toBeInTheDocument();
+      expect(
+        screen.getByText('$200/night • Up to 4 guests')
+      ).toBeInTheDocument();
     });
 
     it('should handle 100% discount (free cabin)', () => {
