@@ -79,7 +79,7 @@ describe('Breadcrumb Component', () => {
 
     const breadcrumbItems = screen
       .getAllByRole('listitem')
-      .map((item) => item.textContent);
+      .map(item => item.textContent);
 
     expect(breadcrumbItems).toEqual(['First', 'Second', 'Third', 'Fourth']);
   });
