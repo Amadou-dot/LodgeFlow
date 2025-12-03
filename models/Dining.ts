@@ -1,7 +1,6 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models, Document } from 'mongoose';
 
-export interface IDining {
-  _id: string;
+export interface IDining extends Document {
   name: string;
   description: string;
   type: 'menu' | 'experience';
