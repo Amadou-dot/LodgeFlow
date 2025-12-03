@@ -16,20 +16,24 @@ jest.mock('@clerk/nextjs', () => ({
 
 jest.mock('@/components/BookingForm', () => {
   return function MockBookingForm() {
-    return <div data-testid="booking-form">Booking Form</div>;
+    return <div data-testid='booking-form'>Booking Form</div>;
   };
 });
 
 jest.mock('@/components/CabinDetails', () => {
   return function MockCabinDetails() {
-    return <div data-testid="cabin-details">Cabin Details</div>;
+    return <div data-testid='cabin-details'>Cabin Details</div>;
   };
 });
 
 jest.mock('@/components/Breadcrumb', () => {
-  return function MockBreadcrumb({ items }: { items: Array<{ label: string; href?: string }> }) {
+  return function MockBreadcrumb({
+    items,
+  }: {
+    items: Array<{ label: string; href?: string }>;
+  }) {
     return (
-      <nav data-testid="breadcrumb">
+      <nav data-testid='breadcrumb'>
         {items.map((item, index) => (
           <span key={index}>{item.label}</span>
         ))}
@@ -100,10 +104,10 @@ describe('Enhanced Cabin Page - Issue #17', () => {
     render(<CabinPage params={mockParams} />);
 
     const backButton = await screen.findByText('Back to Cabins');
-    
+
     // Verify button exists and test the onPress handler directly
     expect(backButton).toBeInTheDocument();
-    
+
     // Simulate the button press by calling the router.push directly
     // This avoids issues with HeroUI's ripple effect in test environment
     const buttonElement = backButton.closest('button');
@@ -173,7 +177,9 @@ describe('Enhanced Cabin Page - Issue #17', () => {
     expect(mainLayout).toBeInTheDocument();
 
     // Check for centered booking form on desktop
-    const bookingFormContainer = container.querySelector('.lg\\:max-w-3xl.lg\\:mx-auto');
+    const bookingFormContainer = container.querySelector(
+      '.lg\\:max-w-3xl.lg\\:mx-auto'
+    );
     expect(bookingFormContainer).toBeInTheDocument();
   });
 

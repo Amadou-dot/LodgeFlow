@@ -120,7 +120,7 @@ export default function BookingsPage() {
       };
 
       await updateBooking.mutateAsync({
-        bookingId: selectedBooking._id,
+        bookingId: selectedBooking._id.toString(),
         updates,
       });
 
@@ -147,7 +147,7 @@ export default function BookingsPage() {
     if (!selectedBooking) return;
 
     try {
-      await cancelBooking.mutateAsync(selectedBooking._id);
+      await cancelBooking.mutateAsync(selectedBooking._id.toString());
       addToast({
         title: 'Booking Cancelled',
         description: 'Your booking has been successfully cancelled.',
@@ -239,7 +239,7 @@ export default function BookingsPage() {
         {!isLoading && !error && bookings && bookings.length > 0 && (
           <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-2'>
             {bookings.map((booking: any) => (
-              <Card key={booking._id} className='w-full'>
+              <Card key={booking._id.toString()} className='w-full'>
                 <CardHeader className='flex gap-3'>
                   <div className='relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden'>
                     <Image

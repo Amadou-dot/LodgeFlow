@@ -58,11 +58,11 @@ export default function Page({ params }: { params: Params }) {
 
   const userData = user
     ? {
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      email: user.emailAddresses[0]?.emailAddress || '',
-      phone: user.phoneNumbers[0]?.phoneNumber || '',
-    }
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        phone: user.phoneNumbers[0]?.phoneNumber || '',
+      }
     : undefined;
 
   const breadcrumbItems = [
@@ -72,18 +72,18 @@ export default function Page({ params }: { params: Params }) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className='container mx-auto px-4 py-8 max-w-7xl'>
       {/* Breadcrumb Navigation */}
-      <div className="mb-6">
+      <div className='mb-6'>
         <Breadcrumb items={breadcrumbItems} />
       </div>
 
       {/* Back Button */}
-      <div className="mb-8">
+      <div className='mb-8'>
         <Button
-          className="gap-2"
+          className='gap-2'
           startContent={<ArrowLeft size={18} />}
-          variant="light"
+          variant='light'
           onPress={() => router.push('/cabins')}
         >
           Back to Cabins
@@ -91,7 +91,7 @@ export default function Page({ params }: { params: Params }) {
       </div>
 
       {/* Main Content - Two Row Layout */}
-      <div className="space-y-8">
+      <div className='space-y-8'>
         {/* Gallery - Full Width */}
         <CabinGallery images={[cabin.image]} />
 
@@ -101,7 +101,7 @@ export default function Page({ params }: { params: Params }) {
         </div>
 
         {/* Booking Form - Full Width on Mobile, Centered on Desktop */}
-        <div className="lg:max-w-3xl lg:mx-auto">
+        <div className='lg:max-w-3xl lg:mx-auto'>
           <BookingForm
             userData={userData}
             cabin={{

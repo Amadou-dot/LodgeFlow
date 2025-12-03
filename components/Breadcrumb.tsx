@@ -13,7 +13,7 @@ interface BreadcrumbProps {
 export default function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <Breadcrumbs
-      size="lg"
+      size='lg'
       classNames={{
         list: 'flex flex-wrap',
       }}
@@ -26,7 +26,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
         >
           {item.href && index !== items.length - 1 ? (
             <Link
-              className="hover:text-primary transition-colors"
+              className='hover:text-primary transition-colors'
               href={item.href}
             >
               {item.label}

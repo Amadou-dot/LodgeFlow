@@ -225,191 +225,189 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
               ${regularPrice}/night • Up to {maxCapacity} guests
             </p>
           )}
+        </div>
+      </CardHeader>
+      <CardBody className='space-y-4'>
+        <Form
+          aria-label='Cabin booking form'
+          className='space-y-4'
+          onSubmit={handleSubmit}
+        >
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
+            <Input
+              defaultValue={userData?.firstName || ''}
+              isReadOnly={true}
+              isRequired
+              label='First Name'
+              name='first_name'
+              placeholder='Enter your first name'
+            />
+            <Input
+              defaultValue={userData?.lastName || ''}
+              isReadOnly={true}
+              isRequired
+              label='Last Name'
+              name='last_name'
+              placeholder='Enter your last name'
+            />
           </div>
-        </CardHeader>
-        <CardBody className='space-y-4'>
-          <Form
-            aria-label='Cabin booking form'
-            className='space-y-4'
-            onSubmit={handleSubmit}
+          <Input
+            defaultValue={userData?.email || ''}
+            isReadOnly={!!userData?.email}
+            isRequired
+            label='Email'
+            name='email'
+            placeholder='Enter your email'
+            type='email'
+          />
+          <Input
+            defaultValue={userData?.phone || ''}
+            isReadOnly={!!userData?.phone}
+            isRequired
+            label='Phone'
+            name='phone_number'
+            placeholder='Enter your phone number'
+            type='tel'
+          />
+
+          <DateRangePicker
+            calendarWidth={400}
+            isDateUnavailable={isDateUnavailable}
+            isRequired
+            label='Stay Duration'
+            minValue={todayDate}
+            name='booking_duration'
+            showMonthAndYearPickers
+            value={dateRange}
+            visibleMonths={2}
+            description={
+              availabilityData?.success
+                ? 'Select your check-in and check-out dates. Unavailable dates are crossed out.'
+                : 'Select your check-in and check-out dates'
+            }
+            errorMessage={
+              availabilityError ? 'Failed to load availability data' : undefined
+            }
+            onChange={setDateRange}
+          />
+
+          {availabilityData?.success && (
+            <div className='text-xs text-default-500'>
+              {availabilityData.data.unavailableDates.length > 0 ? (
+                <>Unavailable dates are crossed out and cannot be selected.</>
+              ) : (
+                <>All dates in the next 6 months are available for booking.</>
+              )}
+            </div>
+          )}
+
+          <Select
+            isRequired
+            label='Number of Guests'
+            name='num_guests'
+            placeholder='Select number of guests'
+            selectedKeys={numberOfGuests ? [numberOfGuests] : []}
+            onSelectionChange={keys => {
+              const selected = Array.from(keys)[0] as string;
+              setNumberOfGuests(selected || '');
+            }}
           >
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
-              <Input
-                defaultValue={userData?.firstName || ''}
-                isReadOnly={true}
-                isRequired
-                label='First Name'
-                name='first_name'
-                placeholder='Enter your first name'
-              />
-              <Input
-                defaultValue={userData?.lastName || ''}
-                isReadOnly={true}
-                isRequired
-                label='Last Name'
-                name='last_name'
-                placeholder='Enter your last name'
-              />
-            </div>
-            <Input
-              defaultValue={userData?.email || ''}
-              isReadOnly={!!userData?.email}
-              isRequired
-              label='Email'
-              name='email'
-              placeholder='Enter your email'
-              type='email'
-            />
-            <Input
-              defaultValue={userData?.phone || ''}
-              isReadOnly={!!userData?.phone}
-              isRequired
-              label='Phone'
-              name='phone_number'
-              placeholder='Enter your phone number'
-              type='tel'
-            />
+            {guestOptions.map(option => (
+              <SelectItem key={option.key}>{option.label}</SelectItem>
+            ))}
+          </Select>
 
-            <DateRangePicker
-              calendarWidth={400}
-              isDateUnavailable={isDateUnavailable}
-              isRequired
-              label='Stay Duration'
-              minValue={todayDate}
-              name='booking_duration'
-              showMonthAndYearPickers
-              value={dateRange}
-              visibleMonths={2}
-              description={
-                availabilityData?.success
-                  ? 'Select your check-in and check-out dates. Unavailable dates are crossed out.'
-                  : 'Select your check-in and check-out dates'
-              }
-              errorMessage={
-                availabilityError
-                  ? 'Failed to load availability data'
-                  : undefined
-              }
-              onChange={setDateRange}
-            />
+          <div className='grid md:grid-cols-2 gap-6'>
+            <Checkbox color='success' name='breakfast'>
+              Would you like to add breakfast?
+            </Checkbox>
+            <Checkbox color='success' name='pets'>
+              Will you be bringing a pet?
+            </Checkbox>
+            <Checkbox color='success' name='parking'>
+              Will you need parking?
+            </Checkbox>
+            <Checkbox color='success' name='early_checkin'>
+              Will you check-in early?
+            </Checkbox>
+            <Checkbox color='success' name='late_checkout'>
+              Will you check-out late?
+            </Checkbox>
+          </div>
 
-            {availabilityData?.success && (
-              <div className='text-xs text-default-500'>
-                {availabilityData.data.unavailableDates.length > 0 ? (
-                  <>Unavailable dates are crossed out and cannot be selected.</>
-                ) : (
-                  <>All dates in the next 6 months are available for booking.</>
-                )}
-              </div>
-            )}
+          <Textarea
+            description='Separate multiple requests with new lines. (ENTER)'
+            label='Special Requests'
+            minRows={3}
+            name='special_requests'
+            placeholder='Any special requests or dietary requirements?'
+          />
 
-            <Select
-              isRequired
-              label='Number of Guests'
-              name='num_guests'
-              placeholder='Select number of guests'
-              selectedKeys={numberOfGuests ? [numberOfGuests] : []}
-              onSelectionChange={keys => {
-                const selected = Array.from(keys)[0] as string;
-                setNumberOfGuests(selected || '');
-              }}
-            >
-              {guestOptions.map(option => (
-                <SelectItem key={option.key}>{option.label}</SelectItem>
-              ))}
-            </Select>
-
-            <div className='grid md:grid-cols-2 gap-6'>
-              <Checkbox color='success' name='breakfast'>
-                Would you like to add breakfast?
-              </Checkbox>
-              <Checkbox color='success' name='pets'>
-                Will you be bringing a pet?
-              </Checkbox>
-              <Checkbox color='success' name='parking'>
-                Will you need parking?
-              </Checkbox>
-              <Checkbox color='success' name='early_checkin'>
-                Will you check-in early?
-              </Checkbox>
-              <Checkbox color='success' name='late_checkout'>
-                Will you check-out late?
-              </Checkbox>
-            </div>
-
-            <Textarea
-              description='Separate multiple requests with new lines. (ENTER)'
-              label='Special Requests'
-              minRows={3}
-              name='special_requests'
-              placeholder='Any special requests or dietary requirements?'
-            />
-
-            <div className='border-t pt-4 w-full'>
-              <div className='space-y-2 mb-4'>
-                {totalInfo ? (
-                  <>
-                    {hasDiscount && (
-                      <div className='flex justify-between items-center text-sm text-default-400 line-through'>
-                        <span>
-                          ${regularPrice} × {totalInfo.nights} night
-                          {totalInfo.nights > 1 ? 's' : ''}
-                        </span>
-                        <span>${totalInfo.originalTotal}</span>
-                      </div>
-                    )}
-                    <div className='flex justify-between items-center text-sm'>
+          <div className='border-t pt-4 w-full'>
+            <div className='space-y-2 mb-4'>
+              {totalInfo ? (
+                <>
+                  {hasDiscount && (
+                    <div className='flex justify-between items-center text-sm text-default-400 line-through'>
                       <span>
-                        ${effectivePrice} × {totalInfo.nights} night
+                        ${regularPrice} × {totalInfo.nights} night
                         {totalInfo.nights > 1 ? 's' : ''}
                       </span>
-                      <span>${totalInfo.subtotal}</span>
+                      <span>${totalInfo.originalTotal}</span>
                     </div>
-                    {hasDiscount && totalInfo.totalSavings > 0 && (
-                      <div className='flex justify-between items-center text-sm text-green-600 font-semibold bg-green-50 dark:bg-green-950 px-3 py-2 rounded-lg'>
-                        <span>Your Savings</span>
-                        <span>-${totalInfo.totalSavings}</span>
-                      </div>
-                    )}
-                    <div className='flex justify-between items-center font-bold text-lg border-t pt-2'>
-                      <span>Total (before taxes)</span>
-                      <span className='text-green-600'>
-                        ${totalInfo.subtotal}
-                      </span>
+                  )}
+                  <div className='flex justify-between items-center text-sm'>
+                    <span>
+                      ${effectivePrice} × {totalInfo.nights} night
+                      {totalInfo.nights > 1 ? 's' : ''}
+                    </span>
+                    <span>${totalInfo.subtotal}</span>
+                  </div>
+                  {hasDiscount && totalInfo.totalSavings > 0 && (
+                    <div className='flex justify-between items-center text-sm text-green-600 font-semibold bg-green-50 dark:bg-green-950 px-3 py-2 rounded-lg'>
+                      <span>Your Savings</span>
+                      <span>-${totalInfo.totalSavings}</span>
                     </div>
-                    <p className='text-xs text-default-500'>
-                      Taxes and fees will be calculated at confirmation
-                    </p>
-                  </>
-                ) : (
-                  <div className='flex justify-between items-center'>
-                    <span>Total</span>
-                    <span className='text-default-500'>
-                      Select dates to see pricing
+                  )}
+                  <div className='flex justify-between items-center font-bold text-lg border-t pt-2'>
+                    <span>Total (before taxes)</span>
+                    <span className='text-green-600'>
+                      ${totalInfo.subtotal}
                     </span>
                   </div>
-                )}
-              </div>
-
-              <Button
-                className='w-full'
-                color='primary'
-                size='lg'
-                type='submit'
-                isDisabled={
-                  !dateRange?.start || !dateRange?.end || !numberOfGuests
-                }
-              >
-                Submit Booking Request
-              </Button>
-
-              <p className='text-xs text-default-500 mt-2 text-center'>
-                This is a booking request. Final confirmation will be provided
-                by our team.
-              </p>
+                  <p className='text-xs text-default-500'>
+                    Taxes and fees will be calculated at confirmation
+                  </p>
+                </>
+              ) : (
+                <div className='flex justify-between items-center'>
+                  <span>Total</span>
+                  <span className='text-default-500'>
+                    Select dates to see pricing
+                  </span>
+                </div>
+              )}
             </div>
-          </Form>
-        </CardBody>
-      </Card>
+
+            <Button
+              className='w-full'
+              color='primary'
+              size='lg'
+              type='submit'
+              isDisabled={
+                !dateRange?.start || !dateRange?.end || !numberOfGuests
+              }
+            >
+              Submit Booking Request
+            </Button>
+
+            <p className='text-xs text-default-500 mt-2 text-center'>
+              This is a booking request. Final confirmation will be provided by
+              our team.
+            </p>
+          </div>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }
