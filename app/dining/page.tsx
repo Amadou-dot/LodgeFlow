@@ -396,7 +396,7 @@ export default function DiningPage() {
                       <div className='space-y-3 mb-4 flex-grow'>
                         {items.slice(0, 3).map(dish => (
                           <div
-                            key={dish._id}
+                            key={dish._id.toString()}
                             className='border-b border-default-200 pb-3 last:border-b-0'
                           >
                             <div className='flex justify-between items-start mb-1'>
@@ -440,9 +440,11 @@ export default function DiningPage() {
                 );
               })}
             </div>
-          </section>
+          </section>;
 
-          {/* Special Dining Experiences */}
+          {
+            /* Special Dining Experiences */
+          }
           <section>
             <div className='text-center mb-8'>
               <h2 className={title({ size: 'md' })}>
@@ -456,7 +458,7 @@ export default function DiningPage() {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
               {diningExperiences.map(experience => (
                 <Card
-                  key={experience._id}
+                  key={experience._id.toString()}
                   className='py-4 flex flex-col h-full'
                 >
                   <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
@@ -529,9 +531,11 @@ export default function DiningPage() {
                 </Card>
               ))}
             </div>
-          </section>
+          </section>;
 
-          {/* Beverages Section */}
+          {
+            /* Beverages Section */
+          }
           <section className='bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 rounded-2xl p-8'>
             <div className='text-center mb-8'>
               <h2 className={title({ size: 'md' })}>Curated Beverages</h2>
@@ -585,7 +589,7 @@ export default function DiningPage() {
                         <ul className='space-y-2'>
                           {items.slice(0, 5).map(item => (
                             <li
-                              key={item._id}
+                              key={item._id.toString()}
                               className='text-sm text-default-600 text-center border-b border-default-200 pb-2 last:border-b-0'
                             >
                               <div className='font-medium'>{item.name}</div>
@@ -625,7 +629,7 @@ export default function DiningPage() {
                 );
               })}
             </div>
-          </section>
+          </section>;
 
           {/* Reservations CTA */}
           <section className='text-center'>
