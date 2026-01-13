@@ -122,10 +122,10 @@ export default function CabinGallery({ images }: CabinGalleryProps) {
 
       {/* Auto-scroll toggle button */}
       <button
+        className='absolute top-2 right-2 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 cursor-pointer'
         aria-label={
           isAutoScrolling ? 'Pause auto-scroll' : 'Resume auto-scroll'
         }
-        className='absolute top-2 right-2 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 cursor-pointer'
         onClick={toggleAutoScroll}
       >
         {isAutoScrolling ? (
