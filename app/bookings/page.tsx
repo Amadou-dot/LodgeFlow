@@ -30,6 +30,10 @@ import {
   useUpdateBooking,
 } from '@/hooks/useBooking';
 import {
+  useCancelDiningReservation,
+  useDiningReservationHistory,
+} from '@/hooks/useDiningReservation';
+import {
   useCancelExperienceBooking,
   useExperienceBookingHistory,
 } from '@/hooks/useExperienceBooking';
@@ -55,6 +59,7 @@ const statusColorMap: Record<
   cancelled: 'danger',
   pending: 'warning',
   completed: 'default',
+  'no-show': 'danger',
 };
 
 const experienceStatusFilters = [
@@ -63,6 +68,15 @@ const experienceStatusFilters = [
   { key: 'confirmed', label: 'Confirmed' },
   { key: 'completed', label: 'Completed' },
   { key: 'cancelled', label: 'Cancelled' },
+];
+
+const diningStatusFilters = [
+  { key: 'all', label: 'All Reservations' },
+  { key: 'pending', label: 'Pending' },
+  { key: 'confirmed', label: 'Confirmed' },
+  { key: 'completed', label: 'Completed' },
+  { key: 'cancelled', label: 'Cancelled' },
+  { key: 'no-show', label: 'No Show' },
 ];
 
 export default function BookingsPage() {
@@ -112,6 +126,17 @@ export default function BookingsPage() {
     expStatusFilter === 'all' ? undefined : expStatusFilter
   );
   const cancelExpBooking = useCancelExperienceBooking();
+
+  // Dining reservations
+  const [diningStatusFilter, setDiningStatusFilter] = useState<string>('all');
+  const {
+    data: diningReservations,
+    isLoading: diningLoading,
+    error: diningError,
+  } = useDiningReservationHistory(
+    diningStatusFilter === 'all' ? undefined : diningStatusFilter
+  );
+  const cancelDiningReservation = useCancelDiningReservation();
 
   const handleViewDetails = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -563,6 +588,187 @@ export default function BookingsPage() {
                                     addToast({
                                       title: 'Error',
                                       description: 'Failed to cancel booking.',
+                                      color: 'danger',
+                                    });
+                                  }
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  ))}
+                </div>
+              )}
+          </Tab>
+
+          <Tab key='dining' title='Dining Reservations'>
+            {/* Dining Reservations Content */}
+            <div className='mb-6 max-w-xs mt-4'>
+              <Select
+                label='Filter by Status'
+                placeholder='Select status'
+                selectedKeys={[diningStatusFilter]}
+                onChange={e => setDiningStatusFilter(e.target.value)}
+              >
+                {diningStatusFilters.map(filter => (
+                  <SelectItem key={filter.key}>{filter.label}</SelectItem>
+                ))}
+              </Select>
+            </div>
+
+            {diningLoading && (
+              <div className='flex justify-center py-12'>
+                <Spinner label='Loading dining reservations...' size='lg' />
+              </div>
+            )}
+
+            {diningError && (
+              <Card className='bg-danger-50 dark:bg-danger-900/20'>
+                <CardBody>
+                  <p className='text-danger'>
+                    Failed to load dining reservations.
+                  </p>
+                </CardBody>
+              </Card>
+            )}
+
+            {!diningLoading &&
+              !diningError &&
+              diningReservations?.length === 0 && (
+                <Card>
+                  <CardBody className='text-center py-12'>
+                    <Calendar className='w-16 h-16 mx-auto mb-4 text-default-400' />
+                    <h3 className='text-xl font-semibold mb-2'>
+                      No dining reservations found
+                    </h3>
+                    <p className='text-default-500 mb-6'>
+                      {diningStatusFilter === 'all'
+                        ? "You haven't made any dining reservations yet."
+                        : `No ${diningStatusFilter} dining reservations found.`}
+                    </p>
+                    <Button
+                      color='primary'
+                      onPress={() => router.push('/dining')}
+                    >
+                      Browse Dining
+                    </Button>
+                  </CardBody>
+                </Card>
+              )}
+
+            {!diningLoading &&
+              !diningError &&
+              diningReservations &&
+              diningReservations.length > 0 && (
+                <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-2'>
+                  {diningReservations.map((reservation: any) => (
+                    <Card key={reservation._id.toString()} className='w-full'>
+                      <CardHeader className='flex gap-3'>
+                        <div className='relative w-24 h-24 shrink-0 rounded-lg overflow-hidden'>
+                          <Image
+                            alt={reservation.dining?.name || 'Dining'}
+                            className='object-cover'
+                            fill
+                            src={
+                              reservation.dining?.image ||
+                              '/placeholder-dining.jpg'
+                            }
+                          />
+                        </div>
+                        <div className='flex flex-col flex-1'>
+                          <p className='text-lg font-bold'>
+                            {reservation.dining?.name}
+                          </p>
+                          <Chip
+                            className='mt-1 w-fit'
+                            color={statusColorMap[reservation.status]}
+                            size='sm'
+                            variant='flat'
+                          >
+                            {reservation.status.toUpperCase().replace('-', ' ')}
+                          </Chip>
+                        </div>
+                      </CardHeader>
+
+                      <CardBody className='pt-0'>
+                        <div className='space-y-3'>
+                          <div className='flex items-center gap-2 text-sm'>
+                            <Calendar className='w-4 h-4 text-default-400' />
+                            <span>
+                              {new Date(reservation.date).toLocaleDateString(
+                                'en-US',
+                                {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                }
+                              )}
+                            </span>
+                          </div>
+
+                          <div className='flex items-center gap-2 text-sm'>
+                            <Clock className='w-4 h-4 text-default-400' />
+                            <span>{reservation.time}</span>
+                          </div>
+
+                          <div className='flex items-center gap-2 text-sm'>
+                            <Users className='w-4 h-4 text-default-400' />
+                            <span>
+                              {reservation.numGuests} guest
+                              {reservation.numGuests > 1 ? 's' : ''}
+                            </span>
+                          </div>
+
+                          <div className='flex items-center gap-2 text-sm font-semibold'>
+                            <DollarSign className='w-4 h-4 text-success' />
+                            <span className='text-lg'>
+                              ${reservation.totalPrice}
+                            </span>
+                            {reservation.isPaid ? (
+                              <Chip color='success' size='sm' variant='flat'>
+                                Paid
+                              </Chip>
+                            ) : null}
+                          </div>
+
+                          {!reservation.isPaid &&
+                            reservation.status !== 'cancelled' &&
+                            reservation.status !== 'no-show' && (
+                              <div className='pt-2'>
+                                <Chip color='warning' size='sm' variant='flat'>
+                                  Payment pending
+                                </Chip>
+                              </div>
+                            )}
+
+                          <div className='flex gap-2 pt-4'>
+                            {(reservation.status === 'pending' ||
+                              reservation.status === 'confirmed') && (
+                              <Button
+                                color='danger'
+                                isLoading={cancelDiningReservation.isPending}
+                                size='sm'
+                                variant='flat'
+                                onPress={async () => {
+                                  try {
+                                    await cancelDiningReservation.mutateAsync(
+                                      reservation._id.toString()
+                                    );
+                                    addToast({
+                                      title: 'Reservation Cancelled',
+                                      description:
+                                        'Your dining reservation has been cancelled.',
+                                      color: 'success',
+                                    });
+                                  } catch {
+                                    addToast({
+                                      title: 'Error',
+                                      description:
+                                        'Failed to cancel reservation.',
                                       color: 'danger',
                                     });
                                   }

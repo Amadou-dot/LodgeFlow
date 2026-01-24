@@ -1,6 +1,7 @@
 import type { IBooking } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
 import type { IDining } from '@/models/Dining';
+import type { IDiningReservation } from '@/models/DiningReservation';
 import type { IExperience } from '@/models/Experience';
 import type { IExperienceBooking } from '@/models/ExperienceBooking';
 import type { ISettings } from '@/models/Settings';
@@ -17,6 +18,7 @@ export type Settings = ISettings;
 export type Experience = IExperience;
 export type Dining = IDining;
 export type ExperienceBooking = IExperienceBooking;
+export type DiningReservation = IDiningReservation;
 
 // Extended types for populated models (used in API responses)
 export interface PopulatedBooking extends Omit<
@@ -157,4 +159,24 @@ export interface DiningQueryParams {
   minPrice?: number;
   maxPrice?: number;
   search?: string;
+}
+
+// Dining Reservation types
+export interface PopulatedDiningReservation extends Omit<
+  IDiningReservation,
+  'dining' | 'date'
+> {
+  dining: IDining;
+  date: string | Date;
+}
+
+export interface CreateDiningReservationData {
+  diningId: string;
+  date: Date;
+  time: string;
+  numGuests: number;
+  dietaryRequirements?: string[];
+  specialRequests?: string[];
+  tablePreference?: 'indoor' | 'outdoor' | 'bar' | 'no-preference';
+  occasion?: string;
 }

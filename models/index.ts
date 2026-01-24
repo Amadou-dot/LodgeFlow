@@ -8,6 +8,10 @@ export {
   default as ExperienceBooking,
   type IExperienceBooking,
 } from './ExperienceBooking';
+export {
+  default as DiningReservation,
+  type IDiningReservation,
+} from './DiningReservation';
 
 // Re-export database connection
 export { default as connectDB } from '../lib/mongodb';

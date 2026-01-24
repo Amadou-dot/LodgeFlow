@@ -28,6 +28,24 @@ interface ExperienceBookingEmailProps {
   timeSlot?: string;
 }
 
+interface DiningReservationEmailProps {
+  diningData: {
+    name: string;
+    price: number;
+    mealType: string;
+    servingTime: { start: string; end: string };
+    location?: string;
+  };
+  firstName: string;
+  date: string;
+  time: string;
+  numGuests: number;
+  totalPrice: number;
+  reservationId: string;
+  tablePreference?: string;
+  occasion?: string;
+}
+
 const emailStyles = {
   button: {
     backgroundColor: '#2563eb',
@@ -603,6 +621,131 @@ export function ExperienceBookingConfirmationEmail({
 
       <div style={emailStyles.footer}>
         <p>We can't wait to see you at the experience!</p>
+        <p style={{ fontSize: '14px', margin: '10px 0 0 0', opacity: 0.8 }}>
+          If you have any questions, please contact us at support@lodgeflow.com
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function DiningReservationConfirmationEmail({
+  diningData,
+  firstName,
+  date,
+  time,
+  numGuests,
+  totalPrice,
+  reservationId,
+  tablePreference,
+  occasion,
+}: DiningReservationEmailProps) {
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      weekday: 'long',
+      year: 'numeric',
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      currency: 'USD',
+      style: 'currency',
+    }).format(price);
+  };
+
+  const tablePreferenceLabels: Record<string, string> = {
+    indoor: 'Indoor',
+    outdoor: 'Outdoor',
+    bar: 'Bar',
+    'no-preference': 'No Preference',
+  };
+
+  return (
+    <div style={emailStyles.container}>
+      <div style={{ ...emailStyles.header, backgroundColor: '#059669' }}>
+        <h1 style={emailStyles.title}>Reservation Confirmed!</h1>
+        <p style={emailStyles.subtitle}>Your table is ready, {firstName}!</p>
+      </div>
+
+      <div style={emailStyles.content}>
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Reservation Details</h2>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Reservation ID:</span>
+            <span style={emailStyles.value}>
+              #{reservationId.slice(-8).toUpperCase()}
+            </span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Dining:</span>
+            <span style={emailStyles.value}>{diningData.name}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Date:</span>
+            <span style={emailStyles.value}>{formatDate(date)}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Time:</span>
+            <span style={emailStyles.value}>{time}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Guests:</span>
+            <span style={emailStyles.value}>{numGuests}</span>
+          </div>
+          {tablePreference && tablePreference !== 'no-preference' && (
+            <div style={emailStyles.row}>
+              <span style={emailStyles.label}>Table Preference:</span>
+              <span style={emailStyles.value}>
+                {tablePreferenceLabels[tablePreference] || tablePreference}
+              </span>
+            </div>
+          )}
+          {occasion && (
+            <div style={emailStyles.row}>
+              <span style={emailStyles.label}>Occasion:</span>
+              <span style={emailStyles.value}>{occasion}</span>
+            </div>
+          )}
+          {diningData.location && (
+            <div style={emailStyles.row}>
+              <span style={emailStyles.label}>Location:</span>
+              <span style={emailStyles.value}>{diningData.location}</span>
+            </div>
+          )}
+        </div>
+
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Pricing</h2>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>
+              {formatPrice(diningData.price)} x {numGuests} guest
+              {numGuests > 1 ? 's' : ''}:
+            </span>
+            <span style={emailStyles.price}>{formatPrice(totalPrice)}</span>
+          </div>
+        </div>
+
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Important Information</h2>
+          <ul>
+            <li>
+              Serving hours: {diningData.servingTime.start} -{' '}
+              {diningData.servingTime.end}
+            </li>
+            <li>Please arrive 5-10 minutes before your reservation time</li>
+            <li>
+              Reservations are held for 15 minutes past the scheduled time
+            </li>
+            <li>Contact us if you need to modify your reservation</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style={emailStyles.footer}>
+        <p>We look forward to serving you at LodgeFlow!</p>
         <p style={{ fontSize: '14px', margin: '10px 0 0 0', opacity: 0.8 }}>
           If you have any questions, please contact us at support@lodgeflow.com
         </p>

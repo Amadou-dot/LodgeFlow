@@ -77,10 +77,11 @@ The plan is sound and well-scoped. The updates below tighten sequencing, add mis
 **Current State Summary (as of January 2026):**
 
 - Cabin browsing, detail, and booking flow: COMPLETE
-- Booking management (view, edit, cancel): COMPLETE
-- Experience browsing and detail pages: COMPLETE (booking flow NOT implemented)
+- Booking management (view, edit, cancel): COMPLETE (refund logic still pending)
+- Payments (Stripe Checkout + webhooks + pay buttons): IMPLEMENTED (idempotency + payment-confirm automation pending)
+- Experience browsing + booking flow: COMPLETE (payment integration not implemented)
 - Dining listing page: COMPLETE (detail page and reservation flow NOT implemented)
-- Email notifications: PARTIAL (welcome + booking confirmation only)
+- Email notifications: PARTIAL (welcome + booking confirmation wired; payment + experience confirmation routes exist but not wired)
 - Availability checking: PARTIAL (inline in BookingForm via SWR, no standalone calendar widget)
 
 **Existing Architecture Pattern:**
@@ -105,7 +106,7 @@ Page/Component → Custom Hook (hooks/) → API Route (app/api/) → Mongoose Mo
 
 ## Phase 1 - Critical (Core Functionality)
 
-### ✅ 1. Payment Processing (Stripe Integration) — COMPLETED
+### ✅ 1. Payment Processing (Stripe Integration) — IMPLEMENTED (hardening + wiring pending)
 
 **New Dependencies:**
 
@@ -138,19 +139,19 @@ Note: `isPaid`, `depositPaid`, `depositAmount`, and `paymentMethod` already exis
 **New Components:**
 
 - `components/PaymentButton.tsx` — Stripe checkout redirect button
-- `components/PaymentStatus.tsx` — Display payment status chip/badge
+- `components/PaymentStatus.tsx` — Display payment status chip/badge (exists, but not wired; bookings page uses inline chips)
 
 **New/Modified Pages:**
 
 - `app/cabins/confirmation/[id]/page.tsx` — Add "Pay Now" button that triggers Stripe Checkout (page exists, needs payment integration)
-- `app/bookings/page.tsx` — Add "Pay" button for unpaid bookings (page exists, currently shows "Payment Pending" chip but no action)
+- `app/bookings/page.tsx` — Add "Pay" button for unpaid bookings (implemented with `PaymentButton`)
 - `app/payments/success/page.tsx` — NEW: Payment success landing page
 - `app/payments/cancel/page.tsx` — NEW: Payment cancelled landing page
 
 **New Email Template:**
 
 - `PaymentConfirmationEmail` in `components/EmailTemplates.tsx`
-- `app/api/send/payment-confirm/route.ts` — NEW: Send payment confirmation email
+- `app/api/send/payment-confirm/route.ts` — NEW: Send payment confirmation email (route exists, not auto-triggered yet)
 
 **Integration Points:**
 
@@ -165,18 +166,19 @@ Note: `isPaid`, `depositPaid`, `depositAmount`, and `paymentMethod` already exis
 - `STRIPE_PUBLISHABLE_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
-**Additional Guardrails (NEW):**
+**Hardening / Follow-ups:**
 
-- **Webhook idempotency:** Store processed `event.id` to avoid double-processing.
-- **Signature verification:** Always verify Stripe signature on webhook requests.
-- **Async refunds:** For cancellations, initiate refunds asynchronously and persist `refundStatus` updates.
-- **Shared Stripe helpers:** Reuse Stripe integration for experiences/dining without duplicating logic.
+- **Webhook idempotency:** TODO (no `event.id` tracking yet).
+- **Signature verification:** ✅ implemented in webhook route.
+- **Async refunds + cancellation integration:** TODO (cancellation flow only updates status).
+- **Shared Stripe helpers:** TODO (logic lives in API routes).
+- **Payment confirmation email automation:** TODO (template + send route exist, but not triggered automatically).
 
 ---
 
-### 2. Experience Booking
+### ✅ 2. Experience Booking — IMPLEMENTED (payment + email wiring pending)
 
-**Current State:** Experience model exists with `maxParticipants`, `rating`, `reviewCount` fields. API routes exist for GET list and GET by ID. Detail page (`app/experiences/[id]/page.tsx`) shows "Contact to Book" CTAs linking to `/contact` and `tel:`. No booking/reservation flow exists.
+**Current State:** Experience booking flow is implemented (model, API routes, hooks, booking form, confirmation page, history tab, availability endpoint). Payments are not integrated; confirmation email route exists but is not wired.
 
 **New Model — `models/ExperienceBooking.ts`:**
 
@@ -227,7 +229,6 @@ export type ExperienceBooking = IExperienceBooking;
 
 export interface CreateExperienceBookingData {
   experienceId: string;
-  customerId: string;
   date: Date;
   timeSlot?: string;
   numParticipants: number;
@@ -261,7 +262,7 @@ export interface CreateExperienceBookingData {
 **New Email Template:**
 
 - `ExperienceBookingConfirmationEmail` in `components/EmailTemplates.tsx`
-- `app/api/send/experience-confirm/route.ts`
+- `app/api/send/experience-confirm/route.ts` (route exists, not auto-triggered yet)
 
 ---
 
@@ -321,7 +322,6 @@ export type DiningReservation = IDiningReservation;
 
 export interface CreateDiningReservationData {
   diningId: string;
-  customerId: string;
   date: Date;
   time: string;
   numGuests: number;
@@ -511,9 +511,9 @@ Add fields to `IBooking` interface and `BookingSchema`:
 
 - `cancelledAt?: Date`
 - `cancellationReason?: string`
-- `refundAmount?: number`
 - `refundStatus?: 'none' | 'pending' | 'partial' | 'full'`
-- `refundedAt?: Date`
+- `refundAmount?: number` (already exists from payments)
+- `refundedAt?: Date` (already exists from payments)
 
 Note: `stripePaymentIntentId` addition is covered in Phase 1 #1 (Payments).
 
@@ -556,7 +556,7 @@ Note: `stripePaymentIntentId` addition is covered in Phase 1 #1 (Payments).
 
 ### 7. Enhanced Notifications
 
-**Current State:** Only two email templates exist (`WelcomeEmail`, `BookingConfirmationEmail`) with corresponding send routes (`/api/send/welcome`, `/api/send/confirm`). The `useSendEmail.ts` hook provides `useSendConfirmationEmail()` and `useSendWelcomeEmail()`.
+**Current State:** Welcome + booking confirmation emails are wired (`/api/send/welcome`, `/api/send/confirm`, `useSendEmail.ts`). Payment + experience confirmation templates/routes exist but are not wired (no hooks or automatic sends yet).
 
 **New API Routes:**
 
@@ -723,6 +723,7 @@ export interface UpdateGuestProfileData {
 **New Page:**
 
 - `app/profile/page.tsx` — Preferences form (dietary, room, accessibility, communication, emergency contact)
+- `app/preferences/page.tsx` — Alias/redirect to `/profile` (nav menu currently links here)
 
 **Integration:**
 
