@@ -4,6 +4,10 @@ export { default as Booking, type IBooking } from './Booking';
 export { default as Settings, type ISettings } from './Settings';
 export { Experience, type IExperience } from './Experience';
 export { default as Dining, type IDining } from './Dining';
+export {
+  default as ExperienceBooking,
+  type IExperienceBooking,
+} from './ExperienceBooking';
 
 // Re-export database connection
 export { default as connectDB } from '../lib/mongodb';

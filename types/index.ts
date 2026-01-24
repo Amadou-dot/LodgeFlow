@@ -2,6 +2,7 @@ import type { IBooking } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
 import type { IDining } from '@/models/Dining';
 import type { IExperience } from '@/models/Experience';
+import type { IExperienceBooking } from '@/models/ExperienceBooking';
 import type { ISettings } from '@/models/Settings';
 import { SVGProps } from 'react';
 
@@ -15,13 +16,13 @@ export type Booking = IBooking;
 export type Settings = ISettings;
 export type Experience = IExperience;
 export type Dining = IDining;
+export type ExperienceBooking = IExperienceBooking;
 
 // Extended types for populated models (used in API responses)
-export interface PopulatedBooking
-  extends Omit<
-    IBooking,
-    'cabin' | 'customer' | 'checkInDate' | 'checkOutDate'
-  > {
+export interface PopulatedBooking extends Omit<
+  IBooking,
+  'cabin' | 'customer' | 'checkInDate' | 'checkOutDate'
+> {
   cabin: ICabin;
   customer: string; // Clerk user ID
   checkInDate: string | Date;
@@ -126,6 +127,24 @@ export interface CreateExperienceData {
 
 export interface UpdateExperienceData extends Partial<CreateExperienceData> {
   _id: string;
+}
+
+// Experience Booking types
+export interface PopulatedExperienceBooking extends Omit<
+  IExperienceBooking,
+  'experience' | 'date'
+> {
+  experience: IExperience;
+  date: string | Date;
+}
+
+export interface CreateExperienceBookingData {
+  experienceId: string;
+  date: Date;
+  timeSlot?: string;
+  numParticipants: number;
+  specialRequests?: string[];
+  observations?: string;
 }
 
 // Dining-related types

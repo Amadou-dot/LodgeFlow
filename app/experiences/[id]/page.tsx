@@ -13,9 +13,7 @@ import {
   Calendar,
   Check,
   Clock,
-  Mail,
   MapPin,
-  Phone,
   Star,
   Users,
 } from 'lucide-react';
@@ -318,22 +316,11 @@ export default function ExperiencePage({ params }: { params: Params }) {
                   as={Link}
                   className='w-full'
                   color='primary'
-                  href='/contact'
+                  href={`/experiences/${experienceId}/book`}
                   size='lg'
-                  startContent={<Mail className='w-4 h-4' />}
+                  startContent={<Calendar className='w-4 h-4' />}
                 >
-                  {experience.ctaText}
-                </Button>
-
-                <Button
-                  as={Link}
-                  className='w-full'
-                  href='tel:+1-800-LODGEFLOW'
-                  size='lg'
-                  startContent={<Phone className='w-4 h-4' />}
-                  variant='bordered'
-                >
-                  Call to Book
+                  Book Now
                 </Button>
               </div>
             </CardBody>

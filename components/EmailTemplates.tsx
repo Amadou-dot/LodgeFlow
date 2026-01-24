@@ -1,4 +1,4 @@
-import type { Cabin, PopulatedBooking } from '@/types';
+import type { Cabin, Experience, PopulatedBooking } from '@/types';
 
 interface EmailTemplateProps {
   firstName: string;
@@ -16,6 +16,16 @@ interface PaymentEmailTemplateProps {
   firstName: string;
   amountPaid: number;
   isDeposit: boolean;
+}
+
+interface ExperienceBookingEmailProps {
+  experienceData: Experience;
+  firstName: string;
+  date: string;
+  numParticipants: number;
+  totalPrice: number;
+  bookingId: string;
+  timeSlot?: string;
 }
 
 const emailStyles = {
@@ -477,6 +487,124 @@ export function PaymentConfirmationEmail({
         <p style={{ fontSize: '14px', margin: '10px 0 0 0', opacity: 0.8 }}>
           If you have any questions about your payment, please contact us at
           support@lodgeflow.com
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function ExperienceBookingConfirmationEmail({
+  experienceData,
+  firstName,
+  date,
+  numParticipants,
+  totalPrice,
+  bookingId,
+  timeSlot,
+}: ExperienceBookingEmailProps) {
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      weekday: 'long',
+      year: 'numeric',
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      currency: 'USD',
+      style: 'currency',
+    }).format(price);
+  };
+
+  return (
+    <div style={emailStyles.container}>
+      <div style={{ ...emailStyles.header, backgroundColor: '#7c3aed' }}>
+        <h1 style={emailStyles.title}>Experience Booked!</h1>
+        <p style={emailStyles.subtitle}>
+          Get ready for an adventure, {firstName}!
+        </p>
+      </div>
+
+      <div style={emailStyles.content}>
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Booking Details</h2>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Booking ID:</span>
+            <span style={emailStyles.value}>
+              #{bookingId.slice(-8).toUpperCase()}
+            </span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Experience:</span>
+            <span style={emailStyles.value}>{experienceData.name}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Date:</span>
+            <span style={emailStyles.value}>{formatDate(date)}</span>
+          </div>
+          {timeSlot && (
+            <div style={emailStyles.row}>
+              <span style={emailStyles.label}>Time:</span>
+              <span style={emailStyles.value}>{timeSlot}</span>
+            </div>
+          )}
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Participants:</span>
+            <span style={emailStyles.value}>{numParticipants}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Duration:</span>
+            <span style={emailStyles.value}>{experienceData.duration}</span>
+          </div>
+          {experienceData.location && (
+            <div style={emailStyles.row}>
+              <span style={emailStyles.label}>Location:</span>
+              <span style={emailStyles.value}>{experienceData.location}</span>
+            </div>
+          )}
+        </div>
+
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Pricing</h2>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>
+              {formatPrice(experienceData.price)} x {numParticipants}{' '}
+              participant{numParticipants > 1 ? 's' : ''}:
+            </span>
+            <span style={emailStyles.price}>{formatPrice(totalPrice)}</span>
+          </div>
+        </div>
+
+        {experienceData.includes && experienceData.includes.length > 0 && (
+          <div style={emailStyles.section}>
+            <h2 style={emailStyles.sectionTitle}>What's Included</h2>
+            <ul style={{ color: '#64748b', margin: '5px 0' }}>
+              {experienceData.includes.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {experienceData.whatToBring &&
+          experienceData.whatToBring.length > 0 && (
+            <div style={emailStyles.section}>
+              <h2 style={emailStyles.sectionTitle}>What to Bring</h2>
+              <ul style={{ color: '#64748b', margin: '5px 0' }}>
+                {experienceData.whatToBring.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+      </div>
+
+      <div style={emailStyles.footer}>
+        <p>We can't wait to see you at the experience!</p>
+        <p style={{ fontSize: '14px', margin: '10px 0 0 0', opacity: 0.8 }}>
+          If you have any questions, please contact us at support@lodgeflow.com
         </p>
       </div>
     </div>

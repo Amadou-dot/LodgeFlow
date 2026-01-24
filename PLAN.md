@@ -4,6 +4,76 @@
 
 This document details the implementation plan for adding missing features to the LodgeFlow guest-facing application. The plan is organized into four phases by priority.
 
+## Plan Review Summary (Updated)
+
+The plan is sound and well-scoped. The updates below tighten sequencing, add missing guardrails (Stripe idempotency, refund workflow, indexing strategy, email idempotency), and clarify cross-feature reuse (payments for experiences/dining).
+
+## Revised Phase Sequencing (Simplified)
+
+### Phase 1 — Payments + Experience + Dining (Core Revenue)
+
+1. **Payment Processing (Stripe Integration)**
+
+- Add payment fields to Booking model (already listed)
+- Webhooks must be **idempotent** (store processed `event.id`) and **signature-verified**
+- Payment status endpoint + Pay Now UI on confirmation + bookings page
+- Shared Stripe helpers so Experiences/Dining can reuse later without duplicating logic
+
+2. **Experience Booking**
+
+- Model + API routes + hooks + booking form + confirmation
+- Availability endpoint (reuse pattern from cabins)
+- Add to Bookings page as a new section/tab
+
+3. **Dining Reservations**
+
+- Model + API routes + hooks + detail + reservation flow
+- Availability endpoint for date/time
+- Add to Bookings page as a new section/tab
+
+### Phase 2 — Availability + Reviews + Cancellation
+
+4. **Availability Calendar Widget**
+
+- Reuse existing cabins availability endpoint
+- Normalize dates + timezone safety (`@internationalized/date`)
+
+5. **Reviews & Ratings System**
+
+- Require completed booking for verified reviews
+- Add moderation status flow (`pending | approved | rejected`)
+- Add a backfill/migration plan for Cabin `rating` and `reviewCount`
+
+6. **Cancellation & Refund Logic**
+
+- Add refund estimate API (already listed)
+- Cancellation API should set `refundStatus` and trigger **async** Stripe refunds
+- Include idempotent email sending to prevent duplicate notifications
+
+### Phase 3 — Notifications + Pricing + Search
+
+7. **Enhanced Notifications**
+
+- Cron jobs should be batched and idempotent
+- Add rate limits for safety and retries
+
+8. **Seasonal/Dynamic Pricing**
+
+- Introduce pricing utility + nightly breakdown
+- Show “from” pricing on Cabin card and details
+
+9. **Global Search**
+
+- Add text indexes on Experience and Dining
+- Use `textScore` sorting + define index creation strategy
+
+### Phase 4 — Profile + Check-in + SEO + Future
+
+10. **Guest Preferences/Profile**
+11. **Check-in/Check-out Workflow**
+12. **SEO & Meta Tags**
+    13+) **Package Deals, Waitlist, Map, i18n**
+
 **Current State Summary (as of January 2026):**
 
 - Cabin browsing, detail, and booking flow: COMPLETE
@@ -35,7 +105,7 @@ Page/Component → Custom Hook (hooks/) → API Route (app/api/) → Mongoose Mo
 
 ## Phase 1 - Critical (Core Functionality)
 
-### 1. Payment Processing (Stripe Integration)
+### ✅ 1. Payment Processing (Stripe Integration) — COMPLETED
 
 **New Dependencies:**
 
@@ -95,6 +165,13 @@ Note: `isPaid`, `depositPaid`, `depositAmount`, and `paymentMethod` already exis
 - `STRIPE_PUBLISHABLE_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 
+**Additional Guardrails (NEW):**
+
+- **Webhook idempotency:** Store processed `event.id` to avoid double-processing.
+- **Signature verification:** Always verify Stripe signature on webhook requests.
+- **Async refunds:** For cancellations, initiate refunds asynchronously and persist `refundStatus` updates.
+- **Shared Stripe helpers:** Reuse Stripe integration for experiences/dining without duplicating logic.
+
 ---
 
 ### 2. Experience Booking
@@ -137,6 +214,11 @@ export interface IExperienceBooking extends Document {
 - `app/api/experience-bookings/[id]/route.ts` — GET, PATCH, DELETE
 - `app/api/experience-bookings/history/route.ts` — GET: Current user's history (pattern: match `app/api/bookings/history/route.ts`)
 - `app/api/experiences/[id]/availability/route.ts` — GET: Check availability for dates (pattern: match `app/api/cabins/[id]/availability/route.ts`)
+
+**Operational Notes (NEW):**
+
+- Decide if Experience bookings require payment now or later; reuse Stripe helpers where possible.
+- Normalize date handling to avoid timezone drift.
 
 **New Types in `types/index.ts`:**
 
@@ -227,6 +309,11 @@ export interface IDiningReservation extends Document {
 - `app/api/dining/[id]/route.ts` — GET: Single dining item details (DOES NOT EXIST YET)
 - `app/api/dining/[id]/availability/route.ts` — GET: Check availability for date/time
 
+**Operational Notes (NEW):**
+
+- Decide if Dining reservations require payment now or later; reuse Stripe helpers where possible.
+- Validate `servingTime` against the new reservation time.
+
 **New Types in `types/index.ts`:**
 
 ```typescript
@@ -307,6 +394,10 @@ export interface CreateDiningReservationData {
 - Selected dates from calendar can be passed to BookingForm as initial values
 - Consider migrating BookingForm's SWR usage to React Query for consistency with this hook
 
+**Operational Notes (NEW):**
+
+- Normalize dates in both server and client (`@internationalized/date`) to avoid timezone mismatches.
+
 ---
 
 ### 5. Reviews & Ratings System
@@ -357,6 +448,11 @@ Note: Experience and Dining models already have these fields.
 - `app/api/reviews/route.ts` — POST: Create (verify completed booking for `isVerified`); GET: List with filters (targetType, targetId, rating)
 - `app/api/reviews/[id]/route.ts` — GET, PATCH, DELETE (own review only, auth check)
 - `app/api/reviews/[id]/helpful/route.ts` — POST: Mark as helpful
+
+**Operational Notes (NEW):**
+
+- Gate verified reviews to completed bookings.
+- Add migration/backfill plan for Cabin `rating` and `reviewCount`.
 
 **New Types in `types/index.ts`:**
 
@@ -441,6 +537,11 @@ Note: `stripePaymentIntentId` addition is covered in Phase 1 #1 (Payments).
   - Initiate Stripe refund if `isPaid` and `stripePaymentIntentId` exists
   - Trigger cancellation confirmation email
 
+**Operational Notes (NEW):**
+
+- Use async refund processing to keep API latency low.
+- Ensure idempotent cancellation (avoid duplicate refunds/emails).
+
 **Modified Components/Pages:**
 
 - `app/bookings/page.tsx` — Cancel modal should show refund estimate before confirming (call refund-estimate API)
@@ -488,6 +589,11 @@ Note: `CancellationEmail` is covered in Phase 2 #6 above.
   ]
 }
 ```
+
+**Operational Notes (NEW):**
+
+- Batch emails, track send status to prevent duplicates.
+- Add rate limiting or backoff in cron handlers.
 
 ---
 
@@ -537,6 +643,11 @@ seasonalPricing?: [{
 
 - `models/Experience.ts` — Add text index: `{ name: 'text', description: 'text', category: 'text' }`
 - `models/Dining.ts` — Add text index: `{ name: 'text', description: 'text' }`
+
+**Operational Notes (NEW):**
+
+- Use `textScore` for relevance sorting.
+- Plan index creation/migrations for production.
 
 **New Hooks — `hooks/useSearch.ts`:**
 

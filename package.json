@@ -43,6 +43,7 @@
     "@heroui/spinner": "^2.2.26",
     "@heroui/switch": "^2.2.26",
     "@heroui/system": "^2.4.25",
+    "@heroui/tabs": "^2.2.26",
     "@heroui/theme": "^2.4.25",
     "@heroui/toast": "^2.0.19",
     "@internationalized/date": "^3.10.1",
