@@ -11,6 +11,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import PaymentButton from '@/components/PaymentButton';
+
 type Params = Promise<{
   id: string;
 }>;
@@ -201,7 +203,7 @@ export default function BookingConfirmationPage({
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
         {/* Cabin Image */}
-        <div className='relative h-64 lg:h-full min-h-[300px] rounded-lg overflow-hidden'>
+        <div className='relative h-64 lg:h-full min-h-75 rounded-lg overflow-hidden'>
           <Image
             alt={booking.cabin.name}
             className='rounded-lg'
@@ -383,6 +385,43 @@ export default function BookingConfirmationPage({
           </p>
         </CardBody>
       </Card>
+
+      {/* Payment Section */}
+      {!booking.isPaid &&
+        booking.status !== 'cancelled' &&
+        (() => {
+          const isDepositDue =
+            booking.depositAmount > 0 && !booking.depositPaid;
+          const remainingBalance = Math.max(
+            0,
+            booking.totalPrice -
+              (booking.depositPaid ? booking.depositAmount : 0)
+          );
+          const amountToPay = isDepositDue
+            ? booking.depositAmount
+            : remainingBalance;
+
+          if (amountToPay <= 0) return null;
+
+          return (
+            <Card className='mb-6 border-2 border-success-200 dark:border-success-800'>
+              <CardBody className='flex flex-col items-center gap-4 p-6'>
+                <h3 className='text-lg font-semibold'>Complete Your Payment</h3>
+                <p className='text-sm text-default-500 text-center'>
+                  {isDepositDue
+                    ? `Pay the deposit of $${booking.depositAmount} to secure your booking.`
+                    : `Pay the remaining balance of $${amountToPay} to confirm your reservation.`}
+                </p>
+                <PaymentButton
+                  amount={amountToPay}
+                  bookingId={booking._id}
+                  isDeposit={isDepositDue}
+                  size='lg'
+                />
+              </CardBody>
+            </Card>
+          );
+        })()}
 
       {/* Action Buttons */}
       <div className='flex flex-col sm:flex-row gap-4 justify-center'>

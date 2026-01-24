@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-import { BookingConfirmationEmail } from '@/components/EmailTemplates';
+import { PaymentConfirmationEmail } from '@/components/EmailTemplates';
 import { Booking, connectDB } from '@/models';
 import { auth, currentUser } from '@clerk/nextjs/server';
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  const { bookingId } = await request.json();
+  const { bookingId, amountPaid, isDeposit } = await request.json();
 
   try {
     if (!bookingId) {
@@ -49,14 +49,23 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
+    const safeAmountPaid =
+      typeof amountPaid === 'number' && amountPaid > 0
+        ? amountPaid
+        : isDeposit
+          ? booking.depositAmount
+          : booking.totalPrice;
+
     const { data, error } = await resend.emails.send({
       from: 'LodgeFlow <onboarding@resend.dev>',
-      react: BookingConfirmationEmail({
+      react: PaymentConfirmationEmail({
+        amountPaid: safeAmountPaid,
         bookingData: booking,
         cabinData: booking.cabin,
         firstName,
+        isDeposit: isDeposit || false,
       }),
-      subject: 'Booking Confirmation',
+      subject: 'Payment Confirmation - LodgeFlow',
       to: `${email}`,
     });
 

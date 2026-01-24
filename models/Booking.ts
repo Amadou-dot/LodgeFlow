@@ -34,6 +34,11 @@ export interface IBooking extends Document {
   specialRequests: string[];
   depositPaid: boolean;
   depositAmount: number;
+  stripePaymentIntentId?: string;
+  stripeSessionId?: string;
+  paidAt?: Date;
+  refundAmount?: number;
+  refundedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -136,6 +141,22 @@ const BookingSchema: Schema = new Schema(
       type: Number,
       default: 0,
       min: [0, 'Deposit amount must be positive'],
+    },
+    stripePaymentIntentId: {
+      type: String,
+    },
+    stripeSessionId: {
+      type: String,
+    },
+    paidAt: {
+      type: Date,
+    },
+    refundAmount: {
+      type: Number,
+      min: [0, 'Refund amount must be positive'],
+    },
+    refundedAt: {
+      type: Date,
     },
   },
   {

@@ -10,6 +10,14 @@ interface BookingEmailTemplateProps {
   firstName: string;
 }
 
+interface PaymentEmailTemplateProps {
+  bookingData: PopulatedBooking;
+  cabinData: Cabin;
+  firstName: string;
+  amountPaid: number;
+  isDeposit: boolean;
+}
+
 const emailStyles = {
   button: {
     backgroundColor: '#2563eb',
@@ -369,6 +377,105 @@ export function BookingConfirmationEmail({
         <p>We can't wait to welcome you to LodgeFlow!</p>
         <p style={{ fontSize: '14px', margin: '10px 0 0 0', opacity: 0.8 }}>
           If you have any questions about your booking, please contact us at
+          support@lodgeflow.com
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function PaymentConfirmationEmail({
+  bookingData,
+  cabinData,
+  firstName,
+  amountPaid,
+  isDeposit,
+}: PaymentEmailTemplateProps) {
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      weekday: 'long',
+      year: 'numeric',
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      currency: 'USD',
+      style: 'currency',
+    }).format(price);
+  };
+
+  return (
+    <div style={emailStyles.container}>
+      <div style={{ ...emailStyles.header, backgroundColor: '#059669' }}>
+        <h1 style={emailStyles.title}>Payment Confirmed!</h1>
+        <p style={emailStyles.subtitle}>
+          Thank you for your payment, {firstName}!
+        </p>
+      </div>
+
+      <div style={emailStyles.content}>
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Payment Details</h2>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Amount Paid:</span>
+            <span style={emailStyles.price}>{formatPrice(amountPaid)}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Payment Type:</span>
+            <span style={emailStyles.value}>
+              {isDeposit ? 'Deposit' : 'Full Payment'}
+            </span>
+          </div>
+          {isDeposit && (
+            <div style={emailStyles.row}>
+              <span style={emailStyles.label}>Remaining Balance:</span>
+              <span style={emailStyles.value}>
+                {formatPrice(bookingData.totalPrice - amountPaid)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div style={emailStyles.section}>
+          <h2 style={emailStyles.sectionTitle}>Booking Summary</h2>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Booking ID:</span>
+            <span style={emailStyles.value}>
+              #{bookingData._id.toString().slice(-8).toUpperCase()}
+            </span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Cabin:</span>
+            <span style={emailStyles.value}>{cabinData.name}</span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Check-in:</span>
+            <span style={emailStyles.value}>
+              {formatDate(bookingData.checkInDate)}
+            </span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Check-out:</span>
+            <span style={emailStyles.value}>
+              {formatDate(bookingData.checkOutDate)}
+            </span>
+          </div>
+          <div style={emailStyles.row}>
+            <span style={emailStyles.label}>Total Price:</span>
+            <span style={emailStyles.value}>
+              {formatPrice(bookingData.totalPrice)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div style={emailStyles.footer}>
+        <p>Thank you for choosing LodgeFlow!</p>
+        <p style={{ fontSize: '14px', margin: '10px 0 0 0', opacity: 0.8 }}>
+          If you have any questions about your payment, please contact us at
           support@lodgeflow.com
         </p>
       </div>

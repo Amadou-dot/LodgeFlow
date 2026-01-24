@@ -22,6 +22,7 @@ import { Calendar, Clock, DollarSign, Users } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import PaymentButton from '@/components/PaymentButton';
 import { title, subtitle } from '@/components/primitives';
 import {
   useBookingHistory,
@@ -241,7 +242,7 @@ export default function BookingsPage() {
             {bookings.map((booking: any) => (
               <Card key={booking._id.toString()} className='w-full'>
                 <CardHeader className='flex gap-3'>
-                  <div className='relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden'>
+                  <div className='relative w-24 h-24 shrink-0 rounded-lg overflow-hidden'>
                     <Image
                       alt={booking.cabin?.name || 'Cabin'}
                       className='object-cover'
@@ -285,12 +286,44 @@ export default function BookingsPage() {
                     <div className='flex items-center gap-2 text-sm font-semibold'>
                       <DollarSign className='w-4 h-4 text-success' />
                       <span className='text-lg'>${booking.totalPrice}</span>
-                      {!booking.isPaid && (
-                        <Chip color='warning' size='sm' variant='flat'>
-                          Payment Pending
+                      {booking.isPaid ? (
+                        <Chip color='success' size='sm' variant='flat'>
+                          Paid
                         </Chip>
-                      )}
+                      ) : booking.depositPaid ? (
+                        <Chip color='primary' size='sm' variant='flat'>
+                          Deposit Paid
+                        </Chip>
+                      ) : null}
                     </div>
+
+                    {!booking.isPaid &&
+                      booking.status !== 'cancelled' &&
+                      (() => {
+                        const isDepositDue =
+                          booking.depositAmount > 0 && !booking.depositPaid;
+                        const remainingBalance = Math.max(
+                          0,
+                          booking.totalPrice -
+                            (booking.depositPaid ? booking.depositAmount : 0)
+                        );
+                        const amountToPay = isDepositDue
+                          ? booking.depositAmount
+                          : remainingBalance;
+
+                        if (amountToPay <= 0) return null;
+
+                        return (
+                          <div className='pt-2'>
+                            <PaymentButton
+                              amount={amountToPay}
+                              bookingId={booking._id.toString()}
+                              isDeposit={isDepositDue}
+                              size='sm'
+                            />
+                          </div>
+                        );
+                      })()}
 
                     <div className='flex gap-2 pt-4'>
                       <Button
@@ -352,7 +385,7 @@ export default function BookingsPage() {
                         Cabin Information
                       </h3>
                       <div className='flex gap-4'>
-                        <div className='relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden'>
+                        <div className='relative w-32 h-32 shrink-0 rounded-lg overflow-hidden'>
                           <Image
                             className='object-cover'
                             fill
