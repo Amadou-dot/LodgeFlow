@@ -38,7 +38,7 @@ export default function DiningReservePage({ params }: { params: Params }) {
   if (error || !dining) {
     return (
       <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-        <p className='text-danger'>Dining item not found</p>
+        <p className='text-danger'>Dining option not found</p>
         <Link href='/dining'>
           <Button
             startContent={<ArrowLeft className='w-4 h-4' />}
@@ -96,7 +96,8 @@ export default function DiningReservePage({ params }: { params: Params }) {
                   startContent={<Users className='w-3 h-3' />}
                   variant='flat'
                 >
-                  {dining.minPeople}-{dining.maxPeople} guests
+                  {dining.minPeople > 1 ? `${dining.minPeople}-` : '1-'}
+                  {dining.maxPeople} guests
                 </Chip>
                 {dining.location && (
                   <Chip
@@ -111,12 +112,25 @@ export default function DiningReservePage({ params }: { params: Params }) {
 
               {dining.includes && dining.includes.length > 0 && (
                 <div>
-                  <p className='text-sm font-medium mb-2'>What's Included:</p>
+                  <p className='text-sm font-medium mb-2'>Includes:</p>
                   <ul className='text-sm text-default-600 space-y-1'>
                     {dining.includes.map((item, i) => (
                       <li key={i}>• {item}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {dining.dietary && dining.dietary.length > 0 && (
+                <div>
+                  <p className='text-sm font-medium mb-2'>Dietary Options:</p>
+                  <div className='flex flex-wrap gap-2'>
+                    {dining.dietary.map((diet, i) => (
+                      <Chip key={i} color='success' size='sm' variant='flat'>
+                        {diet}
+                      </Chip>
+                    ))}
+                  </div>
                 </div>
               )}
             </CardBody>

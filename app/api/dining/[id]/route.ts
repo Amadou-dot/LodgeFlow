@@ -1,18 +1,15 @@
+import { connectDB, Dining } from '@/models';
+import type { ApiResponse, Dining as DiningType } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { connectDB, Dining } from '@/models';
-import type { ApiResponse } from '@/types';
-
-type Params = Promise<{ id: string }>;
-
 export async function GET(
-  _request: NextRequest,
-  { params }: { params: Params }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await connectDB();
-
     const { id } = await params;
+
+    await connectDB();
     const dining = await Dining.findById(id).lean();
 
     if (!dining) {
@@ -20,21 +17,27 @@ export async function GET(
         success: false,
         error: 'Dining item not found',
       };
+
       return NextResponse.json(response, { status: 404 });
     }
 
-    const response: ApiResponse<typeof dining> = {
+    // Convert MongoDB document to plain object
+    const serializedDining = JSON.parse(JSON.stringify(dining));
+
+    const response: ApiResponse<DiningType> = {
       success: true,
-      data: dining,
+      data: serializedDining,
     };
 
     return NextResponse.json(response);
   } catch (error) {
     console.error('Error fetching dining item:', error);
+
     const response: ApiResponse<never> = {
       success: false,
-      error: 'Failed to fetch dining item',
+      error: 'Internal server error',
     };
+
     return NextResponse.json(response, { status: 500 });
   }
 }

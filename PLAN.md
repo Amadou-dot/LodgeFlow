@@ -80,7 +80,7 @@ The plan is sound and well-scoped. The updates below tighten sequencing, add mis
 - Booking management (view, edit, cancel): COMPLETE (refund logic still pending)
 - Payments (Stripe Checkout + webhooks + pay buttons): IMPLEMENTED (idempotency + payment-confirm automation pending)
 - Experience browsing + booking flow: COMPLETE (payment integration not implemented)
-- Dining listing page: COMPLETE (detail page and reservation flow NOT implemented)
+- Dining listing + detail + reservation flow: COMPLETE (payment integration not implemented)
 - Email notifications: PARTIAL (welcome + booking confirmation wired; payment + experience confirmation routes exist but not wired)
 - Availability checking: PARTIAL (inline in BookingForm via SWR, no standalone calendar widget)
 
@@ -266,9 +266,9 @@ export interface CreateExperienceBookingData {
 
 ---
 
-### 3. Dining Reservations
+### ✅ 3. Dining Reservations — IMPLEMENTED (payment + email wiring pending)
 
-**Current State:** Dining model exists with `maxPeople`, `servingTime`, `rating`, `reviewCount` fields. Only a list API route exists (`app/api/dining/route.ts`). The dining page shows items with non-functional "Reserve" buttons. No detail page exists. No reservation model or flow exists.
+**Current State:** Dining reservation flow is implemented (model, API routes, hooks, reservation form, confirmation page, history tab, availability endpoint, detail page). Payments are not integrated; confirmation email route exists but is not auto-triggered.
 
 **New Model — `models/DiningReservation.ts`:**
 
@@ -307,7 +307,7 @@ export interface IDiningReservation extends Document {
 - `app/api/dining-reservations/route.ts` — POST: Create reservation (validate against `maxPeople`, `servingTime`); GET: List
 - `app/api/dining-reservations/[id]/route.ts` — GET, PATCH, DELETE
 - `app/api/dining-reservations/history/route.ts` — GET: Current user's history
-- `app/api/dining/[id]/route.ts` — GET: Single dining item details (DOES NOT EXIST YET)
+- `app/api/dining/[id]/route.ts` — GET: Single dining item details
 - `app/api/dining/[id]/availability/route.ts` — GET: Check availability for date/time
 
 **Operational Notes (NEW):**
@@ -350,13 +350,13 @@ export interface CreateDiningReservationData {
 
 **New Pages:**
 
-- `app/dining/[id]/page.tsx` — Dining item detail page (DOES NOT EXIST YET)
+- `app/dining/[id]/page.tsx` — Dining item detail page
 - `app/dining/[id]/reserve/page.tsx` — Reservation form page
 - `app/dining/confirmation/[id]/page.tsx` — Reservation confirmation
 
 **Modified Pages:**
 
-- `app/dining/page.tsx` — Link "Reserve" buttons to `/dining/[id]/reserve` flow (buttons exist but are non-functional)
+- `app/dining/page.tsx` — Link "Reserve" buttons to `/dining/[id]/reserve` flow
 - `app/bookings/page.tsx` — Add tab/section for dining reservations
 
 **New Email Template:**

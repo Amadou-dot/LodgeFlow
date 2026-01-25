@@ -1,179 +1,211 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { connectDB, Dining, DiningReservation } from '@/models';
-import type { ApiResponse } from '@/types';
 
-type Params = Promise<{ id: string }>;
+/**
+ * Validates HH:MM time format
+ */
+function isValidTimeFormat(time: string): boolean {
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  return timeRegex.test(time);
+}
 
-interface DiningAvailability {
-  diningId: string;
-  date: string;
-  time?: string;
-  seatsRemaining: number;
-  maxPeople: number;
-  isAvailable: boolean;
-  availableTimeSlots?: { time: string; seatsRemaining: number }[];
+/**
+ * Converts HH:MM to minutes since midnight for comparison
+ */
+function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Checks if a time falls within the serving window
+ */
+function isWithinServingWindow(
+  time: string,
+  servingStart: string,
+  servingEnd: string
+): boolean {
+  const timeMinutes = timeToMinutes(time);
+  const startMinutes = timeToMinutes(servingStart);
+  const endMinutes = timeToMinutes(servingEnd);
+  return timeMinutes >= startMinutes && timeMinutes <= endMinutes;
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const { id } = await params;
-    const { searchParams } = new URL(request.url);
-    const dateParam = searchParams.get('date');
-    const timeParam = searchParams.get('time');
+    const { id: diningId } = await context.params;
+    const url = new URL(request.url);
+    const dateParam = url.searchParams.get('date');
+    const timeParam = url.searchParams.get('time');
+    const startDate = url.searchParams.get('startDate');
+    const endDate = url.searchParams.get('endDate');
 
-    if (!dateParam) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Date parameter is required',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    const dining = await Dining.findById(id);
+    const dining = await Dining.findById(diningId);
     if (!dining) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Dining item not found',
-      };
-      return NextResponse.json(response, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Dining item not found' },
+        { status: 404 }
+      );
     }
 
-    const queryDate = new Date(dateParam);
-    if (isNaN(queryDate.getTime())) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Invalid date format',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    const dayStart = new Date(queryDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(queryDate);
-    dayEnd.setHours(23, 59, 59, 999);
-
-    if (timeParam) {
-      // Validate time format
-      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-      if (!timeRegex.test(timeParam)) {
-        const response: ApiResponse<never> = {
-          success: false,
-          error: 'Time must be in HH:MM format',
-        };
-        return NextResponse.json(response, { status: 400 });
+    // If checking a specific date (and optionally time)
+    if (dateParam) {
+      const checkDate = new Date(dateParam);
+      if (isNaN(checkDate.getTime())) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid date parameter' },
+          { status: 400 }
+        );
       }
 
-      // Validate time is within serving window
-      const [reqHour, reqMin] = timeParam.split(':').map(Number);
-      const [startHour, startMin] = dining.servingTime.start
-        .split(':')
-        .map(Number);
-      const [endHour, endMin] = dining.servingTime.end.split(':').map(Number);
-      const reqMinutes = reqHour * 60 + reqMin;
-      const startMinutes = startHour * 60 + startMin;
-      const endMinutes = endHour * 60 + endMin;
+      // Validate time format and serving window if time is provided
+      if (timeParam) {
+        if (!isValidTimeFormat(timeParam)) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'Invalid time format. Expected HH:MM (e.g., 14:30)',
+            },
+            { status: 400 }
+          );
+        }
 
-      if (reqMinutes < startMinutes || reqMinutes > endMinutes) {
-        const response: ApiResponse<never> = {
-          success: false,
-          error: `Time must be within serving hours: ${dining.servingTime.start} - ${dining.servingTime.end}`,
-        };
-        return NextResponse.json(response, { status: 400 });
+        if (
+          !isWithinServingWindow(
+            timeParam,
+            dining.servingTime.start,
+            dining.servingTime.end
+          )
+        ) {
+          return NextResponse.json({
+            success: true,
+            data: {
+              diningId,
+              date: dateParam,
+              time: timeParam,
+              spotsRemaining: 0,
+              maxPeople: dining.maxPeople || null,
+              isAvailable: false,
+              servingTime: dining.servingTime,
+              reason: `Time ${timeParam} is outside serving hours (${dining.servingTime.start} - ${dining.servingTime.end})`,
+            },
+          });
+        }
       }
 
-      // Check availability for a specific time slot
-      const reservations = await DiningReservation.find({
-        dining: id,
+      const dayStart = new Date(checkDate);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(checkDate);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const query: Record<string, unknown> = {
+        dining: diningId,
         date: { $gte: dayStart, $lt: dayEnd },
-        time: timeParam,
         status: { $nin: ['cancelled', 'no-show'] },
-      });
+      };
+
+      // If time is specified, filter by time slot
+      if (timeParam) {
+        query.time = timeParam;
+      }
+
+      const reservations = await DiningReservation.find(query).lean();
 
       const totalGuests = reservations.reduce((sum, r) => sum + r.numGuests, 0);
-      const seatsRemaining = dining.maxPeople - totalGuests;
 
-      const data: DiningAvailability = {
-        diningId: id,
-        date: dateParam,
-        time: timeParam,
-        seatsRemaining: Math.max(0, seatsRemaining),
-        maxPeople: dining.maxPeople,
-        isAvailable: seatsRemaining > 0,
-      };
+      const maxPeople = dining.maxPeople || Infinity;
+      const spotsRemaining = Math.max(0, maxPeople - totalGuests);
 
-      const response: ApiResponse<DiningAvailability> = {
+      return NextResponse.json({
         success: true,
-        data,
-      };
-
-      return NextResponse.json(response);
-    }
-
-    // Check availability across all time slots for the day
-    const reservations = await DiningReservation.find({
-      dining: id,
-      date: { $gte: dayStart, $lt: dayEnd },
-      status: { $nin: ['cancelled', 'no-show'] },
-    });
-
-    // Generate time slots based on serving time (every 30 minutes)
-    const [startHour, startMin] = dining.servingTime.start
-      .split(':')
-      .map(Number);
-    const [endHour, endMin] = dining.servingTime.end.split(':').map(Number);
-    const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
-
-    const timeSlots: { time: string; seatsRemaining: number }[] = [];
-    for (let m = startMinutes; m <= endMinutes; m += 30) {
-      const hour = Math.floor(m / 60);
-      const min = m % 60;
-      const slotTime = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
-
-      const slotReservations = reservations.filter(r => r.time === slotTime);
-      const slotGuests = slotReservations.reduce(
-        (sum, r) => sum + r.numGuests,
-        0
-      );
-
-      timeSlots.push({
-        time: slotTime,
-        seatsRemaining: Math.max(0, dining.maxPeople - slotGuests),
+        data: {
+          diningId,
+          date: dateParam,
+          time: timeParam || null,
+          spotsRemaining,
+          maxPeople: dining.maxPeople || null,
+          isAvailable: spotsRemaining > 0,
+          servingTime: dining.servingTime,
+        },
       });
     }
 
-    const totalGuestsToday = reservations.reduce(
-      (sum, r) => sum + r.numGuests,
-      0
-    );
+    // If checking a date range (for calendar display)
+    const defaultStart = new Date();
+    const defaultEnd = new Date();
+    defaultEnd.setMonth(defaultEnd.getMonth() + 3);
 
-    const data: DiningAvailability = {
-      diningId: id,
-      date: dateParam,
-      seatsRemaining: Math.max(0, dining.maxPeople - totalGuestsToday),
-      maxPeople: dining.maxPeople,
-      isAvailable: timeSlots.some(slot => slot.seatsRemaining > 0),
-      availableTimeSlots: timeSlots,
-    };
+    const queryStart = startDate ? new Date(startDate) : defaultStart;
+    let queryEnd = endDate ? new Date(endDate) : defaultEnd;
 
-    const response: ApiResponse<DiningAvailability> = {
+    if (isNaN(queryStart.getTime()) || isNaN(queryEnd.getTime())) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid date range parameters' },
+        { status: 400 }
+      );
+    }
+
+    // Clamp range to maximum 6 months to prevent heavy queries
+    const maxRangeMs = 6 * 30 * 24 * 60 * 60 * 1000; // ~6 months
+    if (queryEnd.getTime() - queryStart.getTime() > maxRangeMs) {
+      queryEnd = new Date(queryStart.getTime() + maxRangeMs);
+    }
+
+    if (queryEnd <= queryStart) {
+      return NextResponse.json(
+        { success: false, error: 'End date must be after start date' },
+        { status: 400 }
+      );
+    }
+
+    const reservations = await DiningReservation.find({
+      dining: diningId,
+      date: { $gte: queryStart, $lte: queryEnd },
+      status: { $nin: ['cancelled', 'no-show'] },
+    })
+      .select('date time numGuests')
+      .lean();
+
+    // Group by date and calculate availability
+    const dateMap = new Map<string, number>();
+    for (const reservation of reservations) {
+      const dateKey = new Date(reservation.date).toISOString().split('T')[0];
+      dateMap.set(dateKey, (dateMap.get(dateKey) || 0) + reservation.numGuests);
+    }
+
+    const maxPeople = dining.maxPeople || Infinity;
+    const fullyBookedDates: string[] = [];
+
+    dateMap.forEach((guests, dateKey) => {
+      if (guests >= maxPeople) {
+        fullyBookedDates.push(dateKey);
+      }
+    });
+
+    return NextResponse.json({
       success: true,
-      data,
-    };
-
-    return NextResponse.json(response);
+      data: {
+        diningId,
+        fullyBookedDates,
+        maxPeople: dining.maxPeople || null,
+        servingTime: dining.servingTime,
+        queryRange: {
+          start: queryStart.toISOString().split('T')[0],
+          end: queryEnd.toISOString().split('T')[0],
+        },
+      },
+    });
   } catch (error) {
-    console.error('Error checking dining availability:', error);
-    const response: ApiResponse<never> = {
-      success: false,
-      error: 'Failed to check dining availability',
-    };
-    return NextResponse.json(response, { status: 500 });
+    console.error('Error fetching dining availability:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch dining availability' },
+      { status: 500 }
+    );
   }
 }

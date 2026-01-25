@@ -2,28 +2,39 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@heroui/button';
-import { Card, CardBody } from '@heroui/card';
+import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
+import { Divider } from '@heroui/divider';
+import { Link } from '@heroui/link';
 import { Spinner } from '@heroui/spinner';
-import { ArrowLeft, Clock, MapPin, Users, UtensilsCrossed } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import {
+  Calendar,
+  Check,
+  Clock,
+  MapPin,
+  Star,
+  Users,
+  UtensilsCrossed,
+} from 'lucide-react';
 
-import { title, subtitle } from '@/components/primitives';
 import { useDiningItem } from '@/hooks/useDiningItem';
 
-type Params = Promise<{ id: string }>;
+type Params = Promise<{
+  id: string;
+}>;
 
 export default function DiningDetailPage({ params }: { params: Params }) {
   const [diningId, setDiningId] = useState<string>('');
   const { data: dining, isLoading, error } = useDiningItem(diningId);
 
   useEffect(() => {
-    const getId = async () => {
+    const getDiningId = async () => {
       const { id } = await params;
       setDiningId(id);
     };
-    getId();
+
+    getDiningId();
   }, [params]);
 
   if (isLoading || !diningId) {
@@ -34,208 +45,327 @@ export default function DiningDetailPage({ params }: { params: Params }) {
     );
   }
 
-  if (error || !dining) {
+  if (error) {
     return (
-      <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-        <p className='text-danger'>Dining item not found</p>
-        <Link href='/dining'>
-          <Button
-            startContent={<ArrowLeft className='w-4 h-4' />}
-            variant='flat'
-          >
-            Back to Dining
-          </Button>
-        </Link>
+      <div className='flex justify-center items-center min-h-screen'>
+        <div className='text-lg text-red-500'>
+          Error: {error instanceof Error ? error.message : 'An error occurred'}
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className='max-w-7xl mx-auto px-4 py-8'>
-      {/* Back Button */}
-      <Link href='/dining'>
-        <Button
-          className='mb-6'
-          startContent={<ArrowLeft className='w-4 h-4' />}
-          variant='light'
-        >
-          Back to Dining
-        </Button>
-      </Link>
+  if (!dining) {
+    return (
+      <div className='flex justify-center items-center min-h-screen'>
+        <div className='text-lg'>Dining item not found</div>
+      </div>
+    );
+  }
 
-      {/* Hero Section */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-        {/* Image */}
-        <div className='relative h-80 lg:h-96 rounded-xl overflow-hidden'>
+  const getMealTypeColor = (mealType: string) => {
+    switch (mealType) {
+      case 'breakfast':
+        return 'warning';
+      case 'lunch':
+        return 'primary';
+      case 'dinner':
+        return 'secondary';
+      case 'all-day':
+        return 'success';
+      default:
+        return 'default';
+    }
+  };
+
+  return (
+    <div className='max-w-7xl mx-auto px-4 py-8 space-y-8'>
+      {/* Header Section */}
+      <div className='relative'>
+        <div className='relative h-96 rounded-2xl overflow-hidden'>
           <Image
             alt={dining.name}
             className='object-cover'
             fill
             src={dining.image}
           />
-          {dining.isPopular && (
-            <Chip
-              className='absolute top-4 left-4'
-              color='warning'
-              variant='solid'
-            >
-              Popular
-            </Chip>
+          <div className='absolute inset-0 bg-black/40' />
+
+          {/* Header Content Overlay */}
+          <div className='absolute bottom-0 left-0 right-0 p-8 text-white'>
+            <div className='flex items-center gap-3 mb-4'>
+              <Chip
+                className='text-white'
+                color={getMealTypeColor(dining.mealType)}
+                variant='solid'
+              >
+                {dining.mealType.charAt(0).toUpperCase() +
+                  dining.mealType.slice(1)}
+              </Chip>
+              <Chip color='primary' variant='solid'>
+                {dining.type === 'experience'
+                  ? 'Dining Experience'
+                  : 'Menu Item'}
+              </Chip>
+              {dining.isPopular && (
+                <Chip color='warning' startContent={<Star />} variant='solid'>
+                  Popular
+                </Chip>
+              )}
+            </div>
+
+            <h1 className='text-4xl font-bold mb-2'>{dining.name}</h1>
+
+            <div className='flex items-center gap-6 text-sm'>
+              <div className='flex items-center gap-2'>
+                <Clock className='w-4 h-4' />
+                <span>
+                  {dining.servingTime.start} - {dining.servingTime.end}
+                </span>
+              </div>
+
+              <div className='flex items-center gap-2'>
+                <Users className='w-4 h-4' />
+                <span>
+                  {dining.minPeople > 1 ? dining.minPeople + '-' : '1-'}
+                  {dining.maxPeople} guests
+                </span>
+              </div>
+
+              {dining.location && (
+                <div className='flex items-center gap-2'>
+                  <MapPin className='w-4 h-4' />
+                  <span>{dining.location}</span>
+                </div>
+              )}
+
+              {dining.rating && (
+                <div className='flex items-center gap-2'>
+                  <Star className='w-4 h-4 fill-current' />
+                  <span>
+                    {dining.rating}/5 ({dining.reviewCount} reviews)
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        {/* Main Content */}
+        <div className='lg:col-span-2 space-y-8'>
+          {/* Description */}
+          <Card>
+            <CardHeader>
+              <h2 className='text-2xl font-bold'>About This Dining Option</h2>
+            </CardHeader>
+            <CardBody className='space-y-4'>
+              <p className='text-default-600'>{dining.description}</p>
+            </CardBody>
+          </Card>
+
+          {/* Dietary Options */}
+          {dining.dietary && dining.dietary.length > 0 && (
+            <Card>
+              <CardHeader>
+                <h3 className='text-xl font-bold'>Dietary Options</h3>
+              </CardHeader>
+              <CardBody>
+                <div className='flex flex-wrap gap-2'>
+                  {dining.dietary.map((diet, index) => (
+                    <Chip key={index} color='success' variant='flat'>
+                      {diet}
+                    </Chip>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* What's Included (for dining experiences) */}
+          {dining.includes && dining.includes.length > 0 && (
+            <Card>
+              <CardHeader>
+                <h3 className='text-xl font-bold'>Whats Included</h3>
+              </CardHeader>
+              <CardBody>
+                <ul className='space-y-2'>
+                  {dining.includes.map((item, index) => (
+                    <li key={index} className='flex items-start gap-3'>
+                      <Check className='w-5 h-5 text-green-500 mt-0.5' />
+                      <span className='text-default-600'>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Ingredients */}
+          {dining.ingredients && dining.ingredients.length > 0 && (
+            <Card>
+              <CardHeader>
+                <h3 className='text-xl font-bold'>Key Ingredients</h3>
+              </CardHeader>
+              <CardBody>
+                <div className='flex flex-wrap gap-2'>
+                  {dining.ingredients.map((ingredient, index) => (
+                    <Chip key={index} variant='bordered'>
+                      {ingredient}
+                    </Chip>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Allergens */}
+          {dining.allergens && dining.allergens.length > 0 && (
+            <Card>
+              <CardHeader>
+                <h3 className='text-xl font-bold'>Allergen Information</h3>
+              </CardHeader>
+              <CardBody>
+                <div className='flex flex-wrap gap-2'>
+                  {dining.allergens.map((allergen, index) => (
+                    <Chip key={index} color='warning' variant='flat'>
+                      {allergen}
+                    </Chip>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Gallery */}
+          {dining.gallery && dining.gallery.length > 0 && (
+            <Card>
+              <CardHeader>
+                <h3 className='text-xl font-bold'>Gallery</h3>
+              </CardHeader>
+              <CardBody>
+                <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+                  {dining.gallery.map((image, index) => (
+                    <div
+                      key={index}
+                      className='relative h-32 rounded-lg overflow-hidden'
+                    >
+                      <Image
+                        alt={dining.name + ' gallery ' + (index + 1)}
+                        className='object-cover'
+                        fill
+                        src={image}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
           )}
         </div>
 
-        {/* Details */}
+        {/* Sidebar */}
         <div className='space-y-6'>
-          <div>
-            <h1 className={title({ size: 'lg' })}>{dining.name}</h1>
-            <p className={subtitle({ class: 'mt-2' })}>{dining.description}</p>
-          </div>
+          {/* Reservation Card */}
+          <Card className='sticky top-4'>
+            <CardBody className='space-y-6'>
+              <div className='text-center'>
+                <div className='text-3xl font-bold text-primary mb-2'>
+                  ${dining.price}
+                </div>
+                <div className='text-sm text-default-600'>per person</div>
+              </div>
 
-          {/* Quick Info Chips */}
-          <div className='flex flex-wrap gap-3'>
-            <Chip color='success' size='lg' variant='flat'>
-              ${dining.price}/person
-            </Chip>
-            <Chip
-              size='lg'
-              startContent={<Clock className='w-4 h-4' />}
-              variant='flat'
-            >
-              {dining.servingTime.start} - {dining.servingTime.end}
-            </Chip>
-            <Chip
-              size='lg'
-              startContent={<Users className='w-4 h-4' />}
-              variant='flat'
-            >
-              {dining.minPeople}-{dining.maxPeople} guests
-            </Chip>
-            {dining.duration && (
-              <Chip
-                size='lg'
-                startContent={<UtensilsCrossed className='w-4 h-4' />}
-                variant='flat'
-              >
-                {dining.duration}
-              </Chip>
-            )}
-            {dining.location && (
-              <Chip
-                size='lg'
-                startContent={<MapPin className='w-4 h-4' />}
-                variant='flat'
-              >
-                {dining.location}
-              </Chip>
-            )}
-          </div>
+              <Divider />
 
-          {/* Meal Type & Category */}
-          <div className='flex gap-2'>
-            <Chip color='primary' size='sm' variant='flat'>
-              {dining.mealType === 'all-day'
-                ? 'All Day'
-                : dining.mealType.charAt(0).toUpperCase() +
-                  dining.mealType.slice(1)}
-            </Chip>
-            <Chip color='secondary' size='sm' variant='flat'>
-              {dining.type === 'experience' ? 'Dining Experience' : 'Menu Item'}
-            </Chip>
-          </div>
+              <div className='space-y-4'>
+                <div className='flex items-center gap-3'>
+                  <Clock className='w-5 h-5 text-default-400' />
+                  <div>
+                    <div className='font-medium'>Serving Hours</div>
+                    <div className='text-sm text-default-600'>
+                      {dining.servingTime.start} - {dining.servingTime.end}
+                    </div>
+                  </div>
+                </div>
 
-          {/* Reserve Button */}
-          <Link href={`/dining/${diningId}/reserve`}>
-            <Button className='w-full sm:w-auto' color='primary' size='lg'>
-              Make Reservation
-            </Button>
-          </Link>
+                <div className='flex items-center gap-3'>
+                  <Users className='w-5 h-5 text-default-400' />
+                  <div>
+                    <div className='font-medium'>Party Size</div>
+                    <div className='text-sm text-default-600'>
+                      {dining.minPeople > 1 ? dining.minPeople + '-' : '1-'}
+                      {dining.maxPeople} guests
+                    </div>
+                  </div>
+                </div>
+
+                {dining.duration && (
+                  <div className='flex items-center gap-3'>
+                    <UtensilsCrossed className='w-5 h-5 text-default-400' />
+                    <div>
+                      <div className='font-medium'>Duration</div>
+                      <div className='text-sm text-default-600'>
+                        {dining.duration}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Divider />
+
+              <div className='space-y-3'>
+                <Button
+                  as={Link}
+                  className='w-full'
+                  color='primary'
+                  href={'/dining/' + diningId + '/reserve'}
+                  size='lg'
+                  startContent={<Calendar className='w-4 h-4' />}
+                >
+                  Make Reservation
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* Additional Info */}
+          <Card>
+            <CardHeader>
+              <h3 className='text-lg font-bold'>Good to Know</h3>
+            </CardHeader>
+            <CardBody className='space-y-3 text-sm'>
+              {dining.seasonality && (
+                <div>
+                  <span className='font-medium'>Seasonality: </span>
+                  <span className='text-default-600'>{dining.seasonality}</span>
+                </div>
+              )}
+
+              {dining.category !== 'regular' && (
+                <div>
+                  <span className='font-medium'>Category: </span>
+                  <span className='text-default-600'>
+                    {dining.category
+                      .split('-')
+                      .map(
+                        (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
+                      )
+                      .join(' ')}
+                  </span>
+                </div>
+              )}
+
+              <div>
+                <span className='font-medium'>Reservations: </span>
+                <span className='text-default-600'>Recommended</span>
+              </div>
+            </CardBody>
+          </Card>
         </div>
       </div>
-
-      {/* Additional Details */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12'>
-        {/* Dietary Info */}
-        {dining.dietary && dining.dietary.length > 0 && (
-          <Card>
-            <CardBody className='space-y-3'>
-              <h3 className='text-lg font-semibold'>Dietary Options</h3>
-              <div className='flex flex-wrap gap-2'>
-                {dining.dietary.map(diet => (
-                  <Chip key={diet} color='success' size='sm' variant='flat'>
-                    {diet}
-                  </Chip>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
-        )}
-
-        {/* Allergens */}
-        {dining.allergens && dining.allergens.length > 0 && (
-          <Card>
-            <CardBody className='space-y-3'>
-              <h3 className='text-lg font-semibold'>Allergen Information</h3>
-              <div className='flex flex-wrap gap-2'>
-                {dining.allergens.map(allergen => (
-                  <Chip key={allergen} color='warning' size='sm' variant='flat'>
-                    {allergen}
-                  </Chip>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
-        )}
-
-        {/* Ingredients */}
-        {dining.ingredients && dining.ingredients.length > 0 && (
-          <Card>
-            <CardBody className='space-y-3'>
-              <h3 className='text-lg font-semibold'>Ingredients</h3>
-              <ul className='text-sm text-default-600 space-y-1'>
-                {dining.ingredients.map((ingredient, i) => (
-                  <li key={i}>• {ingredient}</li>
-                ))}
-              </ul>
-            </CardBody>
-          </Card>
-        )}
-
-        {/* What's Included */}
-        {dining.includes && dining.includes.length > 0 && (
-          <Card>
-            <CardBody className='space-y-3'>
-              <h3 className='text-lg font-semibold'>What's Included</h3>
-              <ul className='text-sm text-default-600 space-y-1'>
-                {dining.includes.map((item, i) => (
-                  <li key={i} className='flex items-center gap-2'>
-                    <span className='text-success'>✓</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </CardBody>
-          </Card>
-        )}
-      </div>
-
-      {/* Gallery */}
-      {dining.gallery && dining.gallery.length > 0 && (
-        <div className='mt-12'>
-          <h2 className={title({ size: 'sm' })}>Gallery</h2>
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4'>
-            {dining.gallery.map((image, i) => (
-              <div key={i} className='relative h-48 rounded-lg overflow-hidden'>
-                <Image
-                  alt={`${dining.name} - ${i + 1}`}
-                  className='object-cover'
-                  fill
-                  src={image}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
