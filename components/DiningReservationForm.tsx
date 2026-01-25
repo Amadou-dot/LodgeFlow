@@ -11,9 +11,12 @@ import { addToast } from '@heroui/toast';
 import { getLocalTimeZone, today, CalendarDate } from '@internationalized/date';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Calendar, Users } from 'lucide-react';
+import { AlertTriangle, Calendar, Users } from 'lucide-react';
 
-import { useCreateDiningReservation } from '@/hooks/useDiningReservation';
+import {
+  useCreateDiningReservation,
+  useDiningAvailability,
+} from '@/hooks/useDiningReservation';
 import type { Dining } from '@/types';
 
 interface DiningReservationFormProps {
@@ -65,6 +68,18 @@ export default function DiningReservationForm({
     dining.servingTime.start,
     dining.servingTime.end
   );
+
+  // Convert CalendarDate to string for availability check
+  const dateString = date
+    ? `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`
+    : undefined;
+
+  const { data: availability, isLoading: isCheckingAvailability } =
+    useDiningAvailability(dining._id.toString(), dateString, time || undefined);
+
+  const isFullyBooked = availability?.isAvailable === false;
+  const insufficientSeats =
+    availability && availability.seatsRemaining < numGuests;
 
   const handleSubmit = async () => {
     if (!user) {
@@ -173,6 +188,35 @@ export default function DiningReservationForm({
           ))}
         </Select>
 
+        {/* Availability Warning */}
+        {date &&
+          time &&
+          !isCheckingAvailability &&
+          (isFullyBooked || insufficientSeats) && (
+            <div className='flex items-center gap-2 p-3 bg-warning-50 border border-warning-200 rounded-lg text-warning-700'>
+              <AlertTriangle className='w-4 h-4 flex-shrink-0' />
+              <span className='text-sm'>
+                {isFullyBooked
+                  ? 'This time slot is fully booked. Please select a different time.'
+                  : `Only ${availability?.seatsRemaining} seat${availability?.seatsRemaining === 1 ? '' : 's'} remaining. Please reduce the number of guests or select a different time.`}
+              </span>
+            </div>
+          )}
+
+        {/* Availability Info */}
+        {date &&
+          time &&
+          !isCheckingAvailability &&
+          availability?.isAvailable &&
+          !insufficientSeats && (
+            <div className='flex items-center gap-2 p-3 bg-success-50 border border-success-200 rounded-lg text-success-700'>
+              <span className='text-sm'>
+                {availability.seatsRemaining} seat
+                {availability.seatsRemaining === 1 ? '' : 's'} available
+              </span>
+            </div>
+          )}
+
         {/* Number of Guests */}
         <Input
           isRequired
@@ -252,6 +296,9 @@ export default function DiningReservationForm({
         <Button
           className='w-full'
           color='primary'
+          isDisabled={
+            isFullyBooked || insufficientSeats || isCheckingAvailability
+          }
           isLoading={createReservation.isPending}
           size='lg'
           startContent={
@@ -259,7 +306,7 @@ export default function DiningReservationForm({
           }
           onPress={handleSubmit}
         >
-          Reserve Now
+          {isCheckingAvailability ? 'Checking availability...' : 'Reserve Now'}
         </Button>
 
         {/* Serving Time Info */}

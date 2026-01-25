@@ -89,7 +89,7 @@ export async function GET(
               diningId,
               date: dateParam,
               time: timeParam,
-              spotsRemaining: 0,
+              seatsRemaining: 0,
               maxPeople: dining.maxPeople || null,
               isAvailable: false,
               servingTime: dining.servingTime,
@@ -120,7 +120,7 @@ export async function GET(
       const totalGuests = reservations.reduce((sum, r) => sum + r.numGuests, 0);
 
       const maxPeople = dining.maxPeople || Infinity;
-      const spotsRemaining = Math.max(0, maxPeople - totalGuests);
+      const seatsRemaining = Math.max(0, maxPeople - totalGuests);
 
       return NextResponse.json({
         success: true,
@@ -128,9 +128,9 @@ export async function GET(
           diningId,
           date: dateParam,
           time: timeParam || null,
-          spotsRemaining,
+          seatsRemaining,
           maxPeople: dining.maxPeople || null,
-          isAvailable: spotsRemaining > 0,
+          isAvailable: seatsRemaining > 0,
           servingTime: dining.servingTime,
         },
       });
