@@ -296,11 +296,11 @@ export default function DiningReservationForm({
         <Button
           className='w-full'
           color='primary'
+          isLoading={createReservation.isPending}
+          size='lg'
           isDisabled={
             isFullyBooked || insufficientSeats || isCheckingAvailability
           }
-          isLoading={createReservation.isPending}
-          size='lg'
           startContent={
             !createReservation.isPending && <Calendar className='w-4 h-4' />
           }
