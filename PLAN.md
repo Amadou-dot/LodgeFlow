@@ -74,14 +74,15 @@ The plan is sound and well-scoped. The updates below tighten sequencing, add mis
 12. **SEO & Meta Tags**
     13+) **Package Deals, Waitlist, Map, i18n**
 
-**Current State Summary (as of January 2026):**
+**Current State Summary (as of February 2026):**
 
 - Cabin browsing, detail, and booking flow: COMPLETE
-- Booking management (view, edit, cancel): COMPLETE (refund logic still pending)
-- Payments (Stripe Checkout + webhooks + pay buttons): IMPLEMENTED (idempotency + payment-confirm automation pending)
+- Booking management (view, edit, cancel): COMPLETE with refund logic
+- Payments (Stripe Checkout + webhooks + pay buttons): COMPLETE (idempotency + payment-confirm automation implemented)
+- Cancellation & Refund Logic: COMPLETE (refund-estimate endpoint, Stripe refund integration, cancellation emails)
 - Experience browsing + booking flow: COMPLETE (payment integration not implemented)
 - Dining listing + detail + reservation flow: COMPLETE (payment integration not implemented)
-- Email notifications: PARTIAL (welcome + booking confirmation wired; payment + experience confirmation routes exist but not wired)
+- Email notifications: PARTIAL (welcome, booking confirmation, payment confirmation, cancellation wired; experience/dining confirmation routes exist but not auto-triggered)
 - Availability checking: PARTIAL (inline in BookingForm via SWR, no standalone calendar widget)
 
 **Existing Architecture Pattern:**
@@ -168,11 +169,11 @@ Note: `isPaid`, `depositPaid`, `depositAmount`, and `paymentMethod` already exis
 
 **Hardening / Follow-ups:**
 
-- **Webhook idempotency:** TODO (no `event.id` tracking yet).
+- **Webhook idempotency:** ✅ COMPLETE (`ProcessedStripeEvent` model tracks `event.id` with TTL index).
 - **Signature verification:** ✅ implemented in webhook route.
-- **Async refunds + cancellation integration:** TODO (cancellation flow only updates status).
-- **Shared Stripe helpers:** TODO (logic lives in API routes).
-- **Payment confirmation email automation:** TODO (template + send route exist, but not triggered automatically).
+- **Async refunds + cancellation integration:** ✅ COMPLETE (DELETE handler calculates refunds, initiates Stripe refund, sends email).
+- **Shared Stripe helpers:** ✅ COMPLETE (`lib/stripe.ts` with `getStripe()`, `createRefund()`, `createCheckoutSession()`).
+- **Payment confirmation email automation:** ✅ COMPLETE (webhook auto-triggers `sendPaymentConfirmationEmail()` via `lib/email.ts`).
 
 ---
 
@@ -502,9 +503,9 @@ export interface ReviewQueryParams {
 
 ---
 
-### 6. Cancellation & Refund Logic
+### ✅ 6. Cancellation & Refund Logic — IMPLEMENTED
 
-**Current State:** Basic cancellation exists: `app/api/bookings/[id]/route.ts` DELETE sets `status: 'cancelled'` but does NOT calculate refunds, does NOT interact with Stripe, and does NOT send emails. The cancel modal on the bookings page mentions "cancellation policy" but shows no refund details. Settings model has `cancellationPolicy: 'flexible' | 'moderate' | 'strict'` field.
+**Current State:** Cancellation with full refund processing is implemented. The DELETE handler calculates refunds based on policy, initiates Stripe refunds, and sends cancellation confirmation emails. New hooks (`useRefundEstimate`, updated `useCancelBooking`) support the enhanced flow.
 
 **Model Changes — `models/Booking.ts`:**
 Add fields to `IBooking` interface and `BookingSchema`:

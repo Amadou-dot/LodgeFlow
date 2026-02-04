@@ -37,8 +37,18 @@ export interface IBooking extends Document {
   stripePaymentIntentId?: string;
   stripeSessionId?: string;
   paidAt?: Date;
+  cancelledAt?: Date;
+  cancellationReason?: string;
+  refundStatus?:
+    | 'none'
+    | 'pending'
+    | 'processing'
+    | 'partial'
+    | 'full'
+    | 'failed';
   refundAmount?: number;
   refundedAt?: Date;
+  paymentConfirmationSentAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -151,11 +161,26 @@ const BookingSchema: Schema = new Schema(
     paidAt: {
       type: Date,
     },
+    cancelledAt: {
+      type: Date,
+    },
+    cancellationReason: {
+      type: String,
+      maxlength: [500, 'Cancellation reason cannot exceed 500 characters'],
+    },
+    refundStatus: {
+      type: String,
+      enum: ['none', 'pending', 'processing', 'partial', 'full', 'failed'],
+      default: 'none',
+    },
     refundAmount: {
       type: Number,
       min: [0, 'Refund amount must be positive'],
     },
     refundedAt: {
+      type: Date,
+    },
+    paymentConfirmationSentAt: {
       type: Date,
     },
   },

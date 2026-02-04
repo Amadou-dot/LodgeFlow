@@ -12,6 +12,10 @@ export {
   default as DiningReservation,
   type IDiningReservation,
 } from './DiningReservation';
+export {
+  default as ProcessedStripeEvent,
+  type IProcessedStripeEvent,
+} from './ProcessedStripeEvent';
 
 // Re-export database connection
 export { default as connectDB } from '../lib/mongodb';

@@ -198,7 +198,9 @@ export default function BookingsPage() {
     if (!selectedBooking) return;
 
     try {
-      await cancelBooking.mutateAsync(selectedBooking._id.toString());
+      await cancelBooking.mutateAsync({
+        bookingId: selectedBooking._id.toString(),
+      });
       addToast({
         title: 'Booking Cancelled',
         description: 'Your booking has been successfully cancelled.',

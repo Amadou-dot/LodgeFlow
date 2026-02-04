@@ -1,10 +1,8 @@
 import { Booking, connectDB, Settings } from '@/models';
+import { getStripe } from '@/lib/stripe';
 import type { ApiResponse } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,6 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       line_items: [
