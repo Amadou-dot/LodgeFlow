@@ -36,8 +36,8 @@ Custom hooks in `hooks/` use React Query to fetch from internal API routes. API 
 
 ### Key Directories
 
-- `app/api/` - API routes: bookings, cabins, dining, experiences, settings, send (email)
-- `models/` - Mongoose schemas: Booking, Cabin, Dining, Experience, Settings
+- `app/api/` - API routes: bookings, cabins, dining, dining-reservations, experiences, experience-bookings, payments, settings, send (email)
+- `models/` - Mongoose schemas: Booking, Cabin, Dining, DiningReservation, Experience, ExperienceBooking, Settings
 - `hooks/` - React Query hooks matching API resources (useCabin, useBooking, etc.)
 - `types/index.ts` - Centralized TypeScript types, re-exports model interfaces
 - `components/ui/` - Reusable UI components
@@ -45,7 +45,9 @@ Custom hooks in `hooks/` use React Query to fetch from internal API routes. API 
 ### Model Relationships
 
 - **Booking.cabin** references Cabin via ObjectId
-- **Booking.customer** stores Clerk user ID as string (not ObjectId)
+- **ExperienceBooking.experience** references Experience via ObjectId
+- **DiningReservation.dining** references Dining via ObjectId
+- **\*.customer** stores Clerk user ID as string (not ObjectId)
 - All models extend Mongoose `Document` interface
 
 ### API Response Format

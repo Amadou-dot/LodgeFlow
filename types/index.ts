@@ -1,7 +1,10 @@
 import type { IBooking } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
 import type { IDining } from '@/models/Dining';
+import type { IDiningReservation } from '@/models/DiningReservation';
 import type { IExperience } from '@/models/Experience';
+import type { IExperienceBooking } from '@/models/ExperienceBooking';
+import type { IProcessedStripeEvent } from '@/models/ProcessedStripeEvent';
 import type { ISettings } from '@/models/Settings';
 import { SVGProps } from 'react';
 
@@ -15,13 +18,14 @@ export type Booking = IBooking;
 export type Settings = ISettings;
 export type Experience = IExperience;
 export type Dining = IDining;
+export type ExperienceBooking = IExperienceBooking;
+export type DiningReservation = IDiningReservation;
 
 // Extended types for populated models (used in API responses)
-export interface PopulatedBooking
-  extends Omit<
-    IBooking,
-    'cabin' | 'customer' | 'checkInDate' | 'checkOutDate'
-  > {
+export interface PopulatedBooking extends Omit<
+  IBooking,
+  'cabin' | 'customer' | 'checkInDate' | 'checkOutDate'
+> {
   cabin: ICabin;
   customer: string; // Clerk user ID
   checkInDate: string | Date;
@@ -128,6 +132,24 @@ export interface UpdateExperienceData extends Partial<CreateExperienceData> {
   _id: string;
 }
 
+// Experience Booking types
+export interface PopulatedExperienceBooking extends Omit<
+  IExperienceBooking,
+  'experience' | 'date'
+> {
+  experience: IExperience;
+  date: string | Date;
+}
+
+export interface CreateExperienceBookingData {
+  experienceId: string;
+  date: Date;
+  timeSlot?: string;
+  numParticipants: number;
+  specialRequests?: string[];
+  observations?: string;
+}
+
 // Dining-related types
 export interface DiningQueryParams {
   type?: 'menu' | 'experience';
@@ -138,4 +160,73 @@ export interface DiningQueryParams {
   minPrice?: number;
   maxPrice?: number;
   search?: string;
+}
+
+// Dining Reservation types
+export interface PopulatedDiningReservation extends Omit<
+  IDiningReservation,
+  'dining' | 'date'
+> {
+  dining: IDining;
+  date: string | Date;
+}
+
+export interface CreateDiningReservationData {
+  diningId: string;
+  date: Date;
+  time: string;
+  numGuests: number;
+  dietaryRequirements?: string[];
+  specialRequests?: string[];
+  tablePreference?: 'indoor' | 'outdoor' | 'bar' | 'no-preference';
+  occasion?: string;
+}
+
+// Stripe event tracking
+export type ProcessedStripeEvent = IProcessedStripeEvent;
+
+// Cancellation and refund types
+export type CancellationPolicy = 'flexible' | 'moderate' | 'strict';
+export type RefundStatus =
+  | 'none'
+  | 'pending'
+  | 'processing'
+  | 'partial'
+  | 'full'
+  | 'failed';
+export type RefundType = 'full' | 'partial' | 'none';
+
+export interface RefundEstimate {
+  refundPercentage: number;
+  refundAmount: number;
+  refundType: RefundType;
+  reason: string;
+  daysUntilCheckIn: number;
+  policy: CancellationPolicy;
+}
+
+export interface CancellationDeadlines {
+  fullRefundDeadline: Date | null;
+  partialRefundDeadline: Date | null;
+  partialRefundPercentage: number;
+  policy: CancellationPolicy;
+}
+
+export interface RefundEstimateResponse {
+  estimate: RefundEstimate;
+  deadlines: CancellationDeadlines;
+  policyDescription: string;
+  canCancel: boolean;
+  cancelNotAllowedReason?: string;
+}
+
+export interface CancellationResponse {
+  booking: PopulatedBooking;
+  refund: {
+    amount: number;
+    type: RefundType;
+    status: RefundStatus;
+    reason: string;
+    error?: string;
+  };
 }

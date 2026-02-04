@@ -11,6 +11,7 @@ import { subtitle, title } from '@/components/primitives';
 import { useDining } from '@/hooks/useDining';
 import type { Dining, DiningQueryParams } from '@/types';
 import Image from 'next/image';
+import NextLink from 'next/link';
 import { useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
 
@@ -318,7 +319,6 @@ export default function DiningPage() {
               </div>
             </div>
           </section>
-
           {/* Daily Menus */}
           <section>
             <div className='text-center mb-8'>
@@ -428,23 +428,24 @@ export default function DiningPage() {
                         ))}
                       </div>
 
-                      <Button
-                        className='w-full mt-auto'
-                        color='primary'
-                        size='sm'
+                      <NextLink
+                        href={`/dining/${items[0]._id.toString()}/reserve`}
                       >
-                        {getCtaText(mealType)}
-                      </Button>
+                        <Button
+                          className='w-full mt-auto'
+                          color='primary'
+                          size='sm'
+                        >
+                          {getCtaText(mealType)}
+                        </Button>
+                      </NextLink>
                     </CardBody>
                   </Card>
                 );
               })}
             </div>
-          </section>;
-
-          {
-            /* Special Dining Experiences */
-          }
+          </section>
+          ;{/* Special Dining Experiences */}
           <section>
             <div className='text-center mb-8'>
               <h2 className={title({ size: 'md' })}>
@@ -520,22 +521,23 @@ export default function DiningPage() {
                         )}
                     </div>
 
-                    <Button
-                      className='w-full mt-auto'
-                      color='primary'
-                      size='sm'
+                    <NextLink
+                      href={`/dining/${experience._id.toString()}/reserve`}
                     >
-                      Reserve Experience
-                    </Button>
+                      <Button
+                        className='w-full mt-auto'
+                        color='primary'
+                        size='sm'
+                      >
+                        Reserve Experience
+                      </Button>
+                    </NextLink>
                   </CardBody>
                 </Card>
               ))}
             </div>
-          </section>;
-
-          {
-            /* Beverages Section */
-          }
+          </section>
+          ;{/* Beverages Section */}
           <section className='bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 rounded-2xl p-8'>
             <div className='text-center mb-8'>
               <h2 className={title({ size: 'md' })}>Curated Beverages</h2>
@@ -629,9 +631,8 @@ export default function DiningPage() {
                 );
               })}
             </div>
-          </section>;
-
-          {/* Reservations CTA */}
+          </section>
+          ;{/* Reservations CTA */}
           <section className='text-center'>
             <h3 className={title({ size: 'sm' })}>Ready to Dine With Us?</h3>
             <p className={subtitle({ class: 'mt-2 mb-6' })}>

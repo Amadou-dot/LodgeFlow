@@ -1,13 +1,30 @@
 import { Resend } from 'resend';
 
 import { WelcomeEmail } from '@/components/EmailTemplates';
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function POST(request: Request) {
-  const { email, firstName } = await request.json();
+function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export async function POST() {
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  const user = await currentUser();
+  const email = user?.emailAddresses?.[0]?.emailAddress;
+  const firstName = user?.firstName || 'Guest';
 
   try {
+    if (!email || !validateEmail(email)) {
+      return Response.json({ error: 'Invalid email address' }, { status: 400 });
+    }
+
     const { data, error } = await resend.emails.send({
       from: 'LodgeFlow <onboarding@resend.dev>',
       react: WelcomeEmail({ firstName }),

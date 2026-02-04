@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
 
 import { BookingConfirmationEmail } from '@/components/EmailTemplates';
+import { Booking, connectDB } from '@/models';
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -10,26 +12,48 @@ function validateEmail(email: string): boolean {
 }
 
 export async function POST(request: Request) {
-  const { bookingData, cabinData, email, firstName } = await request.json();
-  const emailValid = validateEmail(email);
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  const { bookingId } = await request.json();
 
   try {
-    if (!emailValid) {
-      return Response.json({ error: 'Invalid email address' }, { status: 400 });
-    }
-
-    if (!bookingData || !cabinData) {
+    if (!bookingId) {
       return Response.json(
-        { error: 'Missing booking or cabin data' },
+        { error: 'Booking ID is required' },
         { status: 400 }
       );
+    }
+
+    await connectDB();
+
+    const booking = await Booking.findById(bookingId).populate('cabin');
+    if (!booking) {
+      return Response.json({ error: 'Booking not found' }, { status: 404 });
+    }
+
+    if (booking.customer !== userId) {
+      return Response.json(
+        { error: 'Not authorized to send this confirmation' },
+        { status: 403 }
+      );
+    }
+
+    const user = await currentUser();
+    const email = user?.emailAddresses?.[0]?.emailAddress;
+    const firstName = user?.firstName || 'Guest';
+
+    if (!email || !validateEmail(email)) {
+      return Response.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
     const { data, error } = await resend.emails.send({
       from: 'LodgeFlow <onboarding@resend.dev>',
       react: BookingConfirmationEmail({
-        bookingData,
-        cabinData,
+        bookingData: booking,
+        cabinData: booking.cabin,
         firstName,
       }),
       subject: 'Booking Confirmation',

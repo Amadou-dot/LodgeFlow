@@ -265,9 +265,11 @@ describe('useCancelBooking', () => {
 
     const { result } = renderHook(() => useCancelBooking(), { wrapper });
 
-    await result.current.mutateAsync('1');
+    await result.current.mutateAsync({ bookingId: '1' });
 
     expect(global.fetch).toHaveBeenCalledWith('/api/bookings/1', {
+      body: JSON.stringify({ reason: undefined }),
+      headers: { 'Content-Type': 'application/json' },
       method: 'DELETE',
     });
   });
@@ -280,9 +282,9 @@ describe('useCancelBooking', () => {
 
     const { result } = renderHook(() => useCancelBooking(), { wrapper });
 
-    await expect(result.current.mutateAsync('1')).rejects.toThrow(
-      'Cannot cancel confirmed booking'
-    );
+    await expect(
+      result.current.mutateAsync({ bookingId: '1' })
+    ).rejects.toThrow('Cannot cancel confirmed booking');
   });
 
   it('handles cancellation errors without error message', async () => {
@@ -293,8 +295,8 @@ describe('useCancelBooking', () => {
 
     const { result } = renderHook(() => useCancelBooking(), { wrapper });
 
-    await expect(result.current.mutateAsync('1')).rejects.toThrow(
-      'Failed to cancel booking'
-    );
+    await expect(
+      result.current.mutateAsync({ bookingId: '1' })
+    ).rejects.toThrow('Failed to cancel booking');
   });
 });

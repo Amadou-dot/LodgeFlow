@@ -1,7 +1,10 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { Booking, connectDB } from '@/models';
+import { Booking, Settings, connectDB } from '@/models';
+import { calculateRefund } from '@/lib/cancellation';
+import { createRefund } from '@/lib/stripe';
+import { sendCancellationConfirmationEmail } from '@/lib/email';
 import type { ApiResponse } from '@/types';
 
 export async function GET(
@@ -131,7 +134,8 @@ export async function PATCH(
 /**
  * DELETE /api/bookings/[id]
  * Cancel a booking (soft delete - changes status to 'cancelled')
- * Only unconfirmed or confirmed bookings can be cancelled
+ * Processes refunds based on cancellation policy and sends confirmation email
+ * Cannot cancel bookings with status: checked-in, checked-out, or cancelled
  */
 export async function DELETE(
   request: NextRequest,
@@ -151,8 +155,25 @@ export async function DELETE(
     await connectDB();
     const { id } = await params;
 
-    // Find the booking
-    const booking = await Booking.findById(id);
+    // Parse optional cancellation reason from body (only if JSON content-type)
+    let cancellationReason: string | undefined;
+    const contentType = request.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+      try {
+        const body = await request.json();
+        cancellationReason = body.reason;
+      } catch (parseError) {
+        // Log malformed JSON but don't fail the cancellation
+        console.error('Failed to parse cancellation request body:', parseError);
+      }
+    }
+    // If no content-type or not JSON, cancellationReason remains undefined (expected for simple DELETE)
+
+    // Find the booking with cabin populated for email
+    const booking = await Booking.findById(id).populate(
+      'cabin',
+      'name image capacity price discount description'
+    );
 
     if (!booking) {
       const response: ApiResponse<never> = {
@@ -184,13 +205,103 @@ export async function DELETE(
       return NextResponse.json(response, { status: 400 });
     }
 
-    // Soft delete - update status to cancelled
-    booking.status = 'cancelled';
-    await booking.save();
+    // Get settings for cancellation policy
+    const settings = await Settings.findOne();
+    if (!settings) {
+      console.error(
+        'Settings document not found - cannot calculate refund policy'
+      );
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'System configuration error. Please contact support.',
+      };
+      return NextResponse.json(response, { status: 500 });
+    }
+
+    // Calculate refund based on policy
+    let refundEstimate: {
+      refundAmount: number;
+      refundType: 'full' | 'partial' | 'none';
+      reason: string;
+    } = {
+      refundAmount: 0,
+      refundType: 'none',
+      reason: 'No payment made',
+    };
+
+    if (booking.isPaid || booking.depositPaid) {
+      const estimate = calculateRefund(booking, settings);
+      refundEstimate = {
+        refundAmount: estimate.refundAmount,
+        refundType: estimate.refundType,
+        reason: estimate.reason,
+      };
+    }
+
+    // Process Stripe refund if applicable
+    let refundStatus: 'none' | 'pending' | 'processing' | 'failed' = 'none';
+    let stripeRefundError: string | undefined;
+
+    if (refundEstimate.refundAmount > 0 && booking.stripePaymentIntentId) {
+      refundStatus = 'processing';
+
+      const refundResult = await createRefund(
+        booking.stripePaymentIntentId,
+        refundEstimate.refundAmount
+      );
+
+      if (!refundResult.success) {
+        refundStatus = 'failed';
+        stripeRefundError = refundResult.error;
+        console.error('Stripe refund failed:', refundResult.error);
+      } else {
+        // Refund initiated - webhook will update status to 'partial' or 'full' when completed
+        refundStatus = 'pending';
+      }
+    }
+
+    // Update booking with cancellation details
+    const updateData = {
+      status: 'cancelled',
+      cancelledAt: new Date(),
+      cancellationReason,
+      refundStatus,
+      refundAmount: refundEstimate.refundAmount,
+    };
+
+    const updatedBooking = await Booking.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate('cabin');
+
+    // Send cancellation confirmation email (async, don't block response)
+    if (updatedBooking && updatedBooking.cabin) {
+      sendCancellationConfirmationEmail({
+        booking: updatedBooking,
+        cabin: updatedBooking.cabin,
+        refundAmount: refundEstimate.refundAmount,
+        refundType: refundEstimate.refundType,
+        reason: refundEstimate.reason,
+      }).catch(err => {
+        console.error('Failed to send cancellation email:', err);
+      });
+    } else {
+      console.error(
+        'Could not send cancellation email: booking or cabin data missing after update'
+      );
+    }
 
     const response: ApiResponse<any> = {
       success: true,
-      data: booking,
+      data: {
+        booking: updatedBooking,
+        refund: {
+          amount: refundEstimate.refundAmount,
+          type: refundEstimate.refundType,
+          status: refundStatus,
+          reason: refundEstimate.reason,
+          error: stripeRefundError,
+        },
+      },
       message: 'Booking cancelled successfully',
     };
 
