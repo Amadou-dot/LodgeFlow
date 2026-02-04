@@ -154,7 +154,8 @@ export const useDiningAvailability = (
       return data.data || null;
     },
     queryKey: ['dining-availability', diningId, date, time],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 };
