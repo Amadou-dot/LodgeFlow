@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     const available = searchParams.get('available');
     const search = searchParams.get('search');
 
-    // Build query
-    const query: any = {};
+    // Build query — only show active cabins to guests
+    const query: any = { status: 'active' };
 
     if (capacity) {
       query.capacity = { $gte: parseInt(capacity) };

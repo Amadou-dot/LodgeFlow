@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 
 import { BookingConfirmationEmail } from '@/components/EmailTemplates';
 import { Booking, connectDB } from '@/models';
+import type { PopulatedBooking } from '@/types';
 import { auth, currentUser } from '@clerk/nextjs/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -29,7 +30,9 @@ export async function POST(request: Request) {
 
     await connectDB();
 
-    const booking = await Booking.findById(bookingId).populate('cabin');
+    const booking = (await Booking.findById(bookingId).populate(
+      'cabin'
+    )) as unknown as PopulatedBooking | null;
     if (!booking) {
       return Response.json({ error: 'Booking not found' }, { status: 404 });
     }

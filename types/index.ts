@@ -1,11 +1,11 @@
-import type { IBooking } from '@/models/Booking';
+import type { IBooking, IBookingModel } from '@/models/Booking';
 import type { ICabin } from '@/models/Cabin';
 import type { IDining } from '@/models/Dining';
 import type { IDiningReservation } from '@/models/DiningReservation';
 import type { IExperience } from '@/models/Experience';
 import type { IExperienceBooking } from '@/models/ExperienceBooking';
 import type { IProcessedStripeEvent } from '@/models/ProcessedStripeEvent';
-import type { ISettings } from '@/models/Settings';
+import type { ISettings, ISettingsModel } from '@/models/Settings';
 import { SVGProps } from 'react';
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
@@ -42,6 +42,13 @@ export interface CreateCabinData {
   discount: number;
   description: string;
   amenities: string[];
+  images?: string[];
+  status?: 'active' | 'maintenance' | 'inactive';
+  bedrooms?: number;
+  bathrooms?: number;
+  size?: number;
+  minNights?: number;
+  extraGuestFee?: number;
 }
 
 export interface UpdateCabinData extends Partial<CreateCabinData> {
@@ -91,6 +98,7 @@ export interface CabinsQueryParams {
   maxPrice?: number;
   available?: boolean;
   search?: string;
+  status?: 'active' | 'maintenance' | 'inactive';
 }
 
 // Experience-related types
@@ -184,6 +192,10 @@ export interface CreateDiningReservationData {
 
 // Stripe event tracking
 export type ProcessedStripeEvent = IProcessedStripeEvent;
+
+// Model type re-exports
+export type { IBookingModel } from '@/models/Booking';
+export type { ISettingsModel } from '@/models/Settings';
 
 // Cancellation and refund types
 export type CancellationPolicy = 'flexible' | 'moderate' | 'strict';

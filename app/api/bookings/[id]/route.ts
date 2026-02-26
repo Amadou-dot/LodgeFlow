@@ -5,7 +5,7 @@ import { Booking, Settings, connectDB } from '@/models';
 import { calculateRefund } from '@/lib/cancellation';
 import { createRefund } from '@/lib/stripe';
 import { sendCancellationConfirmationEmail } from '@/lib/email';
-import type { ApiResponse } from '@/types';
+import type { ApiResponse, PopulatedBooking } from '@/types';
 
 export async function GET(
   request: NextRequest,
@@ -206,17 +206,7 @@ export async function DELETE(
     }
 
     // Get settings for cancellation policy
-    const settings = await Settings.findOne();
-    if (!settings) {
-      console.error(
-        'Settings document not found - cannot calculate refund policy'
-      );
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'System configuration error. Please contact support.',
-      };
-      return NextResponse.json(response, { status: 500 });
-    }
+    const settings = await Settings.getSettings();
 
     // Calculate refund based on policy
     let refundEstimate: {
@@ -275,9 +265,10 @@ export async function DELETE(
 
     // Send cancellation confirmation email (async, don't block response)
     if (updatedBooking && updatedBooking.cabin) {
+      const populatedBooking = updatedBooking as unknown as PopulatedBooking;
       sendCancellationConfirmationEmail({
-        booking: updatedBooking,
-        cabin: updatedBooking.cabin,
+        booking: populatedBooking,
+        cabin: populatedBooking.cabin,
         refundAmount: refundEstimate.refundAmount,
         refundType: refundEstimate.refundType,
         reason: refundEstimate.reason,

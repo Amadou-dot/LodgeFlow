@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb';
-import Cabin from '../../../../models/Cabin';
+import { connectDB, Cabin } from '@/models';
+import type { ApiResponse, Cabin as CabinType } from '@/types';
 
 export async function GET(
   request: NextRequest,
@@ -10,22 +10,30 @@ export async function GET(
     const { id } = await params;
 
     await connectDB();
-    const cabin = await Cabin.findById(id).lean();
+    const cabin = await Cabin.findById(id);
 
-    if (!cabin) {
-      return NextResponse.json({ error: 'Cabin not found' }, { status: 404 });
+    if (!cabin || (cabin.status && cabin.status !== 'active')) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'Cabin not found',
+      };
+      return NextResponse.json(response, { status: 404 });
     }
 
-    // Convert MongoDB document to plain object
-    const serializedCabin = JSON.parse(JSON.stringify(cabin));
+    const response: ApiResponse<CabinType> = {
+      success: true,
+      data: cabin,
+    };
 
-    return NextResponse.json({ cabin: serializedCabin });
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Error fetching cabin:', error);
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const response: ApiResponse<never> = {
+      success: false,
+      error: 'Internal server error',
+    };
+
+    return NextResponse.json(response, { status: 500 });
   }
 }

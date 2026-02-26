@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface IBooking extends Document {
   cabin: mongoose.Types.ObjectId | string;
@@ -49,8 +49,23 @@ export interface IBooking extends Document {
   refundAmount?: number;
   refundedAt?: Date;
   paymentConfirmationSentAt?: Date;
+  remainingAmount?: number;
+  checkInTime?: Date;
+  checkOutTime?: Date;
+  durationText: string; // virtual
+  paymentStatus: 'paid' | 'partial' | 'unpaid'; // virtual
   createdAt: Date;
   updatedAt: Date;
+  overlaps(otherCheckIn: Date, otherCheckOut: Date): boolean;
+}
+
+export interface IBookingModel extends Model<IBooking> {
+  findOverlapping(
+    cabinId: string,
+    checkIn: Date,
+    checkOut: Date,
+    excludeId?: string
+  ): Promise<IBooking[]>;
 }
 
 const BookingSchema: Schema = new Schema(
@@ -183,6 +198,16 @@ const BookingSchema: Schema = new Schema(
     paymentConfirmationSentAt: {
       type: Date,
     },
+    remainingAmount: {
+      type: Number,
+      min: [0, 'Remaining amount must be positive'],
+    },
+    checkInTime: {
+      type: Date,
+    },
+    checkOutTime: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -191,10 +216,59 @@ const BookingSchema: Schema = new Schema(
   }
 );
 
+// Auto-compute remainingAmount before saving
+BookingSchema.pre('save', function (this: IBooking) {
+  this.remainingAmount = this.totalPrice - this.depositAmount;
+});
+
+// Virtual: human-readable duration
+BookingSchema.virtual('durationText').get(function (this: IBooking) {
+  return `${this.numNights} night${this.numNights === 1 ? '' : 's'}`;
+});
+
+// Virtual: payment status derived from isPaid and depositPaid
+BookingSchema.virtual('paymentStatus').get(function (
+  this: IBooking
+): 'paid' | 'partial' | 'unpaid' {
+  if (this.isPaid) return 'paid';
+  if (this.depositPaid) return 'partial';
+  return 'unpaid';
+});
+
+// Instance method: check if this booking overlaps with a given date range
+BookingSchema.methods.overlaps = function (
+  this: IBooking,
+  otherCheckIn: Date,
+  otherCheckOut: Date
+): boolean {
+  return this.checkInDate < otherCheckOut && this.checkOutDate > otherCheckIn;
+};
+
+// Static method: find all non-cancelled bookings that overlap a date range for a cabin
+BookingSchema.statics.findOverlapping = async function (
+  cabinId: string,
+  checkIn: Date,
+  checkOut: Date,
+  excludeId?: string
+): Promise<IBooking[]> {
+  const query: mongoose.FilterQuery<IBooking> = {
+    cabin: cabinId,
+    status: { $ne: 'cancelled' },
+    $or: [{ checkInDate: { $lt: checkOut }, checkOutDate: { $gt: checkIn } }],
+  };
+  if (excludeId) {
+    query._id = { $ne: excludeId };
+  }
+  return this.find(query);
+};
+
 // Indexes for efficient queries
 BookingSchema.index({ customer: 1, createdAt: -1 });
 BookingSchema.index({ status: 1, checkInDate: 1 });
 BookingSchema.index({ checkInDate: 1, checkOutDate: 1 });
+BookingSchema.index({ isPaid: 1 });
+BookingSchema.index({ checkInDate: 1 });
+BookingSchema.index({ checkOutDate: 1 });
 
 // Prevent overlapping bookings for the same cabin
 BookingSchema.index(
@@ -208,6 +282,7 @@ BookingSchema.index(
 
 // Prevent model re-compilation in development
 const Booking =
-  mongoose.models.Booking || mongoose.model<IBooking>('Booking', BookingSchema);
+  mongoose.models.Booking ||
+  mongoose.model<IBooking, IBookingModel>('Booking', BookingSchema);
 
-export default Booking;
+export default Booking as IBookingModel;

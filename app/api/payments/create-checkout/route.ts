@@ -1,6 +1,6 @@
 import { Booking, connectDB, Settings } from '@/models';
 import { getStripe } from '@/lib/stripe';
-import type { ApiResponse } from '@/types';
+import type { ApiResponse, PopulatedBooking } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 400 });
     }
 
-    const booking = await Booking.findById(bookingId).populate('cabin');
+    const booking = (await Booking.findById(bookingId).populate(
+      'cabin'
+    )) as unknown as PopulatedBooking;
     if (!booking) {
       const response: ApiResponse<never> = {
         success: false,
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Determine payment amount based on deposit settings
-    const settings = await Settings.findOne().sort({ createdAt: -1 });
+    const settings = await Settings.getSettings();
     let paymentAmount: number;
     let paymentDescription: string;
     let isDepositPayment = false;
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
     if (booking.depositPaid && booking.depositAmount > 0) {
       paymentAmount = booking.totalPrice - booking.depositAmount;
       paymentDescription = `Remaining balance for ${booking.cabin.name}`;
-    } else if (settings?.requireDeposit && booking.depositAmount > 0) {
+    } else if (settings.requireDeposit && booking.depositAmount > 0) {
       paymentAmount = booking.depositAmount;
       paymentDescription = `Deposit for ${booking.cabin.name}`;
       isDepositPayment = true;
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: settings?.currency?.toLowerCase() || 'usd',
+            currency: settings.currency?.toLowerCase() || 'usd',
             product_data: {
               name: booking.cabin.name,
               description: paymentDescription,
