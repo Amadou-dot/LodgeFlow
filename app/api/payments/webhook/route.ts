@@ -1,5 +1,6 @@
 import { Booking, ProcessedStripeEvent, connectDB } from '@/models';
 import { sendPaymentConfirmationEmail } from '@/lib/email';
+import type { PopulatedBooking } from '@/types';
 import { getStripe } from '@/lib/stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
@@ -83,10 +84,10 @@ export async function POST(request: NextRequest) {
         const isDeposit = session.metadata?.isDeposit === 'true';
 
         if (bookingId) {
-          const booking = await Booking.findById(bookingId).populate(
+          const booking = (await Booking.findById(bookingId).populate(
             'cabin',
             'name image capacity price discount description'
-          );
+          )) as unknown as PopulatedBooking | null;
 
           if (!booking) {
             console.error(`Booking not found: ${bookingId}`);

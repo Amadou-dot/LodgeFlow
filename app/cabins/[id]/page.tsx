@@ -105,7 +105,7 @@ export default function Page({ params }: { params: Params }) {
           <BookingForm
             userData={userData}
             cabin={{
-              _id: cabin._id,
+              _id: cabin._id.toString(),
               discount: cabin.discount,
               image: cabin.image,
               maxCapacity: cabin.capacity,

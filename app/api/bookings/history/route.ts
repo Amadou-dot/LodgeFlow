@@ -34,7 +34,10 @@ export async function GET(request: NextRequest) {
 
     // Fetch bookings with cabin details
     const bookings = await Booking.find(query)
-      .populate('cabin', 'name image capacity price discount description')
+      .populate(
+        'cabin',
+        'name image images capacity price discount description status bedrooms bathrooms size minNights'
+      )
       .sort({ createdAt: -1 })
       .lean();
 

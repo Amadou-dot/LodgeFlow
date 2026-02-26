@@ -1,5 +1,5 @@
-import connectDB from '@/lib/mongodb';
-import Booking from '@/models/Booking';
+import { connectDB, Booking, Cabin } from '@/models';
+import type { ApiResponse } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -10,6 +10,17 @@ export async function GET(
     await connectDB();
 
     const { id: cabinId } = await context.params;
+
+    // Verify cabin exists and is active
+    const cabin = await Cabin.findById(cabinId);
+    if (!cabin || (cabin.status && cabin.status !== 'active')) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'Cabin not found',
+      };
+      return NextResponse.json(response, { status: 404 });
+    }
+
     const url = new URL(request.url);
     const startDate = url.searchParams.get('startDate');
     const endDate = url.searchParams.get('endDate');
@@ -23,18 +34,11 @@ export async function GET(
     const queryEndDate = endDate ? new Date(endDate) : defaultEnd;
 
     // Find all bookings that overlap with the query date range
-    const bookings = await Booking.find({
-      cabin: cabinId,
-      status: { $nin: ['cancelled'] }, // Exclude cancelled bookings
-      $or: [
-        {
-          checkInDate: { $lt: queryEndDate },
-          checkOutDate: { $gt: queryStartDate },
-        },
-      ],
-    })
-      .select('checkInDate checkOutDate')
-      .lean();
+    const bookings = await Booking.findOverlapping(
+      cabinId,
+      queryStartDate,
+      queryEndDate
+    );
 
     // Create array of unavailable date ranges
     const unavailableDates = bookings.map(booking => ({

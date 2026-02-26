@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 400 });
     }
 
-    // Check if cabin exists and is available
+    // Check if cabin exists and is active
     const cabin = await Cabin.findById(cabinId);
     if (!cabin) {
       const response: ApiResponse<never> = {
@@ -62,6 +62,14 @@ export async function POST(request: NextRequest) {
         error: 'Cabin not found',
       };
       return NextResponse.json(response, { status: 404 });
+    }
+
+    if (cabin.status && cabin.status !== 'active') {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'This cabin is not available for booking',
+      };
+      return NextResponse.json(response, { status: 400 });
     }
 
     if (numGuests > cabin.capacity) {
@@ -73,16 +81,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for conflicting bookings
-    const conflictingBookings = await Booking.find({
-      cabin: cabinId,
-      status: { $nin: ['cancelled'] },
-      $or: [
-        {
-          checkInDate: { $lt: checkOut },
-          checkOutDate: { $gt: checkIn },
-        },
-      ],
-    });
+    const conflictingBookings = await Booking.findOverlapping(
+      cabinId,
+      checkIn,
+      checkOut
+    );
 
     if (conflictingBookings.length > 0) {
       const response: ApiResponse<never> = {
@@ -93,27 +96,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Get settings for pricing
-    const settings = await Settings.findOne().sort({ createdAt: -1 });
-    if (!settings) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'System settings not found',
-      };
-      return NextResponse.json(response, { status: 500 });
-    }
+    const settings = await Settings.getSettings();
 
     // Calculate nights and pricing
     const numNights = Math.ceil(
       (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
     );
 
+    // Cabin-level minNights takes priority over global setting
+    const effectiveMinNights = cabin.minNights || settings.minBookingLength;
+
     if (
-      numNights < settings.minBookingLength ||
+      numNights < effectiveMinNights ||
       numNights > settings.maxBookingLength
     ) {
       const response: ApiResponse<never> = {
         success: false,
-        error: `Booking length must be between ${settings.minBookingLength} and ${settings.maxBookingLength} nights`,
+        error: `Booking length must be between ${effectiveMinNights} and ${settings.maxBookingLength} nights`,
       };
       return NextResponse.json(response, { status: 400 });
     }
@@ -189,19 +188,10 @@ export async function POST(request: NextRequest) {
       depositAmount,
     });
 
-    // Update customer statistics
-    await Booking.findOneAndUpdate(
-      { customer: customerId },
-      {
-        $inc: { totalBookings: 1, totalSpent: totalPrice },
-        lastBookingDate: new Date(),
-      }
-    );
-
     // Populate the booking for response
-    const populatedBooking: PopulatedBooking = await Booking.findById(
-      booking._id
-    ).populate('cabin');
+    const populatedBooking = (await Booking.findById(booking._id).populate(
+      'cabin'
+    )) as unknown as PopulatedBooking;
     const response: ApiResponse<any> = {
       success: true,
       data: populatedBooking,

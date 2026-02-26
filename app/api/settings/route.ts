@@ -6,15 +6,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    const settings = await Settings.findOne().sort({ createdAt: -1 });
-
-    if (!settings) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Settings not found',
-      };
-      return NextResponse.json(response, { status: 404 });
-    }
+    const settings = await Settings.getSettings();
 
     const response: ApiResponse<SettingsType> = {
       success: true,

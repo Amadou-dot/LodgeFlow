@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface ISettings extends Document {
   minBookingLength: number;
@@ -20,8 +20,36 @@ export interface ISettings extends Document {
   parkingFee: number;
   currency: string;
   timezone: string;
+  businessHours?: {
+    open: string;
+    close: string;
+    daysOpen: string[];
+  };
+  contactInfo?: {
+    phone?: string;
+    email?: string;
+    address?: {
+      street?: string;
+      city?: string;
+      state?: string;
+      country?: string;
+      zipCode?: string;
+    };
+  };
+  notifications?: {
+    emailEnabled: boolean;
+    smsEnabled: boolean;
+    bookingConfirmation: boolean;
+    paymentReminders: boolean;
+    checkInReminders: boolean;
+  };
+  fullAddress: string; // virtual
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ISettingsModel extends Model<ISettings> {
+  getSettings(): Promise<ISettings>;
 }
 
 const SettingsSchema: Schema = new Schema(
@@ -130,6 +158,49 @@ const SettingsSchema: Schema = new Schema(
       required: [true, 'Timezone is required'],
       default: 'UTC',
     },
+    businessHours: {
+      open: { type: String },
+      close: { type: String },
+      daysOpen: {
+        type: [String],
+        enum: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday',
+        ],
+      },
+    },
+    contactInfo: {
+      phone: {
+        type: String,
+        match: [
+          /^\+?[\d\s\-().]{7,20}$/,
+          'Please provide a valid phone number',
+        ],
+      },
+      email: {
+        type: String,
+        match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email'],
+      },
+      address: {
+        street: { type: String },
+        city: { type: String },
+        state: { type: String },
+        country: { type: String },
+        zipCode: { type: String },
+      },
+    },
+    notifications: {
+      emailEnabled: { type: Boolean, default: true },
+      smsEnabled: { type: Boolean, default: false },
+      bookingConfirmation: { type: Boolean, default: true },
+      paymentReminders: { type: Boolean, default: true },
+      checkInReminders: { type: Boolean, default: true },
+    },
   },
   {
     timestamps: true,
@@ -147,9 +218,25 @@ SettingsSchema.pre('validate', function (this: ISettings) {
   }
 });
 
+// Virtual: formatted full address from contactInfo.address
+SettingsSchema.virtual('fullAddress').get(function (this: ISettings): string {
+  const addr = this.contactInfo?.address;
+  if (!addr) return '';
+  return [addr.street, addr.city, addr.state, addr.zipCode, addr.country]
+    .filter(Boolean)
+    .join(', ');
+});
+
+// Static method: get the single settings document or create with defaults
+SettingsSchema.statics.getSettings = async function (): Promise<ISettings> {
+  const settings = await this.findOne();
+  if (settings) return settings;
+  return this.create({});
+};
+
 // Prevent model re-compilation in development
 const Settings =
   mongoose.models.Settings ||
-  mongoose.model<ISettings>('Settings', SettingsSchema);
+  mongoose.model<ISettings, ISettingsModel>('Settings', SettingsSchema);
 
-export default Settings;
+export default Settings as ISettingsModel;

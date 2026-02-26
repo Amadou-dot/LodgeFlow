@@ -23,16 +23,7 @@ import {
   MapPin,
 } from 'lucide-react';
 
-interface Cabin {
-  _id: string;
-  name: string;
-  price: number;
-  capacity: number;
-  image: string;
-  discount: number;
-  description: string;
-  amenities: string[];
-}
+import type { Cabin } from '@/types';
 
 interface CabinDetailsProps {
   cabin: Cabin;
