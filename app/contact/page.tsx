@@ -1,7 +1,12 @@
+'use client';
+
 import { Card, CardBody } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Input, Textarea } from '@heroui/input';
 import { Link } from '@heroui/link';
+const Skeleton = ({ className = '' }: { className?: string }) => (
+  <div className={`animate-pulse bg-default-200 ${className}`} />
+);
 import {
   Phone,
   Mail,
@@ -13,29 +18,118 @@ import {
 
 import { siteConfig } from '@/config/site';
 import { PageHeader, ContactInfoCard } from '@/components/ui';
+import { useSettings } from '@/hooks/useSettings';
+
+// Default fallback values when settings are not available
+const FALLBACK_PHONE = ['+1 (800) LODGEFLOW', '+1 (800) 563-4335'];
+const FALLBACK_EMAIL = ['hello@lodgeflow.com', 'reservations@lodgeflow.com'];
+const FALLBACK_LOCATION = [
+  'LodgeFlow Resort',
+  '1000 Wilderness Drive',
+  'Pine Valley, MT 59718',
+];
+const FALLBACK_HOURS = 'Daily: 8:00 AM - 10:00 PM';
+
+function ContactSkeleton() {
+  return (
+    <div className='space-y-8 py-8'>
+      <PageHeader
+        subtitle="We're here to help you plan the perfect escape to LodgeFlow. Get in touch with our team for any questions or assistance."
+        title='Contact'
+        titleAccent='Us'
+      />
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
+        <Card>
+          <CardBody className='space-y-6'>
+            <Skeleton className='h-6 w-32 rounded-lg' />
+            {[1, 2, 3].map(i => (
+              <div key={i} className='flex items-start gap-3'>
+                <Skeleton className='w-10 h-10 rounded-lg flex-shrink-0' />
+                <div className='space-y-2 flex-1'>
+                  <Skeleton className='h-4 w-20 rounded-lg' />
+                  <Skeleton className='h-4 w-48 rounded-lg' />
+                  <Skeleton className='h-3 w-36 rounded-lg' />
+                </div>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody className='space-y-4'>
+            <Skeleton className='h-6 w-48 rounded-lg' />
+            <Skeleton className='h-4 w-64 rounded-lg' />
+            <div className='grid grid-cols-2 gap-4'>
+              <Skeleton className='h-12 rounded-lg' />
+              <Skeleton className='h-12 rounded-lg' />
+            </div>
+            <Skeleton className='h-12 rounded-lg' />
+            <Skeleton className='h-12 rounded-lg' />
+            <Skeleton className='h-12 rounded-lg' />
+            <Skeleton className='h-24 rounded-lg' />
+            <Skeleton className='h-12 rounded-lg' />
+          </CardBody>
+        </Card>
+      </div>
+    </div>
+  );
+}
 
 export default function ContactPage() {
+  const { data: settings, isLoading } = useSettings();
+
+  if (isLoading) {
+    return <ContactSkeleton />;
+  }
+
+  // Build phone lines from settings or use fallback
+  const phoneLines = settings?.contactInfo?.phone
+    ? [settings.contactInfo.phone]
+    : FALLBACK_PHONE;
+
+  // Build email lines from settings or use fallback
+  const emailLines = settings?.contactInfo?.email
+    ? [settings.contactInfo.email]
+    : FALLBACK_EMAIL;
+
+  // Build location lines from settings address or use fallback
+  const locationLines = (() => {
+    const addr = settings?.contactInfo?.address;
+    if (!addr) return FALLBACK_LOCATION;
+
+    const lines: string[] = [];
+    if (addr.street) lines.push(addr.street);
+    const cityStateZip = [addr.city, addr.state, addr.zipCode]
+      .filter(Boolean)
+      .join(', ');
+    if (cityStateZip) lines.push(cityStateZip);
+    if (addr.country) lines.push(addr.country);
+
+    return lines.length > 0 ? lines : FALLBACK_LOCATION;
+  })();
+
+  // Build business hours subtitle from settings or use fallback
+  const businessHoursSubtitle =
+    settings?.businessHours?.open && settings?.businessHours?.close
+      ? `Daily: ${settings.businessHours.open} - ${settings.businessHours.close}`
+      : FALLBACK_HOURS;
+
   const contactItems = [
     {
       icon: <Phone className='w-5 h-5 text-green-600' />,
       title: 'Phone',
-      lines: ['+1 (800) LODGEFLOW', '+1 (800) 563-4335'],
-      subtitle: 'Daily: 8:00 AM - 10:00 PM',
+      lines: phoneLines,
+      subtitle: businessHoursSubtitle,
     },
     {
       icon: <Mail className='w-5 h-5 text-green-600' />,
       title: 'Email',
-      lines: ['hello@lodgeflow.com', 'reservations@lodgeflow.com'],
+      lines: emailLines,
       subtitle: 'We respond within 2 hours',
     },
     {
       icon: <MapPin className='w-5 h-5 text-green-600' />,
       title: 'Location',
-      lines: [
-        'LodgeFlow Resort',
-        '1000 Wilderness Drive',
-        'Pine Valley, MT 59718',
-      ],
+      lines: locationLines,
     },
   ];
 

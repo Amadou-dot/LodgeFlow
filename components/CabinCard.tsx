@@ -49,6 +49,30 @@ export default function CabinCard({ cabin }: CabinCardProps) {
           {cabin.description}
         </p>
 
+        {(cabin.bedrooms ||
+          cabin.bathrooms ||
+          cabin.size ||
+          cabin.minNights) && (
+          <div className='flex flex-wrap items-center gap-2 mb-3'>
+            {(cabin.bedrooms || cabin.bathrooms || cabin.size) && (
+              <span className='text-small text-default-600'>
+                {[
+                  cabin.bedrooms ? `${cabin.bedrooms} bd` : null,
+                  cabin.bathrooms ? `${cabin.bathrooms} ba` : null,
+                  cabin.size ? `${cabin.size} ft²` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+            )}
+            {cabin.minNights && (
+              <Chip size='sm' variant='flat'>
+                Min {cabin.minNights} nights
+              </Chip>
+            )}
+          </div>
+        )}
+
         {cabin.amenities && cabin.amenities.length > 0 && (
           <div className='flex flex-wrap gap-1 mb-3'>
             {cabin.amenities.slice(0, 3).map((amenity, index) => (

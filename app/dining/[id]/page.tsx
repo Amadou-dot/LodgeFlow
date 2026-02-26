@@ -9,11 +9,14 @@ import { Link } from '@heroui/link';
 import { Spinner } from '@heroui/spinner';
 import Image from 'next/image';
 import {
+  AlertCircle,
   Calendar,
   Check,
   Clock,
+  GlassWater,
   MapPin,
   Star,
+  Tag,
   Users,
   UtensilsCrossed,
 } from 'lucide-react';
@@ -263,6 +266,59 @@ export default function DiningDetailPage({ params }: { params: Params }) {
               </CardBody>
             </Card>
           )}
+
+          {/* Beverages */}
+          {dining.beverages && dining.beverages.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className='flex items-center gap-2'>
+                  <GlassWater className='w-5 h-5 text-primary' />
+                  <h3 className='text-xl font-bold'>Beverages</h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  {dining.beverages.map((beverage, index) => (
+                    <div
+                      key={index}
+                      className='border border-default-200 rounded-lg p-4 space-y-2'
+                    >
+                      <div className='flex items-start justify-between'>
+                        <h4 className='font-semibold'>{beverage.name}</h4>
+                        {beverage.price != null && (
+                          <span className='text-green-600 font-bold'>
+                            ${beverage.price}
+                          </span>
+                        )}
+                      </div>
+                      {beverage.description && (
+                        <p className='text-sm text-default-600'>
+                          {beverage.description}
+                        </p>
+                      )}
+                      <div className='flex flex-wrap gap-2'>
+                        <Chip size='sm' variant='flat'>
+                          {beverage.category
+                            .split('-')
+                            .map(
+                              (w: string) =>
+                                w.charAt(0).toUpperCase() + w.slice(1)
+                            )
+                            .join(' ')}
+                        </Chip>
+                        {beverage.alcoholContent != null &&
+                          beverage.alcoholContent > 0 && (
+                            <Chip color='secondary' size='sm' variant='flat'>
+                              {beverage.alcoholContent}% ABV
+                            </Chip>
+                          )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -364,6 +420,53 @@ export default function DiningDetailPage({ params }: { params: Params }) {
               </div>
             </CardBody>
           </Card>
+
+          {/* Special Requirements */}
+          {dining.specialRequirements &&
+            dining.specialRequirements.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <div className='flex items-center gap-2'>
+                    <AlertCircle className='w-5 h-5 text-warning' />
+                    <h3 className='text-lg font-bold'>Special Requirements</h3>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <ul className='space-y-2'>
+                    {dining.specialRequirements.map((req, index) => (
+                      <li
+                        key={index}
+                        className='flex items-start gap-2 text-sm text-default-600'
+                      >
+                        <span className='text-warning mt-0.5'>&#8226;</span>
+                        <span>{req}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardBody>
+              </Card>
+            )}
+
+          {/* Tags */}
+          {dining.tags && dining.tags.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className='flex items-center gap-2'>
+                  <Tag className='w-5 h-5 text-default-400' />
+                  <h3 className='text-lg font-bold'>Tags</h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className='flex flex-wrap gap-2'>
+                  {dining.tags.map((tag, index) => (
+                    <Chip key={index} size='sm' variant='bordered'>
+                      {tag}
+                    </Chip>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
         </div>
       </div>
     </div>

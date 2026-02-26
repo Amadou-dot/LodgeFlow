@@ -93,7 +93,9 @@ export default function Page({ params }: { params: Params }) {
       {/* Main Content - Two Row Layout */}
       <div className='space-y-8'>
         {/* Gallery - Full Width */}
-        <CabinGallery images={[cabin.image]} />
+        <CabinGallery
+          images={cabin.images?.length ? cabin.images : [cabin.image]}
+        />
 
         {/* Cabin Details - Full Width */}
         <div>
