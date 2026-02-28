@@ -1,6 +1,20 @@
 import { render, screen } from '@testing-library/react';
 import CabinDetails from '@/components/CabinDetails';
 
+// Mock useSettings hook
+jest.mock('@/hooks/useSettings', () => ({
+  useSettings: () => ({
+    settings: {
+      checkInTime: '15:00',
+      checkOutTime: '11:00',
+      cancellationPolicy: 'flexible',
+      smokingAllowed: false,
+    },
+    isLoading: false,
+    error: null,
+  }),
+}));
+
 // Mock cabin data
 const mockCabin = {
   _id: '1',
@@ -42,8 +56,6 @@ describe('CabinDetails Component', () => {
     expect(screen.getByText('Cabin Information')).toBeInTheDocument();
     expect(screen.getByText('Maximum Capacity')).toBeInTheDocument();
     expect(screen.getByText('4 guests')).toBeInTheDocument();
-    expect(screen.getByText('Accommodation')).toBeInTheDocument();
-    expect(screen.getByText(mockCabin.name)).toBeInTheDocument();
   });
 
   it('renders house rules section', () => {

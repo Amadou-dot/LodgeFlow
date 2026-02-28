@@ -2,6 +2,9 @@
 
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Divider } from '@heroui/divider';
+const Skeleton = ({ className = '' }: { className?: string }) => (
+  <div className={`animate-pulse bg-default-200 ${className}`} />
+);
 import {
   Wifi,
   Utensils,
@@ -21,9 +24,13 @@ import {
   Bed,
   Users,
   MapPin,
+  Moon,
+  Square,
+  DollarSign,
 } from 'lucide-react';
 
-import type { Cabin } from '@/types';
+import { useSettings } from '@/hooks/useSettings';
+import type { Cabin, CancellationPolicy } from '@/types';
 
 interface CabinDetailsProps {
   cabin: Cabin;
@@ -64,6 +71,21 @@ const amenityIconMap: Record<string, any> = {
   Hiking: Mountain,
 };
 
+function formatTime(time: string): string {
+  const [hourStr, minuteStr] = time.split(':');
+  let hour = parseInt(hourStr, 10);
+  const minute = minuteStr || '00';
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12 || 12;
+  return `${hour}:${minute} ${ampm}`;
+}
+
+const cancellationPolicyText: Record<CancellationPolicy, string> = {
+  flexible: 'Free cancellation up to 24 hours before check-in',
+  moderate: 'Free cancellation up to 48 hours before check-in',
+  strict: '50% refund up to 7 days before check-in',
+};
+
 function getAmenityIcon(amenity: string) {
   // Try exact match first
   if (amenityIconMap[amenity]) {
@@ -85,6 +107,8 @@ function getAmenityIcon(amenity: string) {
 }
 
 export default function CabinDetails({ cabin }: CabinDetailsProps) {
+  const { data: settings, isLoading: settingsLoading } = useSettings();
+
   return (
     <div className='space-y-6'>
       {/* Description Section */}
@@ -162,10 +186,55 @@ export default function CabinDetails({ cabin }: CabinDetailsProps) {
             <div className='flex items-center gap-3'>
               <Bed className='text-primary' size={24} />
               <div>
-                <p className='text-sm text-default-500'>Accommodation</p>
-                <p className='text-base font-semibold'>{cabin.name}</p>
+                <p className='text-sm text-default-500'>
+                  {cabin.bedrooms ? 'Bedrooms' : 'Accommodation'}
+                </p>
+                <p className='text-base font-semibold'>
+                  {cabin.bedrooms ?? cabin.name}
+                </p>
               </div>
             </div>
+            {cabin.bathrooms && (
+              <div className='flex items-center gap-3'>
+                <Bath className='text-primary' size={24} />
+                <div>
+                  <p className='text-sm text-default-500'>Bathrooms</p>
+                  <p className='text-base font-semibold'>{cabin.bathrooms}</p>
+                </div>
+              </div>
+            )}
+            {cabin.size && (
+              <div className='flex items-center gap-3'>
+                <Square className='text-primary' size={24} />
+                <div>
+                  <p className='text-sm text-default-500'>Size</p>
+                  <p className='text-base font-semibold'>{cabin.size} ft²</p>
+                </div>
+              </div>
+            )}
+            {cabin.minNights && (
+              <div className='flex items-center gap-3'>
+                <Moon className='text-primary' size={24} />
+                <div>
+                  <p className='text-sm text-default-500'>Minimum Stay</p>
+                  <p className='text-base font-semibold'>
+                    {cabin.minNights}{' '}
+                    {cabin.minNights === 1 ? 'night' : 'nights'}
+                  </p>
+                </div>
+              </div>
+            )}
+            {cabin.extraGuestFee != null && cabin.extraGuestFee > 0 && (
+              <div className='flex items-center gap-3'>
+                <DollarSign className='text-primary' size={24} />
+                <div>
+                  <p className='text-sm text-default-500'>Extra Guest Fee</p>
+                  <p className='text-base font-semibold'>
+                    ${cabin.extraGuestFee} per extra guest/night
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </CardBody>
       </Card>
@@ -179,47 +248,73 @@ export default function CabinDetails({ cabin }: CabinDetailsProps) {
         </CardHeader>
         <Divider />
         <CardBody>
-          <div className='space-y-3'>
-            <div className='flex items-start gap-3'>
-              <span className='text-primary text-lg'>✓</span>
-              <div>
-                <p className='font-semibold'>Check-in</p>
-                <p className='text-sm text-default-500'>After 3:00 PM</p>
+          {settingsLoading ? (
+            <div className='space-y-3'>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className='flex items-start gap-3'>
+                  <Skeleton className='w-5 h-5 rounded-full' />
+                  <div className='flex-1 space-y-1'>
+                    <Skeleton className='w-24 h-4 rounded' />
+                    <Skeleton className='w-48 h-3 rounded' />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className='space-y-3'>
+              <div className='flex items-start gap-3'>
+                <span className='text-primary text-lg'>✓</span>
+                <div>
+                  <p className='font-semibold'>Check-in</p>
+                  <p className='text-sm text-default-500'>
+                    After{' '}
+                    {settings ? formatTime(settings.checkInTime) : '3:00 PM'}
+                  </p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <span className='text-primary text-lg'>✓</span>
+                <div>
+                  <p className='font-semibold'>Check-out</p>
+                  <p className='text-sm text-default-500'>
+                    Before{' '}
+                    {settings ? formatTime(settings.checkOutTime) : '11:00 AM'}
+                  </p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <span className='text-primary text-lg'>✓</span>
+                <div>
+                  <p className='font-semibold'>Cancellation Policy</p>
+                  <p className='text-sm text-default-500'>
+                    {settings
+                      ? cancellationPolicyText[settings.cancellationPolicy]
+                      : 'Free cancellation up to 48 hours before check-in'}
+                  </p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <span className='text-primary text-lg'>✓</span>
+                <div>
+                  <p className='font-semibold'>Quiet Hours</p>
+                  <p className='text-sm text-default-500'>10:00 PM - 8:00 AM</p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <span className='text-primary text-lg'>✓</span>
+                <div>
+                  <p className='font-semibold'>Smoking</p>
+                  <p className='text-sm text-default-500'>
+                    {settings
+                      ? settings.smokingAllowed
+                        ? 'Smoking allowed'
+                        : 'No smoking inside the cabin'
+                      : 'No smoking inside the cabin'}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className='flex items-start gap-3'>
-              <span className='text-primary text-lg'>✓</span>
-              <div>
-                <p className='font-semibold'>Check-out</p>
-                <p className='text-sm text-default-500'>Before 11:00 AM</p>
-              </div>
-            </div>
-            <div className='flex items-start gap-3'>
-              <span className='text-primary text-lg'>✓</span>
-              <div>
-                <p className='font-semibold'>Cancellation Policy</p>
-                <p className='text-sm text-default-500'>
-                  Free cancellation up to 48 hours before check-in
-                </p>
-              </div>
-            </div>
-            <div className='flex items-start gap-3'>
-              <span className='text-primary text-lg'>✓</span>
-              <div>
-                <p className='font-semibold'>Quiet Hours</p>
-                <p className='text-sm text-default-500'>10:00 PM - 8:00 AM</p>
-              </div>
-            </div>
-            <div className='flex items-start gap-3'>
-              <span className='text-primary text-lg'>✓</span>
-              <div>
-                <p className='font-semibold'>Smoking</p>
-                <p className='text-sm text-default-500'>
-                  No smoking inside the cabin
-                </p>
-              </div>
-            </div>
-          </div>
+          )}
         </CardBody>
       </Card>
     </div>

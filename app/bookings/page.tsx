@@ -315,14 +315,53 @@ export default function BookingsPage() {
                         <p className='text-lg font-bold'>
                           {booking.cabin?.name}
                         </p>
-                        <Chip
-                          className='mt-1 w-fit'
-                          color={statusColorMap[booking.status]}
-                          size='sm'
-                          variant='flat'
-                        >
-                          {booking.status.replace('-', ' ').toUpperCase()}
-                        </Chip>
+                        <div className='flex items-center gap-2 mt-1 flex-wrap'>
+                          <Chip
+                            className='w-fit'
+                            color={statusColorMap[booking.status]}
+                            size='sm'
+                            variant='flat'
+                          >
+                            {booking.status.replace('-', ' ').toUpperCase()}
+                          </Chip>
+                          {booking.status === 'cancelled' &&
+                            booking.refundStatus &&
+                            booking.refundStatus !== 'none' && (
+                              <Chip
+                                className='w-fit'
+                                size='sm'
+                                variant='flat'
+                                color={
+                                  (
+                                    {
+                                      pending: 'warning',
+                                      processing: 'primary',
+                                      partial: 'warning',
+                                      full: 'success',
+                                      failed: 'danger',
+                                    } as const
+                                  )[
+                                    booking.refundStatus as
+                                      | 'pending'
+                                      | 'processing'
+                                      | 'partial'
+                                      | 'full'
+                                      | 'failed'
+                                  ] || 'default'
+                                }
+                              >
+                                Refund:{' '}
+                                {booking.refundStatus.charAt(0).toUpperCase() +
+                                  booking.refundStatus.slice(1)}
+                              </Chip>
+                            )}
+                        </div>
+                        {booking.status === 'cancelled' &&
+                          booking.cancelledAt && (
+                            <p className='text-xs text-default-400 mt-1'>
+                              Cancelled on {formatDate(booking.cancelledAt)}
+                            </p>
+                          )}
                       </div>
                     </CardHeader>
 
@@ -901,6 +940,118 @@ export default function BookingsPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Deposit / Remaining */}
+                    {selectedBooking.depositAmount > 0 && (
+                      <div>
+                        <h3 className='text-lg font-semibold mb-3'>
+                          Deposit & Balance
+                        </h3>
+                        <div className='space-y-2'>
+                          <div className='flex justify-between items-center'>
+                            <span>Deposit</span>
+                            <div className='flex items-center gap-2'>
+                              <span>${selectedBooking.depositAmount}</span>
+                              <Chip
+                                size='sm'
+                                variant='flat'
+                                color={
+                                  selectedBooking.depositPaid
+                                    ? 'success'
+                                    : 'warning'
+                                }
+                              >
+                                {selectedBooking.depositPaid ? 'Paid' : 'Due'}
+                              </Chip>
+                            </div>
+                          </div>
+                          <div className='flex justify-between items-center'>
+                            <span>Remaining</span>
+                            <div className='flex items-center gap-2'>
+                              <span>
+                                $
+                                {selectedBooking.remainingAmount ??
+                                  selectedBooking.totalPrice -
+                                    selectedBooking.depositAmount}
+                              </span>
+                              {(selectedBooking.remainingAmount ??
+                                selectedBooking.totalPrice -
+                                  selectedBooking.depositAmount) > 0 && (
+                                <Chip color='warning' size='sm' variant='flat'>
+                                  Outstanding
+                                </Chip>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Refund / Cancellation Info */}
+                    {selectedBooking.status === 'cancelled' &&
+                      selectedBooking.refundStatus &&
+                      selectedBooking.refundStatus !== 'none' && (
+                        <div>
+                          <h3 className='text-lg font-semibold mb-3'>
+                            Refund Information
+                          </h3>
+                          <div className='space-y-2'>
+                            <div className='flex justify-between items-center'>
+                              <span>Refund Status</span>
+                              <Chip
+                                size='sm'
+                                variant='flat'
+                                color={
+                                  (
+                                    {
+                                      pending: 'warning',
+                                      processing: 'primary',
+                                      partial: 'warning',
+                                      full: 'success',
+                                      failed: 'danger',
+                                    } as const
+                                  )[
+                                    selectedBooking.refundStatus as
+                                      | 'pending'
+                                      | 'processing'
+                                      | 'partial'
+                                      | 'full'
+                                      | 'failed'
+                                  ] || 'default'
+                                }
+                              >
+                                {selectedBooking.refundStatus
+                                  .charAt(0)
+                                  .toUpperCase() +
+                                  selectedBooking.refundStatus.slice(1)}
+                              </Chip>
+                            </div>
+                            {selectedBooking.refundAmount != null &&
+                              selectedBooking.refundAmount > 0 && (
+                                <div className='flex justify-between'>
+                                  <span>Refund Amount</span>
+                                  <span>${selectedBooking.refundAmount}</span>
+                                </div>
+                              )}
+                            {selectedBooking.cancelledAt && (
+                              <div className='flex justify-between'>
+                                <span>Cancelled</span>
+                                <span>
+                                  {formatDate(selectedBooking.cancelledAt)}
+                                </span>
+                              </div>
+                            )}
+                            {selectedBooking.cancellationReason && (
+                              <div className='flex justify-between'>
+                                <span>Reason</span>
+                                <span className='text-right max-w-[60%] text-default-600'>
+                                  {selectedBooking.cancellationReason}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
                     {/* Extras */}
                     {selectedBooking.extras && (
