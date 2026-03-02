@@ -84,15 +84,24 @@ export default function CabinGallery({ images }: CabinGalleryProps) {
       }
     };
   }, [isAutoScrolling]);
-  // Use 3 images for mock gallery
-  const galleryImages = [
-    '/sarah_linden.png',
-    '/david_lee.png',
-    '/michael_rowan.png',
-    '/sophia_patel.png',
-    '/emily_wren.png',
-    '/james_smith.png',
-  ];
+
+  // If no images or only one image, show a single hero image
+  if (!images || images.length <= 1) {
+    return images && images.length === 1 ? (
+      <div className='w-full mb-8'>
+        <div className='relative w-full aspect-video rounded-lg overflow-hidden shadow'>
+          <Image
+            alt='Cabin image'
+            className='object-cover'
+            fill
+            priority
+            sizes='100vw'
+            src={images[0]}
+          />
+        </div>
+      </div>
+    ) : null;
+  }
 
   return (
     <div className='w-full mb-8 relative group'>
@@ -141,7 +150,7 @@ export default function CabinGallery({ images }: CabinGalleryProps) {
         onTouchStart={handleManualScroll}
         onWheel={handleWheel}
       >
-        {galleryImages.map((src, idx) => (
+        {images.map((src, idx) => (
           <div
             key={idx}
             className='relative flex-none w-[80vw] md:w-[400px] aspect-video rounded-lg overflow-hidden shadow snap-center'
