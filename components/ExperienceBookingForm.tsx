@@ -54,6 +54,15 @@ export default function ExperienceBookingForm({
     }
 
     try {
+      if (!experience._id) {
+        addToast({
+          title: 'Booking Failed',
+          description: 'This experience is missing an identifier.',
+          color: 'danger',
+        });
+        return;
+      }
+
       const bookingDate = date.toDate(getLocalTimeZone());
 
       const result = await createBooking.mutateAsync({

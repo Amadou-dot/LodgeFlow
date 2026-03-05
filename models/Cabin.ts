@@ -56,9 +56,9 @@ const CabinSchema: Schema = new Schema(
       min: [0, 'Discount must be positive'],
       validate: {
         validator: function (this: ICabin, discount: number) {
-          return discount <= this.price;
+          return discount < this.price;
         },
-        message: 'Discount cannot exceed the cabin price',
+        message: 'Discount must be less than the cabin price',
       },
     },
     description: {
