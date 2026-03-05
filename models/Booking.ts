@@ -31,7 +31,7 @@ export interface IBooking extends Document {
     lateCheckOutFee: number;
   };
   observations?: string;
-  specialRequests: string[];
+  specialRequests?: string[];
   depositPaid: boolean;
   depositAmount: number;
   stripePaymentIntentId?: string;

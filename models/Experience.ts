@@ -1,6 +1,7 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
-export interface IExperience extends Document {
+export interface IExperience {
+  _id?: string;
   name: string;
   price: number;
   duration: string;

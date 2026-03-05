@@ -15,8 +15,7 @@ export interface ICabin extends Document {
   size?: number;
   minNights?: number;
   extraGuestFee?: number;
-  effectivePrice: number; // virtual
-  discountedPrice: number; // virtual alias
+  discountedPrice: number; // virtual
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,9 +55,9 @@ const CabinSchema: Schema = new Schema(
       min: [0, 'Discount must be positive'],
       validate: {
         validator: function (this: ICabin, discount: number) {
-          return discount <= this.price;
+          return discount < this.price;
         },
-        message: 'Discount cannot exceed the cabin price',
+        message: 'Discount must be less than the cabin price',
       },
     },
     description: {
@@ -121,12 +120,7 @@ const CabinSchema: Schema = new Schema(
   }
 );
 
-// Virtual for effective price (price - discount)
-CabinSchema.virtual('effectivePrice').get(function (this: ICabin) {
-  return this.price - this.discount;
-});
-
-// Alias virtual for admin dashboard compatibility
+// Virtual for discounted price (price - discount)
 CabinSchema.virtual('discountedPrice').get(function (this: ICabin) {
   return this.price - this.discount;
 });

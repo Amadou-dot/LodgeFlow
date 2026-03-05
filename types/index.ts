@@ -134,6 +134,8 @@ export interface CreateExperienceData {
   cancellationPolicy?: string;
   seasonality?: string;
   tags?: string[];
+  rating?: number;
+  reviewCount?: number;
 }
 
 export interface UpdateExperienceData extends Partial<CreateExperienceData> {
