@@ -94,7 +94,7 @@ export default function Page({ params }: { params: Params }) {
       <div className='space-y-8'>
         {/* Gallery - Full Width */}
         <CabinGallery
-          images={cabin.images?.length ? cabin.images : [cabin.image]}
+          images={[cabin.image, ...(cabin.images || [])].filter(Boolean)}
         />
 
         {/* Cabin Details - Full Width */}

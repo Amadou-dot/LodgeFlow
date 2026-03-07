@@ -1,4 +1,4 @@
-import { title, subtitle } from '@/components/primitives';
+import { title } from '@/components/primitives';
 
 interface PageHeaderProps {
   title: string;
@@ -15,6 +15,8 @@ export function PageHeader({
   centered = true,
   className = '',
 }: PageHeaderProps) {
+  const subtitleClassName = `w-full my-2 mt-4 text-lg lg:text-xl text-default-600 block ${centered ? 'max-w-2xl mx-auto' : 'max-w-full'}`;
+
   return (
     <section className={`${centered ? 'text-center' : ''} ${className}`}>
       <h1 className={title({ size: 'lg' })}>
@@ -28,15 +30,7 @@ export function PageHeader({
           </>
         )}
       </h1>
-      {pageSubtitle && (
-        <p
-          className={subtitle({
-            class: `mt-4 ${centered ? 'max-w-2xl mx-auto' : ''}`,
-          })}
-        >
-          {pageSubtitle}
-        </p>
-      )}
+      {pageSubtitle && <p className={subtitleClassName}>{pageSubtitle}</p>}
     </section>
   );
 }
