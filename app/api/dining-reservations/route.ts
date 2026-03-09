@@ -3,7 +3,12 @@ import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { connectDB, Dining, DiningReservation } from '@/models';
-import type { ApiResponse, CreateDiningReservationData } from '@/types';
+import type { ApiResponse } from '@/types';
+import { createDiningReservationSchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 
 class CapacityExceededError extends Error {
   constructor(message: string) {
@@ -25,69 +30,27 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const body = (await request.json()) as CreateDiningReservationData;
+    const body = await request.json();
+
+    // Validate request body with Zod
+    const validation = validateRequest(createDiningReservationSchema, body);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
     const {
       diningId,
       date,
       time,
       numGuests,
-      dietaryRequirements = [],
-      specialRequests = [],
-      tablePreference = 'no-preference',
+      dietaryRequirements,
+      specialRequests,
+      tablePreference,
       occasion,
-    } = body;
+    } = validation.data;
 
-    if (!diningId || !date || !time || !numGuests) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Missing required fields',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    // Validate date
     const reservationDate = new Date(date);
-    if (isNaN(reservationDate.getTime())) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Invalid date',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    // Compare date-only to allow same-day reservations
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const reservationDay = new Date(reservationDate);
-    reservationDay.setHours(0, 0, 0, 0);
-
-    if (reservationDay < todayStart) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Cannot reserve a date in the past',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    // Validate time format
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if (!timeRegex.test(time)) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Time must be in HH:MM format',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    // Validate numGuests
-    const guests = Math.floor(Number(numGuests));
-    if (!Number.isFinite(guests) || guests < 1) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Number of guests must be at least 1',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
+    const guests = numGuests;
 
     const dining = await Dining.findById(diningId);
     if (!dining) {
