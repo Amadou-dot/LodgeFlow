@@ -1,9 +1,14 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
 import Breadcrumb from '@/components/Breadcrumb';
+import CabinAvailabilityPreview from '@/components/CabinAvailabilityPreview';
+import CabinBookingSteps from '@/components/CabinBookingSteps';
 import CabinDetails from '@/components/CabinDetails';
 import CabinGallery from '@/components/CabinGallery';
+import CabinTestimonials from '@/components/CabinTestimonials';
+import CabinTrustIndicators from '@/components/CabinTrustIndicators';
 import { useCabin } from '@/hooks/useCabin';
+import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
 import { Spinner } from '@heroui/spinner';
@@ -18,6 +23,7 @@ type Params = Promise<{
 export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
+  const { data: settings } = useSettings();
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
@@ -90,20 +96,38 @@ export default function Page({ params }: { params: Params }) {
         </Button>
       </div>
 
-      {/* Main Content - Two Row Layout */}
+      {/* Main Content */}
       <div className='space-y-8'>
         {/* Gallery - Full Width */}
         <CabinGallery
           images={[cabin.image, ...(cabin.images || [])].filter(Boolean)}
         />
 
+        {/* Trust Indicators */}
+        {settings?.cancellationPolicy && (
+          <CabinTrustIndicators
+            cancellationPolicy={
+              settings.cancellationPolicy as 'flexible' | 'moderate' | 'strict'
+            }
+          />
+        )}
+
         {/* Cabin Details - Full Width */}
         <div>
           <CabinDetails cabin={cabin} />
         </div>
 
-        {/* Booking Form - Full Width on Mobile, Centered on Desktop */}
-        <div className='lg:max-w-3xl lg:mx-auto'>
+        {/* Guest Testimonials */}
+        <CabinTestimonials />
+
+        {/* Availability Preview */}
+        <CabinAvailabilityPreview cabinId={cabinId} />
+
+        {/* How Booking Works */}
+        <CabinBookingSteps />
+
+        {/* Booking Form */}
+        <div className='lg:mx-auto lg:max-w-3xl'>
           <BookingForm
             userData={userData}
             cabin={{
