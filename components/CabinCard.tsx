@@ -9,6 +9,10 @@ interface CabinCardProps {
   cabin: Cabin;
 }
 
+function isPseudoPopular(cabinId: string): boolean {
+  return parseInt(cabinId.slice(-4), 16) % 10 < 3;
+}
+
 export default function CabinCard({ cabin }: CabinCardProps) {
   const discountedPrice =
     cabin.discount > 0 ? cabin.price - cabin.discount : cabin.price;
@@ -23,6 +27,16 @@ export default function CabinCard({ cabin }: CabinCardProps) {
             fill
             src={cabin.image}
           />
+          {isPseudoPopular(cabin._id.toString()) && (
+            <Chip
+              className='absolute top-2 left-2'
+              color='warning'
+              size='sm'
+              variant='solid'
+            >
+              Popular
+            </Chip>
+          )}
           {cabin.discount > 0 && (
             <Chip
               className='absolute top-2 right-2'
