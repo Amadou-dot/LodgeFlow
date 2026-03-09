@@ -6,6 +6,11 @@ import { calculateRefund } from '@/lib/cancellation';
 import { createRefund } from '@/lib/stripe';
 import { sendCancellationConfirmationEmail } from '@/lib/email';
 import type { ApiResponse, PopulatedBooking } from '@/types';
+import { updateBookingDetailsSchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 
 export async function GET(
   request: NextRequest,
@@ -67,6 +72,12 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    // Validate request body with Zod
+    const validation = validateRequest(updateBookingDetailsSchema, body);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
     // Find the booking
     const booking = await Booking.findById(id);
 
@@ -87,16 +98,6 @@ export async function PATCH(
       return NextResponse.json(response, { status: 403 });
     }
 
-    // Customers can only update certain fields
-    const allowedUpdates = ['numGuests', 'specialRequests', 'extras'];
-    const updates: any = {};
-
-    allowedUpdates.forEach(field => {
-      if (body[field] !== undefined) {
-        updates[field] = body[field];
-      }
-    });
-
     // Prevent modifications to checked-in/checked-out bookings
     if (booking.status === 'checked-in' || booking.status === 'checked-out') {
       const response: ApiResponse<never> = {
@@ -105,6 +106,8 @@ export async function PATCH(
       };
       return NextResponse.json(response, { status: 400 });
     }
+
+    const updates = validation.data;
 
     // Update the booking
     const updatedBooking = await Booking.findByIdAndUpdate(id, updates, {

@@ -1,21 +1,34 @@
 import { Booking, Cabin, connectDB, Settings } from '@/models';
-import type { ApiResponse, CreateBookingData, PopulatedBooking } from '@/types';
+import type { ApiResponse, PopulatedBooking } from '@/types';
 import { clerkClient } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { createBookingSchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
     const body = await request.json();
+
+    // Validate request body with Zod
+    const validation = validateRequest(createBookingSchema, body);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
     const {
-      cabinId: cabinId,
-      customerId: customerId,
+      cabinId,
+      customerId,
       checkInDate,
       checkOutDate,
       numGuests,
-      extras = {},
-      specialRequests = [],
-    } = body as CreateBookingData;
+      extras,
+      specialRequests,
+      observations,
+    } = validation.data;
 
     const client = await clerkClient();
     const user = await client.users.getUser(customerId);
@@ -28,31 +41,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 404 });
     }
 
-    // Validate required fields
-    if (
-      !cabinId ||
-      !customerId ||
-      !checkInDate ||
-      !checkOutDate ||
-      !numGuests
-    ) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Missing required fields',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
-
-    if (checkIn >= checkOut) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Check-out date must be after check-in date',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
 
     // Check if cabin exists and is active
     const cabin = await Cabin.findById(cabinId);
@@ -123,15 +113,15 @@ export async function POST(request: NextRequest) {
 
     let extrasPrice = 0;
     const bookingExtras = {
-      hasBreakfast: extras.hasBreakfast || false,
+      hasBreakfast: extras.hasBreakfast,
       breakfastPrice: 0,
-      hasPets: extras.hasPets || false,
+      hasPets: extras.hasPets,
       petFee: 0,
-      hasParking: extras.hasParking || false,
+      hasParking: extras.hasParking,
       parkingFee: 0,
-      hasEarlyCheckIn: extras.hasEarlyCheckIn || false,
+      hasEarlyCheckIn: extras.hasEarlyCheckIn,
       earlyCheckInFee: 0,
-      hasLateCheckOut: extras.hasLateCheckOut || false,
+      hasLateCheckOut: extras.hasLateCheckOut,
       lateCheckOutFee: 0,
     };
 
@@ -184,6 +174,7 @@ export async function POST(request: NextRequest) {
       paymentMethod: 'online',
       extras: bookingExtras,
       specialRequests,
+      observations,
       depositPaid: false,
       depositAmount,
     });
