@@ -199,6 +199,30 @@ export type ProcessedStripeEvent = IProcessedStripeEvent;
 export type { IBookingModel } from '@/models/Booking';
 export type { ISettingsModel } from '@/models/Settings';
 
+// Zod-validated input types (preferred for new code)
+export type {
+  CreateBookingInput,
+  PatchBookingInput,
+  UpdateBookingDetailsInput,
+} from '@/lib/validations/booking';
+export type {
+  CreateDiningReservationInput,
+  PatchDiningReservationInput,
+} from '@/lib/validations/dining-reservation';
+export type {
+  CreateExperienceBookingInput,
+  PatchExperienceBookingInput,
+} from '@/lib/validations/experience-booking';
+export type {
+  BookingQueryParams,
+  CabinQueryParams as CabinFilters,
+  DiningQueryParams as DiningFilters,
+  DiningReservationQueryParams,
+  ExperienceBookingQueryParams,
+  ExperienceQueryParams as ExperienceFilters,
+  PaginationParams,
+} from '@/lib/validations/query-params';
+
 // Cancellation and refund types
 export type CancellationPolicy = 'flexible' | 'moderate' | 'strict';
 export type RefundStatus =
