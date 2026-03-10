@@ -24,7 +24,7 @@ function isDateUnavailable(
 ): boolean {
   const ts = date.getTime();
   return ranges.some(
-    ({ end, start }) => ts >= parseLocalDate(start) && ts <= parseLocalDate(end)
+    ({ end, start }) => ts >= parseLocalDate(start) && ts < parseLocalDate(end)
   );
 }
 
