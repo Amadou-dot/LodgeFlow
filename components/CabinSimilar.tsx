@@ -3,6 +3,9 @@
 import CabinCard from '@/components/CabinCard';
 import { useCabins } from '@/hooks/useCabins';
 
+// Maximum number of similar cabins to display
+const SIMILAR_CABINS_LIMIT = 4;
+
 interface CabinSimilarProps {
   capacity: number;
   currentCabinId: string;
@@ -14,8 +17,7 @@ function LoadingSkeleton() {
       {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
-          className='w-64 shrink-0 animate-pulse rounded-2xl bg-default-200 lg:w-full'
-          style={{ height: '300px' }}
+          className='h-[300px] w-64 shrink-0 animate-pulse rounded-2xl bg-default-200 lg:w-full'
         />
       ))}
     </div>
@@ -26,13 +28,19 @@ export default function CabinSimilar({
   capacity,
   currentCabinId,
 }: CabinSimilarProps) {
-  const { data: cabins, isLoading } = useCabins({
+  // The API filters for capacity >= (capacity - 1), so results are approximate
+  // and may include a wider range than an exact ±1 capacity match.
+  const {
+    data: cabins,
+    isError,
+    isLoading,
+  } = useCabins({
     capacity: Math.max(1, capacity - 1),
   });
 
   const similarCabins = (cabins ?? [])
     .filter(cabin => cabin._id.toString() !== currentCabinId)
-    .slice(0, 4);
+    .slice(0, SIMILAR_CABINS_LIMIT);
 
   return (
     <div>
@@ -40,6 +48,8 @@ export default function CabinSimilar({
 
       {isLoading ? (
         <LoadingSkeleton />
+      ) : isError ? (
+        <p className='text-sm text-danger'>Unable to load similar cabins.</p>
       ) : similarCabins.length === 0 ? (
         <p className='text-foreground-500 text-sm'>
           No similar cabins available at this time.

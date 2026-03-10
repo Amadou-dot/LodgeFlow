@@ -13,6 +13,9 @@ interface CabinPricingCalculatorProps {
   price: number;
 }
 
+// Computed once at module load — does not change per render
+const todayDate = today(getLocalTimeZone());
+
 export default function CabinPricingCalculator({
   discount,
   price,
@@ -20,7 +23,6 @@ export default function CabinPricingCalculator({
   const [checkIn, setCheckIn] = useState<CalendarDate | null>(null);
   const [checkOut, setCheckOut] = useState<CalendarDate | null>(null);
 
-  const todayDate = today(getLocalTimeZone());
   const effectiveRate = price - discount;
   const hasDiscount = discount > 0;
 
@@ -43,15 +45,15 @@ export default function CabinPricingCalculator({
         <div className='flex items-center gap-2'>
           {hasDiscount && (
             <span className='text-sm text-default-400 line-through'>
-              ${price}/night
+              ${price.toFixed(2)}/night
             </span>
           )}
           <span className='text-xl font-bold text-success'>
-            ${effectiveRate}/night
+            ${effectiveRate.toFixed(2)}/night
           </span>
           {hasDiscount && (
-            <span className='text-sm text-green-600 font-semibold'>
-              Save ${discount}/night
+            <span className='font-semibold text-sm text-success'>
+              Save ${discount.toFixed(2)}/night
             </span>
           )}
         </div>
@@ -82,16 +84,16 @@ export default function CabinPricingCalculator({
             <div className='space-y-2'>
               <div className='flex items-center justify-between text-sm'>
                 <span>
-                  ${effectiveRate} &times; {validNights} night
+                  ${effectiveRate.toFixed(2)} &times; {validNights} night
                   {validNights > 1 ? 's' : ''}
                 </span>
-                <span>${effectiveRate * validNights}</span>
+                <span>${(effectiveRate * validNights).toFixed(2)}</span>
               </div>
 
               {savings !== null && savings > 0 && (
-                <div className='flex items-center justify-between rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-600 dark:bg-green-950'>
+                <div className='flex items-center justify-between rounded-lg bg-success-50 px-3 py-2 text-sm font-semibold text-success'>
                   <span>Savings</span>
-                  <span>-${savings}</span>
+                  <span>-${savings.toFixed(2)}</span>
                 </div>
               )}
 
@@ -99,7 +101,7 @@ export default function CabinPricingCalculator({
 
               <div className='flex items-center justify-between font-bold text-base'>
                 <span>Total</span>
-                <span className='text-success'>${totalPrice}</span>
+                <span className='text-success'>${totalPrice.toFixed(2)}</span>
               </div>
             </div>
           </>
