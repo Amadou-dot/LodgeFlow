@@ -6,11 +6,18 @@ import CabinBookingSteps from '@/components/CabinBookingSteps';
 import CabinDetails from '@/components/CabinDetails';
 import CabinGallery from '@/components/CabinGallery';
 import CabinMobileTabs from '@/components/CabinMobileTabs';
+import CabinTestimonials from '@/components/CabinTestimonials';
+import CabinTrustIndicators from '@/components/CabinTrustIndicators';
+import CabinPricingCalculator from '@/components/CabinPricingCalculator';
+import CabinShareButton from '@/components/CabinShareButton';
+import CabinSimilar from '@/components/CabinSimilar';
 import { useCabin } from '@/hooks/useCabin';
 import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
-import { ArrowLeft } from 'lucide-react';
+import { Skeleton } from '@heroui/skeleton';
+import { Tooltip } from '@heroui/tooltip';
+import { ArrowLeft, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -36,17 +43,20 @@ export default function Page({ params }: { params: Params }) {
 
   if (isLoading || !cabinId || !userLoaded) {
     return (
-      <div className='container mx-auto px-4 py-8 max-w-7xl'>
-        <div className='mb-6 h-6 w-48 rounded-lg bg-default-200 animate-pulse' />
-        <div className='mb-8 h-10 w-32 rounded-lg bg-default-200 animate-pulse' />
-        <div
-          className='w-full rounded-2xl bg-default-200 animate-pulse'
+      <div
+        className='container mx-auto px-4 py-8 max-w-7xl'
+        data-testid='page-loading-skeleton'
+      >
+        <Skeleton className='mb-6 h-6 w-48 rounded-lg' />
+        <Skeleton className='mb-8 h-10 w-32 rounded-lg' />
+        <Skeleton
+          className='w-full rounded-2xl'
           style={{ aspectRatio: '16 / 9', maxHeight: '520px' }}
         />
         <div className='mt-8 space-y-4'>
-          <div className='h-8 w-64 rounded-lg bg-default-200 animate-pulse' />
-          <div className='h-4 w-full rounded-lg bg-default-200 animate-pulse' />
-          <div className='h-4 w-3/4 rounded-lg bg-default-200 animate-pulse' />
+          <Skeleton className='h-8 w-64 rounded-lg' />
+          <Skeleton className='h-4 w-full rounded-lg' />
+          <Skeleton className='h-4 w-3/4 rounded-lg' />
         </div>
       </div>
     );
@@ -111,8 +121,22 @@ export default function Page({ params }: { params: Params }) {
           images={[cabin.image, ...(cabin.images || [])].filter(Boolean)}
         />
 
+        {/* Share and Wishlist row - always visible */}
+        <div className='flex gap-2'>
+          <CabinShareButton cabinName={cabin.name} />
+          <Tooltip content='Coming soon'>
+            <Button
+              aria-label='Add to wishlist (coming soon)'
+              isDisabled
+              variant='light'
+            >
+              <Heart size={18} />
+            </Button>
+          </Tooltip>
+        </div>
+
         {/* Mobile Layout: tabbed interface (< lg) */}
-        <div className='lg:hidden'>
+        <div className='lg:hidden' id='booking'>
           <CabinMobileTabs
             cabin={cabin}
             userData={userData}
@@ -129,8 +153,31 @@ export default function Page({ params }: { params: Params }) {
 
         {/* Desktop Layout: vertical stack (lg+) */}
         <div className='hidden lg:block space-y-8'>
+          {/* Trust Indicators */}
+          {settings?.cancellationPolicy ? (
+            <CabinTrustIndicators
+              cancellationPolicy={
+                settings.cancellationPolicy as
+                  | 'flexible'
+                  | 'moderate'
+                  | 'strict'
+              }
+            />
+          ) : settingsError ? (
+            <p className='text-sm text-foreground-400'>
+              Trust information temporarily unavailable.
+            </p>
+          ) : null}
+
           <CabinDetails cabin={cabin} />
-          <div className='lg:max-w-3xl lg:mx-auto'>
+
+          <CabinTestimonials />
+
+          <CabinAvailabilityPreview cabinId={cabinId} />
+
+          <CabinBookingSteps />
+
+          <div className='lg:max-w-3xl lg:mx-auto' id='booking'>
             <BookingForm
               userData={userData}
               cabin={{
@@ -144,6 +191,19 @@ export default function Page({ params }: { params: Params }) {
             />
           </div>
         </div>
+      </div>
+
+      {/* Price Calculator - mobile only (desktop has inline pricing in BookingForm) */}
+      <div className='mt-8 lg:hidden'>
+        <CabinPricingCalculator discount={cabin.discount} price={cabin.price} />
+      </div>
+
+      {/* Similar Cabins - visible on all screen sizes */}
+      <div className='mt-8'>
+        <CabinSimilar
+          capacity={cabin.capacity}
+          currentCabinId={cabin._id.toString()}
+        />
       </div>
     </div>
   );

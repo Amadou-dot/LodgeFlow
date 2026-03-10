@@ -62,6 +62,9 @@ All API routes return `ApiResponse<T>`:
 
 Tests live in `__tests__/` organized by feature (bookings, cabins, shared). Jest with React Testing Library. Framer-motion is mocked in `__tests__/__mocks__/`.
 
+- HeroUI components also need manual mocks in `__tests__/__mocks__/@heroui/` — add one per package (e.g. `skeleton.js`, `tooltip.js`)
+- Components that use React Query (`useX` hooks) must be mocked in page-level tests to avoid needing `QueryClientProvider`
+
 ### ESLint Rules
 
 - JSX props must be sorted alphabetically (`react/jsx-sort-props`)

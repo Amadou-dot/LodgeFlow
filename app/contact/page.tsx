@@ -4,9 +4,7 @@ import { Card, CardBody } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Input, Textarea } from '@heroui/input';
 import { Link } from '@heroui/link';
-const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse bg-default-200 ${className}`} />
-);
+import { Skeleton } from '@heroui/skeleton';
 import {
   Phone,
   Mail,

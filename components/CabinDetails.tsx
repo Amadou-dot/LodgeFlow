@@ -2,9 +2,7 @@
 
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Divider } from '@heroui/divider';
-const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse bg-default-200 ${className}`} />
-);
+import { Skeleton } from '@heroui/skeleton';
 import {
   Wifi,
   Utensils,

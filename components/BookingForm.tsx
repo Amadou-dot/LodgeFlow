@@ -1,6 +1,7 @@
 import { subtitle, title } from '@/components/primitives';
 import { useCreateBooking } from '@/hooks/useBooking';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useSettings } from '@/hooks/useSettings';
 import { CreateBookingData } from '@/types';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
@@ -61,8 +62,14 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
     null
   );
   const [numberOfGuests, setNumberOfGuests] = useState<string>('');
+  const [hasBreakfast, setHasBreakfast] = useState(false);
+  const [hasPets, setHasPets] = useState(false);
+  const [hasParking, setHasParking] = useState(false);
+  const [hasEarlyCheckIn, setHasEarlyCheckIn] = useState(false);
+  const [hasLateCheckOut, setHasLateCheckOut] = useState(false);
   const { isSignedIn, isLoaded, user } = useUser();
   const { mutate: createBooking } = useCreateBooking();
+  const { data: settings } = useSettings();
   const router = useRouter();
   const isMobile = useIsMobile();
 
@@ -176,9 +183,6 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   const discount = cabin?.discount || 0;
   const effectivePrice = regularPrice - discount;
   const hasDiscount = discount > 0;
-  const cabinImage =
-    cabin?.image ||
-    'https://images.unsplash.com/photo-1571896349842-33c89424de2d';
 
   const guestOptions = Array.from({ length: maxCapacity }, (_, i) => ({
     key: (i + 1).toString(),
@@ -189,13 +193,51 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
     if (!dateRange?.start || !dateRange?.end) return null;
     const startDate = new Date(dateRange.start.toString());
     const endDate = new Date(dateRange.end.toString());
-    const timeDiff = endDate.getTime() - startDate.getTime();
-    const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    const nights = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)
+    );
     if (nights <= 0) return null;
-    const subtotal = nights * effectivePrice;
+
+    const cabinSubtotal = nights * effectivePrice;
     const originalTotal = nights * regularPrice;
-    const totalSavings = hasDiscount ? originalTotal - subtotal : 0;
-    return { nights, subtotal, originalTotal, totalSavings };
+    const totalSavings = hasDiscount ? originalTotal - cabinSubtotal : 0;
+
+    const guests = parseInt(numberOfGuests, 10) || 1;
+    const breakfastFee =
+      hasBreakfast && settings?.breakfastPrice
+        ? settings.breakfastPrice * nights * guests
+        : 0;
+    const petFee = hasPets && settings?.petFee ? settings.petFee * nights : 0;
+    const parkingFee =
+      hasParking && settings?.parkingFee && !settings?.parkingIncluded
+        ? settings.parkingFee * nights
+        : 0;
+    const earlyCheckInFee =
+      hasEarlyCheckIn && settings?.earlyCheckInFee
+        ? settings.earlyCheckInFee
+        : 0;
+    const lateCheckOutFee =
+      hasLateCheckOut && settings?.lateCheckOutFee
+        ? settings.lateCheckOutFee
+        : 0;
+
+    const extrasTotal =
+      breakfastFee + petFee + parkingFee + earlyCheckInFee + lateCheckOutFee;
+    const grandTotal = cabinSubtotal + extrasTotal;
+
+    return {
+      breakfastFee,
+      cabinSubtotal,
+      earlyCheckInFee,
+      extrasTotal,
+      grandTotal,
+      lateCheckOutFee,
+      nights,
+      originalTotal,
+      parkingFee,
+      petFee,
+      totalSavings,
+    };
   };
 
   const totalInfo = calculateTotal();
@@ -233,6 +275,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
         <Form
           aria-label='Cabin booking form'
           className='space-y-4'
+          validationBehavior='native'
           onSubmit={handleSubmit}
         >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
@@ -320,20 +363,62 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
           </Select>
 
           <div className='grid md:grid-cols-2 gap-6'>
-            <Checkbox color='success' name='breakfast'>
+            <Checkbox
+              color='success'
+              isSelected={hasBreakfast}
+              name='breakfast'
+              onValueChange={setHasBreakfast}
+            >
               Would you like to add breakfast?
+              {settings?.breakfastPrice
+                ? ` (+$${settings.breakfastPrice}/person/night)`
+                : ''}
             </Checkbox>
-            <Checkbox color='success' name='pets'>
-              Will you be bringing a pet?
-            </Checkbox>
-            <Checkbox color='success' name='parking'>
-              Will you need parking?
-            </Checkbox>
-            <Checkbox color='success' name='early_checkin'>
+            {settings?.allowPets !== false && (
+              <Checkbox
+                color='success'
+                isSelected={hasPets}
+                name='pets'
+                onValueChange={setHasPets}
+              >
+                Will you be bringing a pet?
+                {settings?.petFee ? ` (+$${settings.petFee}/night)` : ''}
+              </Checkbox>
+            )}
+            {!settings?.parkingIncluded && (
+              <Checkbox
+                color='success'
+                isSelected={hasParking}
+                name='parking'
+                onValueChange={setHasParking}
+              >
+                Will you need parking?
+                {settings?.parkingFee
+                  ? ` (+$${settings.parkingFee}/night)`
+                  : ''}
+              </Checkbox>
+            )}
+            <Checkbox
+              color='success'
+              isSelected={hasEarlyCheckIn}
+              name='early_checkin'
+              onValueChange={setHasEarlyCheckIn}
+            >
               Will you check-in early?
+              {settings?.earlyCheckInFee
+                ? ` (+$${settings.earlyCheckInFee})`
+                : ''}
             </Checkbox>
-            <Checkbox color='success' name='late_checkout'>
+            <Checkbox
+              color='success'
+              isSelected={hasLateCheckOut}
+              name='late_checkout'
+              onValueChange={setHasLateCheckOut}
+            >
               Will you check-out late?
+              {settings?.lateCheckOutFee
+                ? ` (+$${settings.lateCheckOutFee})`
+                : ''}
             </Checkbox>
           </div>
 
@@ -363,7 +448,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
                       ${effectivePrice} × {totalInfo.nights} night
                       {totalInfo.nights > 1 ? 's' : ''}
                     </span>
-                    <span>${totalInfo.subtotal}</span>
+                    <span>${totalInfo.cabinSubtotal}</span>
                   </div>
                   {hasDiscount && totalInfo.totalSavings > 0 && (
                     <div className='flex justify-between items-center text-sm text-green-600 font-semibold bg-green-50 dark:bg-green-950 px-3 py-2 rounded-lg'>
@@ -371,10 +456,40 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
                       <span>-${totalInfo.totalSavings}</span>
                     </div>
                   )}
+                  {totalInfo.breakfastFee > 0 && (
+                    <div className='flex justify-between items-center text-sm'>
+                      <span>Breakfast</span>
+                      <span>+${totalInfo.breakfastFee}</span>
+                    </div>
+                  )}
+                  {totalInfo.petFee > 0 && (
+                    <div className='flex justify-between items-center text-sm'>
+                      <span>Pet fee</span>
+                      <span>+${totalInfo.petFee}</span>
+                    </div>
+                  )}
+                  {totalInfo.parkingFee > 0 && (
+                    <div className='flex justify-between items-center text-sm'>
+                      <span>Parking</span>
+                      <span>+${totalInfo.parkingFee}</span>
+                    </div>
+                  )}
+                  {totalInfo.earlyCheckInFee > 0 && (
+                    <div className='flex justify-between items-center text-sm'>
+                      <span>Early check-in</span>
+                      <span>+${totalInfo.earlyCheckInFee}</span>
+                    </div>
+                  )}
+                  {totalInfo.lateCheckOutFee > 0 && (
+                    <div className='flex justify-between items-center text-sm'>
+                      <span>Late check-out</span>
+                      <span>+${totalInfo.lateCheckOutFee}</span>
+                    </div>
+                  )}
                   <div className='flex justify-between items-center font-bold text-lg border-t pt-2'>
                     <span>Total (before taxes)</span>
                     <span className='text-green-600'>
-                      ${totalInfo.subtotal}
+                      ${totalInfo.grandTotal}
                     </span>
                   </div>
                   <p className='text-xs text-default-500'>
