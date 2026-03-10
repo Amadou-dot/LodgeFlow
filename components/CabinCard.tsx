@@ -9,8 +9,11 @@ interface CabinCardProps {
   cabin: Cabin;
 }
 
+/** TODO: Replace with real popularity metric (e.g., booking count in last 30 days) */
 function isPseudoPopular(cabinId: string): boolean {
-  return parseInt(cabinId.slice(-4), 16) % 10 < 3;
+  const value = parseInt(cabinId.slice(-4), 16);
+  if (Number.isNaN(value)) return false;
+  return value % 10 < 3;
 }
 
 export default function CabinCard({ cabin }: CabinCardProps) {

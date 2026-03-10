@@ -1,6 +1,7 @@
 'use client';
 import { useCabinAvailability } from '@/hooks/useCabinAvailability';
 import { Card, CardBody, CardHeader } from '@heroui/card';
+import { useState } from 'react';
 
 const Skeleton = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse bg-default-200 ${className}`} />
@@ -12,14 +13,18 @@ interface Props {
 
 const DAY_NAMES = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
+function parseLocalDate(dateStr: string): number {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).getTime();
+}
+
 function isDateUnavailable(
   date: Date,
   ranges: { start: string; end: string }[]
 ): boolean {
   const ts = date.getTime();
   return ranges.some(
-    ({ end, start }) =>
-      ts >= new Date(start).getTime() && ts <= new Date(end).getTime()
+    ({ end, start }) => ts >= parseLocalDate(start) && ts <= parseLocalDate(end)
   );
 }
 
@@ -85,8 +90,8 @@ function MonthCalendar({
 }
 
 export default function CabinAvailabilityPreview({ cabinId }: Props) {
-  const { data, isLoading } = useCabinAvailability(cabinId);
-  const now = new Date();
+  const { data, isError, isLoading } = useCabinAvailability(cabinId);
+  const [now] = useState(() => new Date());
 
   if (isLoading) {
     return (
@@ -98,6 +103,21 @@ export default function CabinAvailabilityPreview({ cabinId }: Props) {
           <div data-testid='availability-skeleton'>
             <Skeleton className='h-40 w-full rounded-lg' />
           </div>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card>
+        <CardHeader>
+          <h3 className='text-lg font-semibold'>Availability</h3>
+        </CardHeader>
+        <CardBody>
+          <p className='text-sm text-foreground-500'>
+            Unable to load availability. Please refresh the page to try again.
+          </p>
         </CardBody>
       </Card>
     );

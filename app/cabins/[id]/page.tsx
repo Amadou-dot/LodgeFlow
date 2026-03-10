@@ -23,7 +23,7 @@ type Params = Promise<{
 export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
-  const { data: settings } = useSettings();
+  const { data: settings, isError: settingsError } = useSettings();
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
@@ -104,13 +104,17 @@ export default function Page({ params }: { params: Params }) {
         />
 
         {/* Trust Indicators */}
-        {settings?.cancellationPolicy && (
+        {settings?.cancellationPolicy ? (
           <CabinTrustIndicators
             cancellationPolicy={
               settings.cancellationPolicy as 'flexible' | 'moderate' | 'strict'
             }
           />
-        )}
+        ) : settingsError ? (
+          <p className='text-sm text-foreground-400'>
+            Trust information temporarily unavailable.
+          </p>
+        ) : null}
 
         {/* Cabin Details - Full Width */}
         <div>

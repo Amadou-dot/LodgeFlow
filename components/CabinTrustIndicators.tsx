@@ -27,7 +27,9 @@ export default function CabinTrustIndicators({ cancellationPolicy }: Props) {
       title: 'Verified Host',
     },
     {
-      description: CANCELLATION_TEXT[cancellationPolicy],
+      description:
+        CANCELLATION_TEXT[cancellationPolicy] ??
+        'Contact us for cancellation details',
       icon: CalendarX,
       id: 'cancellation',
       title: 'Cancellation Policy',
