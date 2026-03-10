@@ -1,5 +1,6 @@
 import { subtitle, title } from '@/components/primitives';
 import { useCreateBooking } from '@/hooks/useBooking';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { CreateBookingData } from '@/types';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
@@ -63,6 +64,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
   const { isSignedIn, isLoaded, user } = useUser();
   const { mutate: createBooking } = useCreateBooking();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const { data: availabilityData, error: availabilityError } = useSWR<{
     success: boolean;
@@ -271,7 +273,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
           />
 
           <DateRangePicker
-            calendarWidth={400}
+            {...(isMobile ? {} : { calendarWidth: 400 })}
             isDateUnavailable={isDateUnavailable}
             isRequired
             label='Stay Duration'
@@ -279,7 +281,7 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
             name='booking_duration'
             showMonthAndYearPickers
             value={dateRange}
-            visibleMonths={2}
+            visibleMonths={isMobile ? 1 : 2}
             description={
               availabilityData?.success
                 ? 'Select your check-in and check-out dates. Unavailable dates are crossed out.'

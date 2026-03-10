@@ -106,217 +106,233 @@ function getAmenityIcon(amenity: string) {
   return null;
 }
 
-export default function CabinDetails({ cabin }: CabinDetailsProps) {
-  const { data: settings, isLoading: settingsLoading } = useSettings();
+export function CabinDescriptionSection({ cabin }: CabinDetailsProps) {
+  return (
+    <Card className='w-full'>
+      <CardHeader className='flex gap-3'>
+        <div className='flex flex-col w-full'>
+          <h2 className='text-2xl font-bold'>About this cabin</h2>
+        </div>
+      </CardHeader>
+      <Divider />
+      <CardBody>
+        <p className='text-default-700 text-base leading-relaxed'>
+          {cabin.description}
+        </p>
+      </CardBody>
+    </Card>
+  );
+}
+
+export function CabinAmenitiesSection({ cabin }: CabinDetailsProps) {
+  if (!cabin.amenities || cabin.amenities.length === 0) return null;
 
   return (
-    <div className='space-y-6'>
-      {/* Description Section */}
-      <Card className='w-full'>
-        <CardHeader className='flex gap-3'>
-          <div className='flex flex-col w-full'>
-            <h2 className='text-2xl font-bold'>About this cabin</h2>
-          </div>
-        </CardHeader>
-        <Divider />
-        <CardBody>
-          <p className='text-default-700 text-base leading-relaxed'>
-            {cabin.description}
+    <Card className='w-full'>
+      <CardHeader className='flex gap-3'>
+        <div className='flex flex-col w-full'>
+          <h2 className='text-2xl font-bold'>Amenities</h2>
+          <p className='text-small text-default-500'>
+            Everything you need for a comfortable stay
           </p>
-        </CardBody>
-      </Card>
+        </div>
+      </CardHeader>
+      <Divider />
+      <CardBody>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {cabin.amenities.map((amenity, index) => {
+            const Icon = getAmenityIcon(amenity);
 
-      {/* Amenities Section */}
-      {cabin.amenities && cabin.amenities.length > 0 && (
-        <Card className='w-full'>
-          <CardHeader className='flex gap-3'>
-            <div className='flex flex-col w-full'>
-              <h2 className='text-2xl font-bold'>Amenities</h2>
-              <p className='text-small text-default-500'>
-                Everything you need for a comfortable stay
+            return (
+              <div
+                key={index}
+                className='flex items-center gap-3 p-3 rounded-lg hover:bg-default-100 transition-colors'
+              >
+                {Icon ? (
+                  <Icon className='text-primary flex-shrink-0' size={24} />
+                ) : (
+                  <div className='w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0'>
+                    <span className='text-primary text-xs'>✓</span>
+                  </div>
+                )}
+                <span className='text-default-700'>{amenity}</span>
+              </div>
+            );
+          })}
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+export function CabinInfoSection({ cabin }: CabinDetailsProps) {
+  return (
+    <Card className='w-full'>
+      <CardHeader className='flex gap-3'>
+        <div className='flex flex-col w-full'>
+          <h2 className='text-2xl font-bold'>Cabin Information</h2>
+        </div>
+      </CardHeader>
+      <Divider />
+      <CardBody>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='flex items-center gap-3'>
+            <Users className='text-primary' size={24} />
+            <div>
+              <p className='text-sm text-default-500'>Maximum Capacity</p>
+              <p className='text-base font-semibold'>
+                {cabin.capacity} {cabin.capacity === 1 ? 'guest' : 'guests'}
               </p>
             </div>
-          </CardHeader>
-          <Divider />
-          <CardBody>
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-              {cabin.amenities.map((amenity, index) => {
-                const Icon = getAmenityIcon(amenity);
-
-                return (
-                  <div
-                    key={index}
-                    className='flex items-center gap-3 p-3 rounded-lg hover:bg-default-100 transition-colors'
-                  >
-                    {Icon ? (
-                      <Icon className='text-primary flex-shrink-0' size={24} />
-                    ) : (
-                      <div className='w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0'>
-                        <span className='text-primary text-xs'>✓</span>
-                      </div>
-                    )}
-                    <span className='text-default-700'>{amenity}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Cabin Information */}
-      <Card className='w-full'>
-        <CardHeader className='flex gap-3'>
-          <div className='flex flex-col w-full'>
-            <h2 className='text-2xl font-bold'>Cabin Information</h2>
           </div>
-        </CardHeader>
-        <Divider />
-        <CardBody>
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='flex items-center gap-3'>
+            <Bed className='text-primary' size={24} />
+            <div>
+              <p className='text-sm text-default-500'>
+                {cabin.bedrooms ? 'Bedrooms' : 'Accommodation'}
+              </p>
+              <p className='text-base font-semibold'>
+                {cabin.bedrooms ?? cabin.name}
+              </p>
+            </div>
+          </div>
+          {cabin.bathrooms && (
             <div className='flex items-center gap-3'>
-              <Users className='text-primary' size={24} />
+              <Bath className='text-primary' size={24} />
               <div>
-                <p className='text-sm text-default-500'>Maximum Capacity</p>
-                <p className='text-base font-semibold'>
-                  {cabin.capacity} {cabin.capacity === 1 ? 'guest' : 'guests'}
-                </p>
-              </div>
-            </div>
-            <div className='flex items-center gap-3'>
-              <Bed className='text-primary' size={24} />
-              <div>
-                <p className='text-sm text-default-500'>
-                  {cabin.bedrooms ? 'Bedrooms' : 'Accommodation'}
-                </p>
-                <p className='text-base font-semibold'>
-                  {cabin.bedrooms ?? cabin.name}
-                </p>
-              </div>
-            </div>
-            {cabin.bathrooms && (
-              <div className='flex items-center gap-3'>
-                <Bath className='text-primary' size={24} />
-                <div>
-                  <p className='text-sm text-default-500'>Bathrooms</p>
-                  <p className='text-base font-semibold'>{cabin.bathrooms}</p>
-                </div>
-              </div>
-            )}
-            {cabin.size && (
-              <div className='flex items-center gap-3'>
-                <Square className='text-primary' size={24} />
-                <div>
-                  <p className='text-sm text-default-500'>Size</p>
-                  <p className='text-base font-semibold'>{cabin.size} ft²</p>
-                </div>
-              </div>
-            )}
-            {cabin.minNights && (
-              <div className='flex items-center gap-3'>
-                <Moon className='text-primary' size={24} />
-                <div>
-                  <p className='text-sm text-default-500'>Minimum Stay</p>
-                  <p className='text-base font-semibold'>
-                    {cabin.minNights}{' '}
-                    {cabin.minNights === 1 ? 'night' : 'nights'}
-                  </p>
-                </div>
-              </div>
-            )}
-            {cabin.extraGuestFee != null && cabin.extraGuestFee > 0 && (
-              <div className='flex items-center gap-3'>
-                <DollarSign className='text-primary' size={24} />
-                <div>
-                  <p className='text-sm text-default-500'>Extra Guest Fee</p>
-                  <p className='text-base font-semibold'>
-                    ${cabin.extraGuestFee} per extra guest/night
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </CardBody>
-      </Card>
-
-      {/* House Rules */}
-      <Card className='w-full'>
-        <CardHeader className='flex gap-3'>
-          <div className='flex flex-col w-full'>
-            <h2 className='text-2xl font-bold'>House Rules</h2>
-          </div>
-        </CardHeader>
-        <Divider />
-        <CardBody>
-          {settingsLoading ? (
-            <div className='space-y-3'>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className='flex items-start gap-3'>
-                  <Skeleton className='w-5 h-5 rounded-full' />
-                  <div className='flex-1 space-y-1'>
-                    <Skeleton className='w-24 h-4 rounded' />
-                    <Skeleton className='w-48 h-3 rounded' />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className='space-y-3'>
-              <div className='flex items-start gap-3'>
-                <span className='text-primary text-lg'>✓</span>
-                <div>
-                  <p className='font-semibold'>Check-in</p>
-                  <p className='text-sm text-default-500'>
-                    After{' '}
-                    {settings ? formatTime(settings.checkInTime) : '3:00 PM'}
-                  </p>
-                </div>
-              </div>
-              <div className='flex items-start gap-3'>
-                <span className='text-primary text-lg'>✓</span>
-                <div>
-                  <p className='font-semibold'>Check-out</p>
-                  <p className='text-sm text-default-500'>
-                    Before{' '}
-                    {settings ? formatTime(settings.checkOutTime) : '11:00 AM'}
-                  </p>
-                </div>
-              </div>
-              <div className='flex items-start gap-3'>
-                <span className='text-primary text-lg'>✓</span>
-                <div>
-                  <p className='font-semibold'>Cancellation Policy</p>
-                  <p className='text-sm text-default-500'>
-                    {settings
-                      ? cancellationPolicyText[settings.cancellationPolicy]
-                      : 'Free cancellation up to 48 hours before check-in'}
-                  </p>
-                </div>
-              </div>
-              <div className='flex items-start gap-3'>
-                <span className='text-primary text-lg'>✓</span>
-                <div>
-                  <p className='font-semibold'>Quiet Hours</p>
-                  <p className='text-sm text-default-500'>10:00 PM - 8:00 AM</p>
-                </div>
-              </div>
-              <div className='flex items-start gap-3'>
-                <span className='text-primary text-lg'>✓</span>
-                <div>
-                  <p className='font-semibold'>Smoking</p>
-                  <p className='text-sm text-default-500'>
-                    {settings
-                      ? settings.smokingAllowed
-                        ? 'Smoking allowed'
-                        : 'No smoking inside the cabin'
-                      : 'No smoking inside the cabin'}
-                  </p>
-                </div>
+                <p className='text-sm text-default-500'>Bathrooms</p>
+                <p className='text-base font-semibold'>{cabin.bathrooms}</p>
               </div>
             </div>
           )}
-        </CardBody>
-      </Card>
+          {cabin.size && (
+            <div className='flex items-center gap-3'>
+              <Square className='text-primary' size={24} />
+              <div>
+                <p className='text-sm text-default-500'>Size</p>
+                <p className='text-base font-semibold'>{cabin.size} ft²</p>
+              </div>
+            </div>
+          )}
+          {cabin.minNights && (
+            <div className='flex items-center gap-3'>
+              <Moon className='text-primary' size={24} />
+              <div>
+                <p className='text-sm text-default-500'>Minimum Stay</p>
+                <p className='text-base font-semibold'>
+                  {cabin.minNights} {cabin.minNights === 1 ? 'night' : 'nights'}
+                </p>
+              </div>
+            </div>
+          )}
+          {cabin.extraGuestFee != null && cabin.extraGuestFee > 0 && (
+            <div className='flex items-center gap-3'>
+              <DollarSign className='text-primary' size={24} />
+              <div>
+                <p className='text-sm text-default-500'>Extra Guest Fee</p>
+                <p className='text-base font-semibold'>
+                  ${cabin.extraGuestFee} per extra guest/night
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+export function CabinHouseRulesSection() {
+  const { data: settings, isLoading: settingsLoading } = useSettings();
+
+  return (
+    <Card className='w-full'>
+      <CardHeader className='flex gap-3'>
+        <div className='flex flex-col w-full'>
+          <h2 className='text-2xl font-bold'>House Rules</h2>
+        </div>
+      </CardHeader>
+      <Divider />
+      <CardBody>
+        {settingsLoading ? (
+          <div className='space-y-3'>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className='flex items-start gap-3'>
+                <Skeleton className='w-5 h-5 rounded-full' />
+                <div className='flex-1 space-y-1'>
+                  <Skeleton className='w-24 h-4 rounded' />
+                  <Skeleton className='w-48 h-3 rounded' />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='space-y-3'>
+            <div className='flex items-start gap-3'>
+              <span className='text-primary text-lg'>✓</span>
+              <div>
+                <p className='font-semibold'>Check-in</p>
+                <p className='text-sm text-default-500'>
+                  After{' '}
+                  {settings ? formatTime(settings.checkInTime) : '3:00 PM'}
+                </p>
+              </div>
+            </div>
+            <div className='flex items-start gap-3'>
+              <span className='text-primary text-lg'>✓</span>
+              <div>
+                <p className='font-semibold'>Check-out</p>
+                <p className='text-sm text-default-500'>
+                  Before{' '}
+                  {settings ? formatTime(settings.checkOutTime) : '11:00 AM'}
+                </p>
+              </div>
+            </div>
+            <div className='flex items-start gap-3'>
+              <span className='text-primary text-lg'>✓</span>
+              <div>
+                <p className='font-semibold'>Cancellation Policy</p>
+                <p className='text-sm text-default-500'>
+                  {settings
+                    ? cancellationPolicyText[settings.cancellationPolicy]
+                    : 'Free cancellation up to 48 hours before check-in'}
+                </p>
+              </div>
+            </div>
+            <div className='flex items-start gap-3'>
+              <span className='text-primary text-lg'>✓</span>
+              <div>
+                <p className='font-semibold'>Quiet Hours</p>
+                <p className='text-sm text-default-500'>10:00 PM - 8:00 AM</p>
+              </div>
+            </div>
+            <div className='flex items-start gap-3'>
+              <span className='text-primary text-lg'>✓</span>
+              <div>
+                <p className='font-semibold'>Smoking</p>
+                <p className='text-sm text-default-500'>
+                  {settings
+                    ? settings.smokingAllowed
+                      ? 'Smoking allowed'
+                      : 'No smoking inside the cabin'
+                    : 'No smoking inside the cabin'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
+
+export default function CabinDetails({ cabin }: CabinDetailsProps) {
+  return (
+    <div className='space-y-6'>
+      <CabinDescriptionSection cabin={cabin} />
+      <CabinAmenitiesSection cabin={cabin} />
+      <CabinInfoSection cabin={cabin} />
+      <CabinHouseRulesSection />
     </div>
   );
 }

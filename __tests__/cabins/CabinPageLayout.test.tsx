@@ -65,6 +65,12 @@ jest.mock('@/components/CabinDetails', () => {
   };
 });
 
+jest.mock('@/components/CabinMobileTabs', () => {
+  return function MockCabinMobileTabs() {
+    return <div data-testid='cabin-mobile-tabs'>Mobile Tabs</div>;
+  };
+});
+
 jest.mock('@/components/Breadcrumb', () => {
   return function MockBreadcrumb({
     items,
@@ -174,9 +180,8 @@ describe('Enhanced Cabin Page - Issue #17', () => {
       error: null,
     });
 
-    render(<CabinPage params={mockParams} />);
-
-    expect(screen.getByText('Loading cabin details...')).toBeInTheDocument();
+    const { container } = render(<CabinPage params={mockParams} />);
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('shows error state when cabin fetch fails', async () => {
@@ -228,9 +233,8 @@ describe('Enhanced Cabin Page - Issue #17', () => {
       isLoaded: false,
     });
 
-    render(<CabinPage params={mockParams} />);
-
-    expect(screen.getByText('Loading cabin details...')).toBeInTheDocument();
+    const { container } = render(<CabinPage params={mockParams} />);
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('renders new social proof sections', async () => {

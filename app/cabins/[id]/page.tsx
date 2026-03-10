@@ -5,13 +5,11 @@ import CabinAvailabilityPreview from '@/components/CabinAvailabilityPreview';
 import CabinBookingSteps from '@/components/CabinBookingSteps';
 import CabinDetails from '@/components/CabinDetails';
 import CabinGallery from '@/components/CabinGallery';
-import CabinTestimonials from '@/components/CabinTestimonials';
-import CabinTrustIndicators from '@/components/CabinTrustIndicators';
+import CabinMobileTabs from '@/components/CabinMobileTabs';
 import { useCabin } from '@/hooks/useCabin';
 import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
-import { Spinner } from '@heroui/spinner';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -38,8 +36,18 @@ export default function Page({ params }: { params: Params }) {
 
   if (isLoading || !cabinId || !userLoaded) {
     return (
-      <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-        <Spinner label='Loading cabin details...' size='lg' />
+      <div className='container mx-auto px-4 py-8 max-w-7xl'>
+        <div className='mb-6 h-6 w-48 rounded-lg bg-default-200 animate-pulse' />
+        <div className='mb-8 h-10 w-32 rounded-lg bg-default-200 animate-pulse' />
+        <div
+          className='w-full rounded-2xl bg-default-200 animate-pulse'
+          style={{ aspectRatio: '16 / 9', maxHeight: '520px' }}
+        />
+        <div className='mt-8 space-y-4'>
+          <div className='h-8 w-64 rounded-lg bg-default-200 animate-pulse' />
+          <div className='h-4 w-full rounded-lg bg-default-200 animate-pulse' />
+          <div className='h-4 w-3/4 rounded-lg bg-default-200 animate-pulse' />
+        </div>
       </div>
     );
   }
@@ -98,43 +106,17 @@ export default function Page({ params }: { params: Params }) {
 
       {/* Main Content */}
       <div className='space-y-8'>
-        {/* Gallery - Full Width */}
+        {/* Gallery - always visible */}
         <CabinGallery
           images={[cabin.image, ...(cabin.images || [])].filter(Boolean)}
         />
 
-        {/* Trust Indicators */}
-        {settings?.cancellationPolicy ? (
-          <CabinTrustIndicators
-            cancellationPolicy={
-              settings.cancellationPolicy as 'flexible' | 'moderate' | 'strict'
-            }
-          />
-        ) : settingsError ? (
-          <p className='text-sm text-foreground-400'>
-            Trust information temporarily unavailable.
-          </p>
-        ) : null}
-
-        {/* Cabin Details - Full Width */}
-        <div>
-          <CabinDetails cabin={cabin} />
-        </div>
-
-        {/* Guest Testimonials */}
-        <CabinTestimonials />
-
-        {/* Availability Preview */}
-        <CabinAvailabilityPreview cabinId={cabinId} />
-
-        {/* How Booking Works */}
-        <CabinBookingSteps />
-
-        {/* Booking Form */}
-        <div className='lg:mx-auto lg:max-w-3xl'>
-          <BookingForm
+        {/* Mobile Layout: tabbed interface (< lg) */}
+        <div className='lg:hidden'>
+          <CabinMobileTabs
+            cabin={cabin}
             userData={userData}
-            cabin={{
+            bookingCabin={{
               _id: cabin._id.toString(),
               discount: cabin.discount,
               image: cabin.image,
@@ -143,6 +125,24 @@ export default function Page({ params }: { params: Params }) {
               regularPrice: cabin.price,
             }}
           />
+        </div>
+
+        {/* Desktop Layout: vertical stack (lg+) */}
+        <div className='hidden lg:block space-y-8'>
+          <CabinDetails cabin={cabin} />
+          <div className='lg:max-w-3xl lg:mx-auto'>
+            <BookingForm
+              userData={userData}
+              cabin={{
+                _id: cabin._id.toString(),
+                discount: cabin.discount,
+                image: cabin.image,
+                maxCapacity: cabin.capacity,
+                name: cabin.name,
+                regularPrice: cabin.price,
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
