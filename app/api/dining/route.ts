@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
+
 import { connectDB, Dining } from '@/models';
+import { diningQuerySchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 
 export async function GET(request: Request) {
   try {
@@ -7,43 +13,59 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
 
-    // Build query object based on search parameters
+    // Convert searchParams to object for validation
+    const queryParams = Object.fromEntries(searchParams.entries());
+
+    // Validate query parameters with Zod
+    const validation = validateRequest(diningQuerySchema, queryParams);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
+    const {
+      type,
+      mealType,
+      category,
+      minPrice,
+      maxPrice,
+      isPopular,
+      dietary,
+      search,
+    } = validation.data;
+
+    // Build query object based on validated parameters
     const query: any = { isAvailable: true };
 
-    if (searchParams.get('type')) {
-      query.type = searchParams.get('type');
+    if (type) {
+      query.type = type;
     }
 
-    if (searchParams.get('mealType')) {
-      query.mealType = searchParams.get('mealType');
+    if (mealType) {
+      query.mealType = mealType;
     }
 
-    if (searchParams.get('category')) {
-      query.category = searchParams.get('category');
+    if (category) {
+      query.category = category;
     }
 
-    if (searchParams.get('isPopular')) {
-      query.isPopular = searchParams.get('isPopular') === 'true';
+    if (isPopular !== undefined) {
+      query.isPopular = isPopular;
     }
 
     // Price range filtering
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
     if (minPrice || maxPrice) {
       query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+      if (minPrice) query.price.$gte = minPrice;
+      if (maxPrice) query.price.$lte = maxPrice;
     }
 
     // Dietary restrictions filtering
-    const dietary = searchParams.get('dietary');
     if (dietary) {
       const dietaryArray = dietary.split(',');
       query.dietary = { $in: dietaryArray };
     }
 
     // Text search functionality
-    const search = searchParams.get('search');
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },

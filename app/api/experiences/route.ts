@@ -1,18 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { connectDB, Experience } from '@/models';
 import type { ApiResponse, Experience as ExperienceType } from '@/types';
+import { experienceQuerySchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const difficulty = searchParams.get('difficulty');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
-    const isPopular = searchParams.get('isPopular');
-    const tags = searchParams.get('tags');
+
+    // Convert searchParams to object for validation
+    const queryParams = Object.fromEntries(searchParams.entries());
+
+    // Validate query parameters with Zod
+    const validation = validateRequest(experienceQuerySchema, queryParams);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
+    const { category, difficulty, minPrice, maxPrice, isPopular, tags } =
+      validation.data;
 
     // Build query
     const query: any = {};
@@ -27,12 +39,12 @@ export async function GET(request: NextRequest) {
 
     if (minPrice || maxPrice) {
       query.price = {};
-      if (minPrice) query.price.$gte = parseInt(minPrice);
-      if (maxPrice) query.price.$lte = parseInt(maxPrice);
+      if (minPrice) query.price.$gte = minPrice;
+      if (maxPrice) query.price.$lte = maxPrice;
     }
 
-    if (isPopular !== null) {
-      query.isPopular = isPopular === 'true';
+    if (isPopular !== undefined) {
+      query.isPopular = isPopular;
     }
 
     if (tags) {
