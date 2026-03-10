@@ -1,7 +1,5 @@
 'use client';
 
-import { Card, CardBody, CardHeader } from '@heroui/card';
-import { Skeleton } from '@heroui/skeleton';
 import CabinCard from '@/components/CabinCard';
 import { useCabins } from '@/hooks/useCabins';
 
@@ -14,17 +12,11 @@ function LoadingSkeleton() {
   return (
     <div className='flex gap-4 overflow-x-auto lg:grid lg:grid-cols-4 lg:overflow-visible'>
       {Array.from({ length: 3 }).map((_, i) => (
-        <Card key={i} className='w-64 shrink-0 lg:w-full'>
-          <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
-            <Skeleton className='h-48 w-full rounded-lg' />
-          </CardHeader>
-          <CardBody className='space-y-3 py-2'>
-            <Skeleton className='h-5 w-3/4 rounded-lg' />
-            <Skeleton className='h-4 w-full rounded-lg' />
-            <Skeleton className='h-4 w-2/3 rounded-lg' />
-            <Skeleton className='h-8 w-full rounded-lg' />
-          </CardBody>
-        </Card>
+        <div
+          key={i}
+          className='w-64 shrink-0 animate-pulse rounded-2xl bg-default-200 lg:w-full'
+          style={{ height: '300px' }}
+        />
       ))}
     </div>
   );
