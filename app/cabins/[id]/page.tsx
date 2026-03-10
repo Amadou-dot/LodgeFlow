@@ -131,7 +131,7 @@ export default function Page({ params }: { params: Params }) {
         </div>
 
         {/* Mobile Layout: tabbed interface (< lg) */}
-        <div className='lg:hidden'>
+        <div className='lg:hidden' id='booking'>
           <CabinMobileTabs
             cabin={cabin}
             userData={userData}

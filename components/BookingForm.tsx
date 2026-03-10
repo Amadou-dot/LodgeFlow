@@ -207,9 +207,11 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
       hasBreakfast && settings?.breakfastPrice
         ? settings.breakfastPrice * nights * guests
         : 0;
-    const petFee = hasPets && settings?.petFee ? settings.petFee : 0;
+    const petFee = hasPets && settings?.petFee ? settings.petFee * nights : 0;
     const parkingFee =
-      hasParking && settings?.parkingFee ? settings.parkingFee * nights : 0;
+      hasParking && settings?.parkingFee && !settings?.parkingIncluded
+        ? settings.parkingFee * nights
+        : 0;
     const earlyCheckInFee =
       hasEarlyCheckIn && settings?.earlyCheckInFee
         ? settings.earlyCheckInFee
@@ -380,18 +382,22 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
                 onValueChange={setHasPets}
               >
                 Will you be bringing a pet?
-                {settings?.petFee ? ` (+$${settings.petFee} flat fee)` : ''}
+                {settings?.petFee ? ` (+$${settings.petFee}/night)` : ''}
               </Checkbox>
             )}
-            <Checkbox
-              color='success'
-              isSelected={hasParking}
-              name='parking'
-              onValueChange={setHasParking}
-            >
-              Will you need parking?
-              {settings?.parkingFee ? ` (+$${settings.parkingFee}/night)` : ''}
-            </Checkbox>
+            {!settings?.parkingIncluded && (
+              <Checkbox
+                color='success'
+                isSelected={hasParking}
+                name='parking'
+                onValueChange={setHasParking}
+              >
+                Will you need parking?
+                {settings?.parkingFee
+                  ? ` (+$${settings.parkingFee}/night)`
+                  : ''}
+              </Checkbox>
+            )}
             <Checkbox
               color='success'
               isSelected={hasEarlyCheckIn}

@@ -49,7 +49,10 @@ export default function CabinPricingCalculator({
     hasBreakfast && settings?.breakfastPrice && validNights !== null
       ? settings.breakfastPrice * validNights
       : 0;
-  const petFee = hasPets && settings?.petFee ? settings.petFee : 0;
+  const petFee =
+    hasPets && settings?.petFee && validNights !== null
+      ? settings.petFee * validNights
+      : 0;
   const parkingFee =
     hasParking && settings?.parkingFee && validNights !== null
       ? settings.parkingFee * validNights
@@ -136,7 +139,7 @@ export default function CabinPricingCalculator({
                 onValueChange={setHasPets}
               >
                 Pets
-                {` (+$${settings.petFee} flat fee)`}
+                {` (+$${settings.petFee}/night)`}
               </Checkbox>
             )}
             {!settings?.parkingIncluded && settings?.parkingFee && (
