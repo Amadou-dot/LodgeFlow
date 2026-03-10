@@ -1,8 +1,6 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
 import Breadcrumb from '@/components/Breadcrumb';
-import CabinAvailabilityPreview from '@/components/CabinAvailabilityPreview';
-import CabinBookingSteps from '@/components/CabinBookingSteps';
 import CabinDetails from '@/components/CabinDetails';
 import CabinGallery from '@/components/CabinGallery';
 import CabinMobileTabs from '@/components/CabinMobileTabs';
@@ -13,7 +11,6 @@ import { useCabin } from '@/hooks/useCabin';
 import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
-import { Tooltip } from '@heroui/tooltip';
 import { ArrowLeft, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -118,11 +115,11 @@ export default function Page({ params }: { params: Params }) {
         {/* Share and Wishlist row - always visible */}
         <div className='flex gap-2'>
           <CabinShareButton cabinName={cabin.name} />
-          <Tooltip content='Coming soon'>
+          <span title='Coming soon'>
             <Button isDisabled variant='light'>
               <Heart size={18} />
             </Button>
-          </Tooltip>
+          </span>
         </div>
 
         {/* Mobile Layout: tabbed interface (< lg) */}
