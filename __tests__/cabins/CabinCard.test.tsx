@@ -83,4 +83,16 @@ describe('CabinCard', () => {
 
     expect(screen.queryByText('WiFi')).not.toBeInTheDocument();
   });
+
+  it('shows Popular badge for cabins that qualify', () => {
+    const popularCabin = { ...mockCabin, _id: '0000000000000000000000f0' }; // "00f0" → 240 % 10 = 0 → popular
+    render(<CabinCard cabin={popularCabin} />);
+    expect(screen.getByText('Popular')).toBeInTheDocument();
+  });
+
+  it('does not show Popular badge for non-qualifying cabins', () => {
+    const unpopularCabin = { ...mockCabin, _id: '000000000000000000000005' }; // "0005" → 5 % 10 = 5 → not popular
+    render(<CabinCard cabin={unpopularCabin} />);
+    expect(screen.queryByText('Popular')).not.toBeInTheDocument();
+  });
 });
