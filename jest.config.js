@@ -22,6 +22,9 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/$1',
     // Mock framer-motion for testing
     '^framer-motion$': '<rootDir>/__tests__/__mocks__/framer-motion.js',
+    // Mock HeroUI components that don't work in jsdom
+    '^@heroui/tooltip$': '<rootDir>/__tests__/__mocks__/@heroui/tooltip.js',
+    '^@heroui/skeleton$': '<rootDir>/__tests__/__mocks__/@heroui/skeleton.js',
   },
   collectCoverageFrom: [
     'components/**/*.{js,jsx,ts,tsx}',

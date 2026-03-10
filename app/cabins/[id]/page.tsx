@@ -15,6 +15,8 @@ import { useCabin } from '@/hooks/useCabin';
 import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
+import { Skeleton } from '@heroui/skeleton';
+import { Tooltip } from '@heroui/tooltip';
 import { ArrowLeft, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -41,17 +43,20 @@ export default function Page({ params }: { params: Params }) {
 
   if (isLoading || !cabinId || !userLoaded) {
     return (
-      <div className='container mx-auto px-4 py-8 max-w-7xl'>
-        <div className='mb-6 h-6 w-48 rounded-lg bg-default-200 animate-pulse' />
-        <div className='mb-8 h-10 w-32 rounded-lg bg-default-200 animate-pulse' />
-        <div
-          className='w-full rounded-2xl bg-default-200 animate-pulse'
+      <div
+        className='container mx-auto px-4 py-8 max-w-7xl'
+        data-testid='page-loading-skeleton'
+      >
+        <Skeleton className='mb-6 h-6 w-48 rounded-lg' />
+        <Skeleton className='mb-8 h-10 w-32 rounded-lg' />
+        <Skeleton
+          className='w-full rounded-2xl'
           style={{ aspectRatio: '16 / 9', maxHeight: '520px' }}
         />
         <div className='mt-8 space-y-4'>
-          <div className='h-8 w-64 rounded-lg bg-default-200 animate-pulse' />
-          <div className='h-4 w-full rounded-lg bg-default-200 animate-pulse' />
-          <div className='h-4 w-3/4 rounded-lg bg-default-200 animate-pulse' />
+          <Skeleton className='h-8 w-64 rounded-lg' />
+          <Skeleton className='h-4 w-full rounded-lg' />
+          <Skeleton className='h-4 w-3/4 rounded-lg' />
         </div>
       </div>
     );
@@ -119,7 +124,7 @@ export default function Page({ params }: { params: Params }) {
         {/* Share and Wishlist row - always visible */}
         <div className='flex gap-2'>
           <CabinShareButton cabinName={cabin.name} />
-          <span title='Coming soon'>
+          <Tooltip content='Coming soon'>
             <Button
               aria-label='Add to wishlist (coming soon)'
               isDisabled
@@ -127,7 +132,7 @@ export default function Page({ params }: { params: Params }) {
             >
               <Heart size={18} />
             </Button>
-          </span>
+          </Tooltip>
         </div>
 
         {/* Mobile Layout: tabbed interface (< lg) */}

@@ -199,7 +199,9 @@ describe('Enhanced Cabin Page - Issue #17', () => {
     });
 
     const { container } = render(<CabinPage params={mockParams} />);
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="page-loading-skeleton"]')
+    ).toBeInTheDocument();
   });
 
   it('shows error state when cabin fetch fails', async () => {
@@ -252,7 +254,9 @@ describe('Enhanced Cabin Page - Issue #17', () => {
     });
 
     const { container } = render(<CabinPage params={mockParams} />);
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="page-loading-skeleton"]')
+    ).toBeInTheDocument();
   });
 
   it('renders new social proof sections', async () => {

@@ -1,11 +1,8 @@
 'use client';
 import { useCabinAvailability } from '@/hooks/useCabinAvailability';
 import { Card, CardBody, CardHeader } from '@heroui/card';
+import { Skeleton } from '@heroui/skeleton';
 import { useState } from 'react';
-
-const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse bg-default-200 ${className}`} />
-);
 
 interface Props {
   cabinId: string;

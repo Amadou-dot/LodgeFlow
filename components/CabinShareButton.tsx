@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@heroui/button';
+import { Tooltip } from '@heroui/tooltip';
 import { Share2 } from 'lucide-react';
 
 interface CabinShareButtonProps {
@@ -35,13 +36,17 @@ export default function CabinShareButton({ cabinName }: CabinShareButtonProps) {
   };
 
   return (
-    <Button
-      aria-label={copied ? 'Link copied to clipboard' : 'Share this cabin'}
-      startContent={<Share2 className='h-4 w-4' />}
-      variant='flat'
-      onPress={handleShare}
+    <Tooltip
+      content={copied ? 'Link copied to clipboard!' : 'Share this cabin'}
     >
-      {copied ? 'Link Copied!' : 'Share'}
-    </Button>
+      <Button
+        aria-label={copied ? 'Link copied to clipboard' : 'Share this cabin'}
+        startContent={<Share2 className='h-4 w-4' />}
+        variant='flat'
+        onPress={handleShare}
+      >
+        {copied ? 'Link Copied!' : 'Share'}
+      </Button>
+    </Tooltip>
   );
 }
