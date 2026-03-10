@@ -1,10 +1,13 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
 import Breadcrumb from '@/components/Breadcrumb';
+import CabinAvailabilityPreview from '@/components/CabinAvailabilityPreview';
+import CabinBookingSteps from '@/components/CabinBookingSteps';
 import CabinDetails from '@/components/CabinDetails';
 import CabinGallery from '@/components/CabinGallery';
 import CabinMobileTabs from '@/components/CabinMobileTabs';
 import { useCabin } from '@/hooks/useCabin';
+import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -18,6 +21,7 @@ type Params = Promise<{
 export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
+  const { data: settings, isError: settingsError } = useSettings();
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 

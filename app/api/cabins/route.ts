@@ -1,29 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { connectDB, Cabin } from '@/models';
 import type { ApiResponse, Cabin as CabinType } from '@/types';
+import { cabinQuerySchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const capacity = searchParams.get('capacity');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
-    const available = searchParams.get('available');
-    const search = searchParams.get('search');
+
+    // Convert searchParams to object for validation
+    const queryParams = Object.fromEntries(searchParams.entries());
+
+    // Validate query parameters with Zod
+    const validation = validateRequest(cabinQuerySchema, queryParams);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
+    const { capacity, minPrice, maxPrice, search } = validation.data;
 
     // Build query — only show active cabins to guests
     const query: any = { status: 'active' };
 
     if (capacity) {
-      query.capacity = { $gte: parseInt(capacity) };
+      query.capacity = { $gte: capacity };
     }
 
     if (minPrice || maxPrice) {
       query.price = {};
-      if (minPrice) query.price.$gte = parseInt(minPrice);
-      if (maxPrice) query.price.$lte = parseInt(maxPrice);
+      if (minPrice) query.price.$gte = minPrice;
+      if (maxPrice) query.price.$lte = maxPrice;
     }
 
     // Text search functionality

@@ -2,7 +2,12 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { connectDB, Experience, ExperienceBooking } from '@/models';
-import type { ApiResponse, CreateExperienceBookingData } from '@/types';
+import type { ApiResponse } from '@/types';
+import { createExperienceBookingSchema } from '@/lib/validations';
+import {
+  validateRequest,
+  validationErrorResponse,
+} from '@/lib/validations/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,51 +22,25 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const body = (await request.json()) as CreateExperienceBookingData;
+    const body = await request.json();
+
+    // Validate request body with Zod
+    const validation = validateRequest(createExperienceBookingSchema, body);
+    if (!validation.success) {
+      return validationErrorResponse(validation.error);
+    }
+
     const {
       experienceId,
       date,
       timeSlot,
       numParticipants,
-      specialRequests = [],
+      specialRequests,
       observations,
-    } = body;
+    } = validation.data;
 
-    if (!experienceId || !date || !numParticipants) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Missing required fields',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    // Validate date
     const bookingDate = new Date(date);
-    if (isNaN(bookingDate.getTime())) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Invalid date',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    if (bookingDate < new Date()) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Cannot book a date in the past',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
-
-    // Validate numParticipants
-    const participants = Math.floor(Number(numParticipants));
-    if (!Number.isFinite(participants) || participants < 1) {
-      const response: ApiResponse<never> = {
-        success: false,
-        error: 'Number of participants must be at least 1',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
+    const participants = numParticipants;
 
     const experience = await Experience.findById(experienceId);
     if (!experience) {

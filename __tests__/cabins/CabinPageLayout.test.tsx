@@ -14,6 +14,45 @@ jest.mock('@clerk/nextjs', () => ({
   useUser: jest.fn(),
 }));
 
+jest.mock('@/hooks/useSettings', () => ({
+  useSettings: jest.fn(() => ({
+    data: { cancellationPolicy: 'moderate' },
+    isLoading: false,
+  })),
+}));
+
+jest.mock(
+  '@/components/CabinTrustIndicators',
+  () =>
+    function MockCabinTrustIndicators() {
+      return <div data-testid='cabin-trust-indicators'>Trust Indicators</div>;
+    }
+);
+
+jest.mock(
+  '@/components/CabinTestimonials',
+  () =>
+    function MockCabinTestimonials() {
+      return <div data-testid='cabin-testimonials'>Testimonials</div>;
+    }
+);
+
+jest.mock(
+  '@/components/CabinAvailabilityPreview',
+  () =>
+    function MockCabinAvailabilityPreview() {
+      return <div data-testid='cabin-availability-preview'>Availability</div>;
+    }
+);
+
+jest.mock(
+  '@/components/CabinBookingSteps',
+  () =>
+    function MockCabinBookingSteps() {
+      return <div data-testid='cabin-booking-steps'>Booking Steps</div>;
+    }
+);
+
 jest.mock('@/components/BookingForm', () => {
   return function MockBookingForm() {
     return <div data-testid='booking-form'>Booking Form</div>;
@@ -196,5 +235,17 @@ describe('Enhanced Cabin Page - Issue #17', () => {
 
     const { container } = render(<CabinPage params={mockParams} />);
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+  });
+
+  it('renders new social proof sections', async () => {
+    render(<CabinPage params={mockParams} />);
+    expect(
+      await screen.findByTestId('cabin-trust-indicators')
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('cabin-testimonials')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('cabin-availability-preview')
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('cabin-booking-steps')).toBeInTheDocument();
   });
 });
