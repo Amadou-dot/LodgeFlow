@@ -8,7 +8,6 @@ import CabinPricingCalculator from '@/components/CabinPricingCalculator';
 import CabinShareButton from '@/components/CabinShareButton';
 import CabinSimilar from '@/components/CabinSimilar';
 import { useCabin } from '@/hooks/useCabin';
-import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
 import { ArrowLeft, Heart } from 'lucide-react';
@@ -22,7 +21,6 @@ type Params = Promise<{
 export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
-  const { data: settings, isError: settingsError } = useSettings();
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
@@ -116,7 +114,11 @@ export default function Page({ params }: { params: Params }) {
         <div className='flex gap-2'>
           <CabinShareButton cabinName={cabin.name} />
           <span title='Coming soon'>
-            <Button isDisabled variant='light'>
+            <Button
+              aria-label='Add to wishlist (coming soon)'
+              isDisabled
+              variant='light'
+            >
               <Heart size={18} />
             </Button>
           </span>
@@ -159,7 +161,6 @@ export default function Page({ params }: { params: Params }) {
 
       {/* Price Calculator - visible on all screen sizes */}
       <div className='mt-8'>
-        <h2 className='text-2xl font-semibold mb-4'>Price Calculator</h2>
         <CabinPricingCalculator discount={cabin.discount} price={cabin.price} />
       </div>
 

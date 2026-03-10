@@ -14,7 +14,7 @@ interface CabinSimilarProps {
 function LoadingSkeleton() {
   return (
     <div className='flex gap-4 overflow-x-auto lg:grid lg:grid-cols-4 lg:overflow-visible'>
-      {Array.from({ length: 3 }).map((_, i) => (
+      {Array.from({ length: SIMILAR_CABINS_LIMIT }).map((_, i) => (
         <div
           key={i}
           className='h-[300px] w-64 shrink-0 animate-pulse rounded-2xl bg-default-200 lg:w-full'
