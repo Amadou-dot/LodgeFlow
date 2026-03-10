@@ -57,7 +57,10 @@ export default function CabinSimilar({
       ) : (
         <div className='flex gap-4 overflow-x-auto lg:grid lg:grid-cols-4 lg:overflow-visible'>
           {similarCabins.map(cabin => (
-            <div key={cabin._id.toString()} className='w-64 shrink-0 lg:w-full'>
+            <div
+              key={cabin._id.toString()}
+              className='w-64 shrink-0 lg:w-full lg:h-full'
+            >
               <CabinCard cabin={cabin} />
             </div>
           ))}

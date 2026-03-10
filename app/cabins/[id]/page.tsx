@@ -188,8 +188,8 @@ export default function Page({ params }: { params: Params }) {
         </div>
       </div>
 
-      {/* Price Calculator - visible on all screen sizes */}
-      <div className='mt-8'>
+      {/* Price Calculator - mobile only (desktop has inline pricing in BookingForm) */}
+      <div className='mt-8 lg:hidden'>
         <CabinPricingCalculator discount={cabin.discount} price={cabin.price} />
       </div>
 

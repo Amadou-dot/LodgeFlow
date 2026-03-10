@@ -21,7 +21,7 @@ export default function CabinCard({ cabin }: CabinCardProps) {
     cabin.discount > 0 ? cabin.price - cabin.discount : cabin.price;
 
   return (
-    <Card className='w-full'>
+    <Card className='w-full h-full'>
       <CardHeader className='pb-0 pt-2 px-4 flex-col items-start'>
         <div className='relative w-full h-48 mb-2'>
           <Image
