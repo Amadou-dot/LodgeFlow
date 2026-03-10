@@ -372,15 +372,17 @@ export default function BookingForm({ cabin, userData }: BookingFormProps) {
                 ? ` (+$${settings.breakfastPrice}/person/night)`
                 : ''}
             </Checkbox>
-            <Checkbox
-              color='success'
-              isSelected={hasPets}
-              name='pets'
-              onValueChange={setHasPets}
-            >
-              Will you be bringing a pet?
-              {settings?.petFee ? ` (+$${settings.petFee} flat fee)` : ''}
-            </Checkbox>
+            {settings?.allowPets !== false && (
+              <Checkbox
+                color='success'
+                isSelected={hasPets}
+                name='pets'
+                onValueChange={setHasPets}
+              >
+                Will you be bringing a pet?
+                {settings?.petFee ? ` (+$${settings.petFee} flat fee)` : ''}
+              </Checkbox>
+            )}
             <Checkbox
               color='success'
               isSelected={hasParking}
