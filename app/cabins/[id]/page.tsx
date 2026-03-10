@@ -1,13 +1,18 @@
 'use client';
 import BookingForm from '@/components/BookingForm';
 import Breadcrumb from '@/components/Breadcrumb';
+import CabinAvailabilityPreview from '@/components/CabinAvailabilityPreview';
+import CabinBookingSteps from '@/components/CabinBookingSteps';
 import CabinDetails from '@/components/CabinDetails';
 import CabinGallery from '@/components/CabinGallery';
 import CabinMobileTabs from '@/components/CabinMobileTabs';
+import CabinTestimonials from '@/components/CabinTestimonials';
+import CabinTrustIndicators from '@/components/CabinTrustIndicators';
 import CabinPricingCalculator from '@/components/CabinPricingCalculator';
 import CabinShareButton from '@/components/CabinShareButton';
 import CabinSimilar from '@/components/CabinSimilar';
 import { useCabin } from '@/hooks/useCabin';
+import { useSettings } from '@/hooks/useSettings';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@heroui/button';
 import { ArrowLeft, Heart } from 'lucide-react';
@@ -21,6 +26,7 @@ type Params = Promise<{
 export default function Page({ params }: { params: Params }) {
   const [cabinId, setCabinId] = useState<string>('');
   const { data: cabin, isLoading, error } = useCabin(cabinId);
+  const { data: settings, isError: settingsError } = useSettings();
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
@@ -142,7 +148,30 @@ export default function Page({ params }: { params: Params }) {
 
         {/* Desktop Layout: vertical stack (lg+) */}
         <div className='hidden lg:block space-y-8'>
+          {/* Trust Indicators */}
+          {settings?.cancellationPolicy ? (
+            <CabinTrustIndicators
+              cancellationPolicy={
+                settings.cancellationPolicy as
+                  | 'flexible'
+                  | 'moderate'
+                  | 'strict'
+              }
+            />
+          ) : settingsError ? (
+            <p className='text-sm text-foreground-400'>
+              Trust information temporarily unavailable.
+            </p>
+          ) : null}
+
           <CabinDetails cabin={cabin} />
+
+          <CabinTestimonials />
+
+          <CabinAvailabilityPreview cabinId={cabinId} />
+
+          <CabinBookingSteps />
+
           <div className='lg:max-w-3xl lg:mx-auto' id='booking'>
             <BookingForm
               userData={userData}

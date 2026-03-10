@@ -59,6 +59,24 @@ jest.mock('@/components/BookingForm', () => {
   };
 });
 
+jest.mock('@/components/CabinSimilar', () => {
+  return function MockCabinSimilar() {
+    return <div data-testid='cabin-similar'>Similar Cabins</div>;
+  };
+});
+
+jest.mock('@/components/CabinShareButton', () => {
+  return function MockCabinShareButton() {
+    return <button data-testid='cabin-share-button'>Share</button>;
+  };
+});
+
+jest.mock('@/components/CabinPricingCalculator', () => {
+  return function MockCabinPricingCalculator() {
+    return <div data-testid='cabin-pricing-calculator'>Pricing Calculator</div>;
+  };
+});
+
 jest.mock('@/components/CabinDetails', () => {
   return function MockCabinDetails() {
     return <div data-testid='cabin-details'>Cabin Details</div>;
