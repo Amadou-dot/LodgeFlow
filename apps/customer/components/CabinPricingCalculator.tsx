@@ -91,7 +91,7 @@ export default function CabinPricingCalculator({
   };
 
   const title = (
-    <div className='flex items-center gap-2'>
+    <div className='flex flex-wrap items-center gap-2'>
       <span className='text-base font-bold'>Price Calculator</span>
       {hasDiscount && (
         <span className='text-sm text-default-400 line-through'>

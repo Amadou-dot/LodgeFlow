@@ -64,6 +64,15 @@ jest.mock('@heroui/date-picker', () => {
   };
 });
 
+test('allows the discounted nightly rates and savings to wrap in the calculator heading', () => {
+  render(<CabinPricingCalculator discount={50} price={450} />);
+  const heading = screen.getByText('Price Calculator').parentElement;
+  expect(heading).toHaveClass('flex-wrap');
+  expect(heading).toContainElement(screen.getByText('$450.00/night'));
+  expect(heading).toContainElement(screen.getByText('$400.00/night'));
+  expect(heading).toContainElement(screen.getByText('Save $50.00/night'));
+});
+
 test('preview retains fixed ungrouped strings, fractional price arithmetic and per-night extras', () => {
   render(<CabinPricingCalculator discount={1} price={1001.005} />);
   expect(screen.getByText('$1000.00/night')).toBeInTheDocument();
