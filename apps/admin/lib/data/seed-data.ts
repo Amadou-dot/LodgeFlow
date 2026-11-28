@@ -205,15 +205,13 @@ export const cabinData = [
   },
   {
     name: 'Treetop Hideaway',
-    image:
-      'https://images.unsplash.com/photo-1751834410723-b0dd9afe6237?w=400&h=300&auto=format&fit=crop',
-    images: [],
+    ...cabinGalleryImages('Treetop Hideaway'),
     status: 'active' as const,
     capacity: 2,
     price: 320,
     discount: 20,
     description:
-      'Unique elevated cabin among the treetops for an unforgettable canopy experience.',
+      'Cross the plank suspension bridge and the fir branches come level with the windows. This cedar hideaway has one bedroom for two, with a round porthole beside the bed. Make coffee in the little green kitchenette, then take the binoculars out to the deck to watch for birds. From the trail below, you can look back through the sword ferns and see the cabin tucked between the trunks.',
     amenities: [
       'WiFi',
       'Kitchenette',
