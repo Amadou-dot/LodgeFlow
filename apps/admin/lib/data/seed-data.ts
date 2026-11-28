@@ -54,18 +54,13 @@ export const cabinData = [
   },
   {
     name: 'Mountain View Lodge',
-    image:
-      'https://images.unsplash.com/photo-1661285129351-2ccc4133dbc0?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&h=300&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Mountain View Lodge'),
     status: 'active' as const,
     capacity: 8,
     price: 450,
     discount: 50,
     description:
-      'Luxury lodge with panoramic mountain views and premium furnishings.',
+      'Watch the morning light move along the ridgeline from the king bedroom’s corner windows. The stone hearth opens onto the adjoining sitting and dining areas, where a long walnut table brings everyone together for supper. Two queen rooms and a twin room give the lodge space for eight. Downstairs, chalk a cue for a game of pool, warm up in the timber-lined sauna, or step out to the terrace Jacuzzi above the aspens.',
     amenities: [
       'WiFi',
       'Full Kitchen',
@@ -73,6 +68,8 @@ export const cabinData = [
       'Sauna',
       'Game Room',
       'Panoramic Views',
+      'Fireplace',
+      'Pool Table',
     ],
     bedrooms: 4,
     bathrooms: 3,

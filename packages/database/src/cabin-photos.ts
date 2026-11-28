@@ -5,6 +5,7 @@ import { forestEdgeCabinPhotos } from './cabin-galleries/forest-edge-cabin';
 import { glacierViewChaletPhotos } from './cabin-galleries/glacier-view-chalet';
 import { lakesideHavenPhotos } from './cabin-galleries/lakeside-haven';
 import { meadowBrookCottagePhotos } from './cabin-galleries/meadow-brook-cottage';
+import { mountainViewLodgePhotos } from './cabin-galleries/mountain-view-lodge';
 import { pineValleyCabinPhotos } from './cabin-galleries/pine-valley-cabin';
 import { riversideEscapePhotos } from './cabin-galleries/riverside-escape';
 import { sunsetRetreatPhotos } from './cabin-galleries/sunset-retreat';
@@ -19,6 +20,7 @@ export const cabinPhotoGalleries = {
   'Glacier View Chalet': glacierViewChaletPhotos,
   'Lakeside Haven': lakesideHavenPhotos,
   'Meadow Brook Cottage': meadowBrookCottagePhotos,
+  'Mountain View Lodge': mountainViewLodgePhotos,
   'Pine Valley Cabin': pineValleyCabinPhotos,
   'Riverside Escape': riversideEscapePhotos,
   'Sunset Retreat': sunsetRetreatPhotos,
