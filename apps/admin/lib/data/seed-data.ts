@@ -105,17 +105,13 @@ export const cabinData = [
   },
   {
     name: 'Sunset Retreat',
-    image:
-      'https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Sunset Retreat'),
     status: 'active' as const,
     capacity: 5,
     price: 300,
     discount: 30,
     description:
-      'Watch spectacular sunsets from this elevated cabin with wrap-around deck.',
+      'Follow the evening light from the picture window out onto the wraparound cedar deck. The hot tub sits at the corner with a view down the ridge, and the telescope is ready for clear nights. Inside, the kitchen opens onto a dining table beside the glass doors. A queen bedroom and a twin-over-full bunk room sleep five, with two bathrooms to share.',
     amenities: [
       'WiFi',
       'Kitchen',
