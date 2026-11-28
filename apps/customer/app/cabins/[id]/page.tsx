@@ -22,7 +22,7 @@ export async function generateMetadata({
       robots: { index: false, follow: false },
     };
   }
-  const url = `/cabins/${id}`;
+  const url = `/cabins/${cabin._id}`;
   const effectivePrice = Math.max(0, cabin.price - (cabin.discount ?? 0));
   const title = `${cabin.name} — $${effectivePrice}/night`;
   const description = cabin.description.slice(0, 160);

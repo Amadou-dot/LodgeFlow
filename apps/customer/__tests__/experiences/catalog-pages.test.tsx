@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { Experience } from '@/types';
-import ExperiencePage from '@/app/experiences/[id]/page';
+import ExperiencePage from '@/components/ExperienceDetailClient';
 import ExperienceBookPage from '@/app/experiences/[id]/book/page';
 
 let mockExperience: Experience;
@@ -29,30 +29,42 @@ const fixture: Experience = {
 };
 
 test.each([
-  { name: 'detail', Page: ExperiencePage, title: 'Forest walk' },
-  { name: 'booking', Page: ExperienceBookPage, title: 'Book: Forest walk' },
+  { name: 'detail', title: 'Forest walk' },
+  { name: 'booking', title: 'Book: Forest walk' },
 ])(
   '$name renders populated includes without changing booking identity',
-  async ({ Page, title }) => {
+  async ({ name, title }) => {
     mockExperience = {
       ...fixture,
       includes: ['Local guide'],
       available: ['Monday'],
     };
-    render(<Page params={Promise.resolve({ id: fixture._id })} />);
+    render(
+      name === 'detail' ? (
+        <ExperiencePage initialExperience={mockExperience} />
+      ) : (
+        <ExperienceBookPage params={Promise.resolve({ id: fixture._id })} />
+      )
+    );
     expect(await screen.findByText(title)).toBeInTheDocument();
     expect(screen.getByText(/Local guide/)).toBeInTheDocument();
   }
 );
 
 test.each([
-  { name: 'detail', Page: ExperiencePage, title: 'Forest walk' },
-  { name: 'booking', Page: ExperienceBookPage, title: 'Book: Forest walk' },
+  { name: 'detail', title: 'Forest walk' },
+  { name: 'booking', title: 'Book: Forest walk' },
 ])(
   '$name renders sparse legacy catalogs without defaulted arrays',
-  async ({ Page, title }) => {
+  async ({ name, title }) => {
     mockExperience = fixture;
-    render(<Page params={Promise.resolve({ id: fixture._id })} />);
+    render(
+      name === 'detail' ? (
+        <ExperiencePage initialExperience={mockExperience} />
+      ) : (
+        <ExperienceBookPage params={Promise.resolve({ id: fixture._id })} />
+      )
+    );
     expect(await screen.findByText(title)).toBeInTheDocument();
     expect(screen.queryByText(/Local guide/)).not.toBeInTheDocument();
   }
@@ -63,7 +75,7 @@ test('detail renders only the usable images in a legacy gallery', async () => {
     ...fixture,
     gallery: [null, '/images/trail.jpg', ''],
   };
-  render(<ExperiencePage params={Promise.resolve({ id: fixture._id })} />);
+  render(<ExperiencePage initialExperience={mockExperience} />);
   expect(await screen.findByText('Forest walk')).toBeInTheDocument();
   expect(screen.getAllByAltText(/Forest walk gallery/)).toHaveLength(1);
 });

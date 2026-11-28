@@ -229,14 +229,22 @@ describe('cabin catalog characterization', () => {
     expect(mockSort).toHaveBeenCalledWith({ price: 1 });
   });
 
-  test('server loaders preserve missing/error fallbacks', async () => {
+  test('server loaders preserve missing records and the listing error fallback', async () => {
     mockFindById.mockResolvedValueOnce(null);
-    expect(await getCabinById(cabinId)).toBeNull();
-    mockFindById.mockRejectedValueOnce(new Error('private database details'));
     expect(await getCabinById(cabinId)).toBeNull();
     mockSort.mockRejectedValueOnce(new Error('private database details'));
     expect(await getAllActiveCabinsForListing()).toEqual([]);
   });
+
+  test.each(['connection', 'query'])(
+    'server detail propagates a %s failure instead of producing a false 404',
+    async source => {
+      const failure = new Error('database unavailable');
+      if (source === 'connection') mockConnect.mockRejectedValueOnce(failure);
+      else mockFindById.mockRejectedValueOnce(failure);
+      await expect(getCabinById(cabinId)).rejects.toBe(failure);
+    }
+  );
 
   test('server detail avoids database access for an empty ID', async () => {
     expect(await getCabinById('')).toBeNull();

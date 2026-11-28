@@ -25,7 +25,8 @@ export const getCabinById = cache(
       return serializeCabinDetail(doc);
     } catch (error) {
       logger.error('getCabinById: failed', error, { cabinId: input.data });
-      return null;
+      // Only absent or inactive records are 404s; outages must remain errors.
+      throw error;
     }
   }
 );

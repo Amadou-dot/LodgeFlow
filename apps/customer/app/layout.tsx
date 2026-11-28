@@ -21,13 +21,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/logo.svg',
   },
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: '/',
     siteName: siteConfig.name,
     title: siteConfig.name,
     description: siteConfig.description,
@@ -40,11 +36,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
   },
   robots: {
-    index: true,
-    follow: true,
     googleBot: {
-      index: true,
-      follow: true,
       'max-image-preview': 'large',
       'max-snippet': -1,
       'max-video-preview': -1,

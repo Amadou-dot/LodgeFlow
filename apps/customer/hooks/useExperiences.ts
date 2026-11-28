@@ -31,8 +31,12 @@ const fetchExperiences = async (
   });
 };
 
-export function useExperiences(params: ExperienceQueryParams = {}) {
+export function useExperiences(
+  params: ExperienceQueryParams = {},
+  { initialData }: { initialData?: Experience[] } = {}
+) {
   return useQuery({
+    initialData,
     queryKey: ['experiences', params],
     queryFn: () => fetchExperiences(params),
     staleTime: 1000 * 60 * 5, // 5 minutes
