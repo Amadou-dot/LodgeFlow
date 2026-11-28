@@ -276,15 +276,13 @@ export const cabinData = [
   },
   {
     name: 'Meadow Brook Cottage',
-    image:
-      'https://images.unsplash.com/photo-1679480554968-b76deb287584?w=400&h=300&auto=format&fit=crop',
-    images: [],
+    ...cabinGalleryImages('Meadow Brook Cottage'),
     status: 'active' as const,
     capacity: 3,
     price: 195,
     discount: 10,
     description:
-      'Charming cottage surrounded by wildflower meadows and peaceful brooks.',
+      'The blue front door opens onto a stone path just a few steps from the brook. Inside, a double bedroom and a striped daybed in the sitting room make space for three. Have breakfast at the pine kitchen table, then settle into the blue reading chair by the garden window. On a warm afternoon, follow the water through the wildflowers or stretch out in the hammock under the apple trees.',
     amenities: [
       'WiFi',
       'Country Kitchen',
