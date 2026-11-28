@@ -231,17 +231,13 @@ export const cabinData = [
   },
   {
     name: 'Desert Rose Villa',
-    image:
-      'https://images.unsplash.com/photo-1561026555-13539e82532f?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Desert Rose Villa'),
     status: 'active' as const,
     capacity: 6,
     price: 380,
     discount: 0,
     description:
-      'Modern villa with desert landscape views and sustainable design features.',
+      'Follow the agave-lined path to a solar-powered villa at the foot of the desert mountains. Glass doors connect the living room to a shaded terrace, and the full kitchen opens onto a dining table for six. Roll out a mat in the yoga studio as the morning light crosses the floor, or rinse off in the open-air shower behind rose-colored walls. Three bedrooms and two bathrooms give everyone space to settle in.',
     amenities: [
       'WiFi',
       'Full Kitchen',
@@ -249,6 +245,7 @@ export const cabinData = [
       'Desert Garden',
       'Outdoor Shower',
       'Yoga Studio',
+      'Shaded Terrace',
     ],
     bedrooms: 3,
     bathrooms: 2,

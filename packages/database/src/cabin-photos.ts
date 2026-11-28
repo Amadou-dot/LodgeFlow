@@ -1,9 +1,11 @@
+import { desertRoseVillaPhotos } from './cabin-galleries/desert-rose-villa';
 import { lakesideHavenPhotos } from './cabin-galleries/lakeside-haven';
 import { pineValleyCabinPhotos } from './cabin-galleries/pine-valley-cabin';
 import { riversideEscapePhotos } from './cabin-galleries/riverside-escape';
 import { sunsetRetreatPhotos } from './cabin-galleries/sunset-retreat';
 
 export const cabinPhotoGalleries = {
+  'Desert Rose Villa': desertRoseVillaPhotos,
   'Lakeside Haven': lakesideHavenPhotos,
   'Pine Valley Cabin': pineValleyCabinPhotos,
   'Riverside Escape': riversideEscapePhotos,
