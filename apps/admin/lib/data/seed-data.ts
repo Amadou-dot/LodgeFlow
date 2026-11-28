@@ -153,17 +153,13 @@ export const cabinData = [
   },
   {
     name: 'Riverside Escape',
-    image:
-      'https://images.unsplash.com/photo-1580856942656-d4416b6e5c2e?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Riverside Escape'),
     status: 'active' as const,
     capacity: 4,
     price: 280,
     discount: 0,
     description:
-      'Tranquil cabin beside a babbling brook with natural soundscapes and fishing access.',
+      'A shallow stream runs past the green-framed windows of this cedar-shingled cottage. Take a fishing rod down to the mossy bank, or settle into a wicker chair on the screened porch and listen to the current. A table for four sits beside the kitchen, and a river-stone fireplace warms the sitting room. The creek-facing queen room and a second bedroom with twin beds share one bathroom.',
     amenities: [
       'WiFi',
       'Kitchen',
@@ -171,6 +167,8 @@ export const cabinData = [
       'Fishing Gear',
       'Meditation Area',
       'Nature Sounds',
+      'Screened Porch',
+      'Fireplace',
     ],
     bedrooms: 2,
     bathrooms: 1,
