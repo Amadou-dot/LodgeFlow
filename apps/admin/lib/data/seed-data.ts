@@ -252,17 +252,13 @@ export const cabinData = [
   },
   {
     name: 'Glacier View Chalet',
-    image:
-      'https://images.unsplash.com/photo-1654949935785-29cbc0090492?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Glacier View Chalet'),
     status: 'active' as const,
     capacity: 7,
     price: 520,
     discount: 40,
     description:
-      'Premium chalet with glacier views and luxury amenities for discerning guests.',
+      'A long timber balcony runs along this three-bedroom chalet, with the glacier in view across the valley and summer wildflowers below. Take your coffee outside, then settle by the stone fireplace as the light slips off the ice. The kitchen has room to cook for seven, and the wine cellar has a quiet spot to sit with a glass. Heated floors and a deep soaking tub take the chill off an alpine evening.',
     amenities: [
       'WiFi',
       'Gourmet Kitchen',

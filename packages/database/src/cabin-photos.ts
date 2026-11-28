@@ -1,5 +1,6 @@
 import { desertRoseVillaPhotos } from './cabin-galleries/desert-rose-villa';
 import { forestEdgeCabinPhotos } from './cabin-galleries/forest-edge-cabin';
+import { glacierViewChaletPhotos } from './cabin-galleries/glacier-view-chalet';
 import { lakesideHavenPhotos } from './cabin-galleries/lakeside-haven';
 import { pineValleyCabinPhotos } from './cabin-galleries/pine-valley-cabin';
 import { riversideEscapePhotos } from './cabin-galleries/riverside-escape';
@@ -9,6 +10,7 @@ import { treetopHideawayPhotos } from './cabin-galleries/treetop-hideaway';
 export const cabinPhotoGalleries = {
   'Desert Rose Villa': desertRoseVillaPhotos,
   'Forest Edge Cabin': forestEdgeCabinPhotos,
+  'Glacier View Chalet': glacierViewChaletPhotos,
   'Lakeside Haven': lakesideHavenPhotos,
   'Pine Valley Cabin': pineValleyCabinPhotos,
   'Riverside Escape': riversideEscapePhotos,
