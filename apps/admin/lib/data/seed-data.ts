@@ -354,17 +354,13 @@ export const cabinData = [
   },
   {
     name: 'Zen Garden Retreat',
-    image:
-      'https://images.unsplash.com/photo-1668315808815-538f8f72fee9?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600566753151-384129cf4e3e?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Zen Garden Retreat'),
     status: 'active' as const,
     capacity: 4,
     price: 340,
     discount: 25,
     description:
-      'Peaceful retreat with Japanese-inspired design and meditation gardens.',
+      'Slide open the cedar-framed doors and take your tea out to the narrow wooden veranda. Koi swim among the mossy stones below, and a Japanese maple shades a patch of raked gravel. Inside, the main bedroom has a low double bed, while the second has two singles. Unroll a yoga mat in the tatami meditation room, or draw a warm bath in the deep wooden soaking tub.',
     amenities: [
       'WiFi',
       'Tea Kitchen',

@@ -9,6 +9,7 @@ import { pineValleyCabinPhotos } from './cabin-galleries/pine-valley-cabin';
 import { riversideEscapePhotos } from './cabin-galleries/riverside-escape';
 import { sunsetRetreatPhotos } from './cabin-galleries/sunset-retreat';
 import { treetopHideawayPhotos } from './cabin-galleries/treetop-hideaway';
+import { zenGardenRetreatPhotos } from './cabin-galleries/zen-garden-retreat';
 
 export const cabinPhotoGalleries = {
   'Alpine Sanctuary': alpineSanctuaryPhotos,
@@ -22,6 +23,7 @@ export const cabinPhotoGalleries = {
   'Riverside Escape': riversideEscapePhotos,
   'Sunset Retreat': sunsetRetreatPhotos,
   'Treetop Hideaway': treetopHideawayPhotos,
+  'Zen Garden Retreat': zenGardenRetreatPhotos,
 } as const;
 
 const photosBySrc = new Map<string, { src: string; alt: string }>();
