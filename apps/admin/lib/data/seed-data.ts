@@ -173,18 +173,13 @@ export const cabinData = [
   },
   {
     name: 'Wilderness Estate',
-    image:
-      'https://images.unsplash.com/photo-1693949231048-5518d112e142?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=300&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Wilderness Estate'),
     status: 'active' as const,
     capacity: 10,
     price: 600,
     discount: 75,
     description:
-      'Luxurious estate cabin perfect for large groups and special celebrations.',
+      'A flagstone path winds through ferns to this green-shingled forest lodge. Have coffee on the covered terrace, then gather in the great room around a river-stone fireplace. The gourmet kitchen opens onto a long oak dining table, with a private chef available for group dinners. Five bedrooms sleep ten. There’s a pool table, a home theater and a separate meeting room with windows looking into the trees.',
     amenities: [
       'WiFi',
       'Gourmet Kitchen',
