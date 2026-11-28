@@ -300,17 +300,13 @@ export const cabinData = [
   },
   {
     name: 'Canyon Edge Lodge',
-    image:
-      'https://images.unsplash.com/photo-1597256817041-0c75c0633658?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Canyon Edge Lodge'),
     status: 'inactive' as const,
     capacity: 5,
     price: 420,
     discount: 35,
     description:
-      'Dramatic lodge perched on canyon edge with spectacular views and adventure access.',
+      'Watch the bands of red sandstone change color from the covered porch of this timber lodge. The same canyon fills the living room windows, with a stone hearth close enough to warm your feet. Gather around the kitchen table before a day on the trails. A queen bedroom and a twin-over-full bunk room sleep five, with two bathrooms and a mudroom for ropes, helmets and dusty boots.',
     amenities: [
       'WiFi',
       'Kitchen',
@@ -319,6 +315,8 @@ export const cabinData = [
       'Rappelling Gear',
       'Safety Equipment',
       'Guide Services',
+      'Covered Porch',
+      'Fireplace',
     ],
     bedrooms: 2,
     bathrooms: 2,
