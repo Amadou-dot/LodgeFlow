@@ -8,6 +8,7 @@ import { meadowBrookCottagePhotos } from './cabin-galleries/meadow-brook-cottage
 import { mountainViewLodgePhotos } from './cabin-galleries/mountain-view-lodge';
 import { pineValleyCabinPhotos } from './cabin-galleries/pine-valley-cabin';
 import { riversideEscapePhotos } from './cabin-galleries/riverside-escape';
+import { stoneheartManorPhotos } from './cabin-galleries/stoneheart-manor';
 import { sunsetRetreatPhotos } from './cabin-galleries/sunset-retreat';
 import { treetopHideawayPhotos } from './cabin-galleries/treetop-hideaway';
 import { wildernessEstatePhotos } from './cabin-galleries/wilderness-estate';
@@ -24,6 +25,7 @@ export const cabinPhotoGalleries = {
   'Mountain View Lodge': mountainViewLodgePhotos,
   'Pine Valley Cabin': pineValleyCabinPhotos,
   'Riverside Escape': riversideEscapePhotos,
+  'Stoneheart Manor': stoneheartManorPhotos,
   'Sunset Retreat': sunsetRetreatPhotos,
   'Treetop Hideaway': treetopHideawayPhotos,
   'Wilderness Estate': wildernessEstatePhotos,

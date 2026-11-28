@@ -316,18 +316,13 @@ export const cabinData = [
   },
   {
     name: 'Stoneheart Manor',
-    image:
-      'https://images.unsplash.com/photo-1739511534497-92b2fc4df100?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1600585154363-67eb9e2e2099?w=400&h=300&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Stoneheart Manor'),
     status: 'active' as const,
     capacity: 12,
     price: 750,
     discount: 100,
     description:
-      'Historic stone manor with antique furnishings and old-world charm for large gatherings.',
+      'Roses frame the oak door of this six-bedroom stone manor. Take a book to the library window, linger over supper in the dining room or try a few dance steps on the ballroom parquet. Upstairs, you can choose a carved four-poster bed or a pair of singles under the eaves. The commercial kitchen and wine cellar serve a full house, with butler service and event planning available for special occasions.',
     amenities: [
       'WiFi',
       'Commercial Kitchen',
