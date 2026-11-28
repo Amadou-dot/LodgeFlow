@@ -82,21 +82,20 @@ export const cabinData = [
   },
   {
     name: 'Forest Edge Cabin',
-    image:
-      'https://images.unsplash.com/photo-1725138187136-790dc99ed924?w=400&h=300&auto=format&fit=crop',
-    images: [],
+    ...cabinGalleryImages('Forest Edge Cabin'),
     status: 'active' as const,
     capacity: 2,
     price: 180,
     discount: 0,
     description:
-      'Intimate cabin on the forest edge, perfect for romantic getaways.',
+      'Red shutters and a stone doorstep mark the way into this shingled cottage for two. A moss-green sofa sits by the fieldstone fireplace, and the kitchenette has a breakfast table by the window. The queen bedroom looks out into the trees. Watch the bird feeder from the wooden armchair, or bring your coffee out to the garden table under the birches.',
     amenities: [
       'WiFi',
       'Kitchenette',
       'Fireplace',
       'Forest View',
       'Bird Watching',
+      'Outdoor Seating',
     ],
     bedrooms: 1,
     bathrooms: 1,
