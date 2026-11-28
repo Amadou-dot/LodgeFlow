@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { lakesideHavenPhotos } from '@lodgeflow/database/cabin-photos';
+import { cabinPhotoGalleries } from '@lodgeflow/database/cabin-photos';
 import CabinGallery from '@/components/CabinGallery';
 
 it('keeps the fullscreen viewer inside the gallery when navigating from the dock back to the cover', () => {
+  const lakesideHavenPhotos = cabinPhotoGalleries['Lakeside Haven'];
   const photos = lakesideHavenPhotos.map(photo => photo.src);
   const cover = lakesideHavenPhotos[0];
   const dock = lakesideHavenPhotos[7];

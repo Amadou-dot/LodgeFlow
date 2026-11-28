@@ -1,22 +1,17 @@
-import { lakesideHavenPhotos } from '@lodgeflow/database/cabin-photos';
+import { cabinGalleryImages } from '@lodgeflow/database/cabin-photos';
 
 export { settingsData } from '@lodgeflow/database/settings-defaults';
 
 export const cabinData = [
   {
     name: 'Pine Valley Cabin',
-    image:
-      'https://images.unsplash.com/photo-1633830902223-727413dfad8f?w=400&h=300&auto=format&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=400&h=300&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&auto=format&fit=crop',
-    ],
+    ...cabinGalleryImages('Pine Valley Cabin'),
     status: 'active' as const,
     capacity: 4,
     price: 250,
     discount: 25,
     description:
-      'A cozy cabin nestled in the pine valley with stunning mountain views and modern amenities.',
+      'Pull up a chair on the long front porch and watch the light move across the mountain ridge. The turquoise door opens into a log cabin with a fieldstone fireplace and a pine kitchen table for four. The queen bedroom looks out over the valley, and the second room has two twin beds. Outside, grill supper by the picnic table or take an evening soak in the cedar hot tub.',
     amenities: [
       'WiFi',
       'Kitchen',
@@ -24,6 +19,7 @@ export const cabinData = [
       'Hot Tub',
       'Mountain View',
       'BBQ Grill',
+      'Covered Porch',
     ],
     bedrooms: 2,
     bathrooms: 1,
@@ -33,8 +29,7 @@ export const cabinData = [
   },
   {
     name: 'Lakeside Haven',
-    image: lakesideHavenPhotos[0].src,
-    images: lakesideHavenPhotos.slice(1).map(photo => photo.src),
+    ...cabinGalleryImages('Lakeside Haven'),
     status: 'active' as const,
     capacity: 6,
     price: 350,

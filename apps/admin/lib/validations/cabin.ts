@@ -1,7 +1,7 @@
 import { priceAmountSchema } from './money';
 import { objectRequestSchema } from './object-request';
 import { CABIN_STATUSES } from '@/lib/config';
-import { lakesideHavenPhotos } from '@lodgeflow/database/cabin-photos';
+import { bundledCabinPhotoPaths } from '@lodgeflow/database/cabin-photos';
 import { z } from 'zod';
 
 /**
@@ -10,11 +10,7 @@ import { z } from 'zod';
 const cabinStatusSchema = z.enum(CABIN_STATUSES);
 const imageUrl = z
   .string()
-  .pipe(
-    z
-      .url('Invalid image URL')
-      .or(z.literal(lakesideHavenPhotos.map(photo => photo.src)))
-  );
+  .pipe(z.url('Invalid image URL').or(z.literal(bundledCabinPhotoPaths)));
 
 /**
  * Description length bounds — kept as constants so create/update can't
