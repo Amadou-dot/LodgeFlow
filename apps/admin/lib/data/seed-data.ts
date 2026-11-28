@@ -127,15 +127,13 @@ export const cabinData = [
   },
   {
     name: 'Alpine Sanctuary',
-    image:
-      'https://images.unsplash.com/photo-1660553926576-b81fd7648618?w=400&h=300&auto=format&fit=crop',
-    images: [],
+    ...cabinGalleryImages('Alpine Sanctuary'),
     status: 'maintenance' as const,
     capacity: 3,
     price: 220,
     discount: 15,
     description:
-      'Secluded alpine cabin with rustic charm and breathtaking wilderness views.',
+      'A footpath winds through the larches to this gray-shingled cabin beneath a curving alpine ridge. A plaid quilt covers the bed in the separate bedroom, and a daybed beside the wood stove makes room for a third guest. Share breakfast at the little pine table, then follow the meadow trail past granite boulders where marmots sometimes bask. Two wooden chairs on the deck face the peaks for stargazing after dark.',
     amenities: [
       'WiFi',
       'Kitchenette',
@@ -143,6 +141,8 @@ export const cabinData = [
       'Hiking Trails',
       'Wildlife Viewing',
       'Stargazing Deck',
+      'Window Daybed',
+      'Walk-in Shower',
     ],
     bedrooms: 1,
     bathrooms: 1,

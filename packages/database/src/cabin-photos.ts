@@ -1,3 +1,4 @@
+import { alpineSanctuaryPhotos } from './cabin-galleries/alpine-sanctuary';
 import { canyonEdgeLodgePhotos } from './cabin-galleries/canyon-edge-lodge';
 import { desertRoseVillaPhotos } from './cabin-galleries/desert-rose-villa';
 import { forestEdgeCabinPhotos } from './cabin-galleries/forest-edge-cabin';
@@ -10,6 +11,7 @@ import { sunsetRetreatPhotos } from './cabin-galleries/sunset-retreat';
 import { treetopHideawayPhotos } from './cabin-galleries/treetop-hideaway';
 
 export const cabinPhotoGalleries = {
+  'Alpine Sanctuary': alpineSanctuaryPhotos,
   'Canyon Edge Lodge': canyonEdgeLodgePhotos,
   'Desert Rose Villa': desertRoseVillaPhotos,
   'Forest Edge Cabin': forestEdgeCabinPhotos,
