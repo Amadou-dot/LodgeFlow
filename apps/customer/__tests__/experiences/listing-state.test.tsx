@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import ExperiencesPage from '@/app/experiences/page';
+import ExperiencesPage from '@/components/ExperiencesPageClient';
 jest.mock('@/hooks/useExperiences', () => ({
   useExperiences: () => ({
     data: [],
@@ -8,7 +8,7 @@ jest.mock('@/hooks/useExperiences', () => ({
   }),
 }));
 test('a failed experiences request does not render a successful empty catalog', () => {
-  render(<ExperiencesPage />);
+  render(<ExperiencesPage initialExperiences={[]} />);
   expect(
     screen.getByText(/Error loading experiences: offline/)
   ).toBeInTheDocument();

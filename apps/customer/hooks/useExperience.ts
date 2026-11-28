@@ -15,8 +15,12 @@ const fetchExperience = async (experienceId: string): Promise<Experience> => {
   });
 };
 
-export function useExperience(experienceId: string) {
+export function useExperience(
+  experienceId: string,
+  { initialData }: { initialData?: Experience } = {}
+) {
   return useQuery({
+    initialData,
     queryKey: ['experience', experienceId],
     queryFn: () => fetchExperience(experienceId),
     enabled: !!experienceId, // Only run query if experienceId exists

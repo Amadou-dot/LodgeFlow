@@ -7,6 +7,7 @@ import { Phone, Mail } from 'lucide-react';
 import { connection } from 'next/server';
 
 import { siteConfig } from '@/config/site';
+import { createPageMetadata } from '@/lib/seo/metadata';
 import { siteToLodgingBusiness } from '@/lib/seo/jsonLd';
 import { connectDB, Cabin } from '@lodgeflow/database';
 import { logger } from '@lodgeflow/database/logger';
@@ -16,6 +17,15 @@ import {
   FeatureGrid,
   CallToActionSection,
 } from '@/components/ui';
+
+export const metadata = {
+  ...createPageMetadata({
+    title: siteConfig.name,
+    description: siteConfig.description,
+    path: '/',
+  }),
+  title: { absolute: siteConfig.name },
+};
 
 async function getFeaturedCabins() {
   try {

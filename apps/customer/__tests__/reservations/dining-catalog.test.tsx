@@ -1,6 +1,6 @@
 import { render, screen } from '@/__tests__/shared/test-utils';
-import DiningPage from '@/app/dining/page';
-import DiningDetailPage from '@/app/dining/[id]/page';
+import DiningPage from '@/components/DiningPageClient';
+import DiningDetailPage from '@/components/DiningDetailClient';
 import type { Dining } from '@/types';
 const mockDining = jest.fn();
 const mockDiningItem = jest.fn();
@@ -20,13 +20,14 @@ const dish: Dining = {
   image: 'https://example.test/soup.jpg',
 };
 test('keeps default name ordering, meal grouping and the first menu reservation link', () => {
+  const dishes = [
+    dish,
+    { ...dish, _id: '507f1f77bcf86cd799439012', name: 'Apple Soup' },
+  ];
   mockDining.mockReturnValue({
-    data: [
-      dish,
-      { ...dish, _id: '507f1f77bcf86cd799439012', name: 'Apple Soup' },
-    ],
+    data: dishes,
   });
-  render(<DiningPage />);
+  render(<DiningPage initialDining={dishes} />);
   const names = screen
     .getAllByRole('heading', { level: 5 })
     .map(item => item.textContent);
@@ -35,7 +36,10 @@ test('keeps default name ordering, meal grouping and the first menu reservation 
     'href',
     '/dining/507f1f77bcf86cd799439012/reserve'
   );
-  expect(mockDining).toHaveBeenCalledWith({ search: undefined });
+  expect(mockDining).toHaveBeenCalledWith(
+    { search: undefined },
+    { initialData: dishes }
+  );
 });
 
 jest.mock('@/hooks/useDiningItem', () => ({
@@ -49,7 +53,7 @@ test('detail renders only the usable images in a legacy gallery', async () => {
       gallery: ['', null, '/images/vegetables.jpg'],
     },
   });
-  render(<DiningDetailPage params={Promise.resolve({ id: dish._id })} />);
+  render(<DiningDetailPage initialDining={dish} />);
   expect(await screen.findByText('Zucchini Soup')).toBeInTheDocument();
   expect(screen.getAllByAltText(/Zucchini Soup gallery/)).toHaveLength(1);
 });

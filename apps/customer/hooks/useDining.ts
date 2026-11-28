@@ -34,8 +34,12 @@ const fetchDining = async (
   });
 };
 
-export function useDining(params: DiningQueryParams = {}) {
+export function useDining(
+  params: DiningQueryParams = {},
+  { initialData }: { initialData?: Dining[] } = {}
+) {
   return useQuery({
+    initialData,
     queryKey: ['dining', params],
     queryFn: () => fetchDining(params),
     staleTime: 1000 * 60 * 5, // 5 minutes

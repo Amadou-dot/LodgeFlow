@@ -7,7 +7,15 @@ import {
   ValuesGrid,
 } from '@/components/ui';
 import { siteConfig } from '@/config/site';
+import { createPageMetadata } from '@/lib/seo/metadata';
 import { Sprout, Sparkles, Mountain, Handshake } from 'lucide-react';
+
+export const metadata = createPageMetadata({
+  title: 'About',
+  description:
+    'Learn about LodgeFlow, our approach to hospitality, and our commitment to luxury stays in nature.',
+  path: '/about',
+});
 
 export default function AboutPage() {
   const cabinCount = 12;

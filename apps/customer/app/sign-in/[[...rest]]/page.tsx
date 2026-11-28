@@ -1,4 +1,7 @@
 import { SignIn } from '@clerk/nextjs';
+import { noIndexMetadata } from '@/lib/seo/metadata';
+
+export const metadata = noIndexMetadata;
 
 export default function SignInPage() {
   return (

@@ -9,8 +9,12 @@ import type { Dining } from '@/types';
 /**
  * Hook to fetch a single dining item by ID
  */
-export const useDiningItem = (diningId: string) => {
+export const useDiningItem = (
+  diningId: string,
+  { initialData }: { initialData?: Dining } = {}
+) => {
   return useQuery({
+    initialData,
     enabled: !!diningId,
     queryFn: async (): Promise<Dining> => {
       const response = await fetch(`/api/dining/${diningId}`);
